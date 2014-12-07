@@ -1,66 +1,47 @@
 package binauld.pierre.musictag;
 
 import android.app.Activity;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.tag.FieldKey;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import binauld.pierre.musictag.file.SongBrowser;
-import binauld.pierre.musictag.file.SongLoader;
+import binauld.pierre.musictag.file.LibraryItemAdapter;
+import binauld.pierre.musictag.file.LibraryItemComparator;
+import binauld.pierre.musictag.file.LibraryItemFilter;
+import binauld.pierre.musictag.file.LibraryItemLoader;
+import binauld.pierre.musictag.file.factory.LibraryItemFactory;
+import binauld.pierre.musictag.file.factory.Mp3FileFactory;
 
 
 public class MainActivity extends Activity {
 
-    private ListView songList;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        List<Map<String, String>> songs = new ArrayList<Map<String, String>>();
+        listView = (ListView) findViewById(R.id.library_item_list);
 
-//        SongBrowser browser = new SongBrowser();
-//        for (AudioFile song : browser.listSongs(Environment.getExternalStorageDirectory().toString() + "/Music")) {
-////            Log.d("ok", song.getTag().getFirst(FieldKey.TITLE));
-//            HashMap<String, String> s = new HashMap<String, String>();
-//            s.put("title", song.getTag().getFirst(FieldKey.TITLE));
-//            s.put("artist", song.getTag().getFirst(FieldKey.ARTIST));
-//            songs.add(s);
-//        }
+//        SimpleAdapter adapter = new SimpleAdapter(
+//                this.getBaseContext(),
+//                songs,
+//                android.R.layout.simple_list_item_2,
+//                new String[]{FieldKey.TITLE.name(), FieldKey.ARTIST.name()},
+//                new int[]{android.R.id.text1, android.R.id.text2}
+//        );
 
-        songList = (ListView) findViewById(R.id.song_list);
+        LibraryItemLoader loader = buildAndSetLoaderAndAdapter();
 
-        SimpleAdapter songAdapter = new SimpleAdapter(
-                this.getBaseContext(),
-                songs,
-                android.R.layout.simple_list_item_2,
-                new String[]{"title", "artist"},
-                new int[]{android.R.id.text1, android.R.id.text2}
-        );
-
-        songList.setAdapter(songAdapter);
-
-        SongLoader loader = new SongLoader(songAdapter, songs);
-        Log.d(this.getClass().toString(), "coucou");
-        loader.execute(new File(Environment.getExternalStorageDirectory().toString() + "/Music").listFiles());
+        loader.execute(new File(Environment.getExternalStorageDirectory().toString() + "/Music"));
     }
 
 
@@ -84,5 +65,24 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private LibraryItemFactory buildLibraryItemFactory() {
+        LibraryItemFactory factory = new LibraryItemFactory();
+
+        factory.put(new Mp3FileFactory());
+
+        return factory;
+    }
+
+    private LibraryItemLoader buildAndSetLoaderAndAdapter() {
+        LibraryItemAdapter adapter = new LibraryItemAdapter();
+
+        LibraryItemFactory factory = buildLibraryItemFactory();
+        LibraryItemComparator sorter = new LibraryItemComparator();
+        LibraryItemFilter filter = new LibraryItemFilter(factory.getSupportedAudioFiles());
+
+        listView.setAdapter(adapter);
+        return new LibraryItemLoader(adapter, factory, sorter, filter);
     }
 }

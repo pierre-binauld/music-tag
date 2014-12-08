@@ -11,6 +11,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import binauld.pierre.musictag.file.LibraryItemAdapter;
 import binauld.pierre.musictag.file.LibraryItemComparator;
@@ -28,6 +30,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
 
         listView = (ListView) findViewById(R.id.library_item_list);
 
@@ -76,7 +80,7 @@ public class MainActivity extends Activity {
     }
 
     private LibraryItemLoader buildAndSetLoaderAndAdapter() {
-        LibraryItemAdapter adapter = new LibraryItemAdapter();
+        LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext());
 
         LibraryItemFactory factory = buildLibraryItemFactory();
         LibraryItemComparator sorter = new LibraryItemComparator();

@@ -13,5 +13,5 @@ public interface AudioFileFactory {
 
     String getFormat();
 
-    AudioFile build(File file) throws ReadOnlyFileException, TagException, InvalidAudioFrameException, IOException;
+    AudioFile build(File file) throws IOException;
 }

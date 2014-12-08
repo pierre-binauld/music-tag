@@ -22,7 +22,7 @@ public class LibraryItemFactory {
 
     private Map<String, AudioFileFactory> factories = new HashMap<String, AudioFileFactory>();
 
-    public LibraryItem build(File file) throws UnsupportedFileException, ReadOnlyFileException, TagException, InvalidAudioFrameException, IOException {
+    public LibraryItem build(File file) throws IOException {
         if(file.isDirectory()) {
             return new NodeItem(file);
         } else {

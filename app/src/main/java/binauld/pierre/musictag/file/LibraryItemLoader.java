@@ -23,10 +23,10 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
     private BaseAdapter adapter;
     private LibraryItemFilter filter;
     private List<LibraryItem> items;
-    private Comparator comparator;
+    private Comparator<LibraryItem> comparator;
     private LibraryItemFactory libraryItemFactory;
 
-    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, Comparator comparator, LibraryItemFilter filter) {
+    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, Comparator<LibraryItem> comparator, LibraryItemFilter filter) {
         this.adapter = adapter;
         this.filter = filter;
         this.items = adapter.getItems();
@@ -48,17 +48,11 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
                     LibraryItem item = libraryItemFactory.build(files[i]);
                     items.add(item);
                     step++;
-                } catch (ReadOnlyFileException e) {
-                    Log.w(this.getClass().toString(), e.getMessage(), e);
-                } catch (TagException e) {
-                    Log.w(this.getClass().toString(), e.getMessage(), e);
-                } catch (InvalidAudioFrameException e) {
-                    Log.w(this.getClass().toString(), e.getMessage(), e);
                 } catch (IOException e) {
                     Log.w(this.getClass().toString(), e.getMessage(), e);
                 }
 
-                if (step >= UPDATE_STEP) {
+                if (step >= UPDATE_STEP || i == files.length - 1) {
                     Collections.sort(items, comparator);
                     publishProgress();
                     step = 0;

@@ -20,7 +20,15 @@ public class Mp3FileFactory implements AudioFileFactory {
     }
 
     @Override
-    public AudioFile build(File file) throws ReadOnlyFileException, TagException, InvalidAudioFrameException, IOException {
-        return new MP3File(file);
+    public AudioFile build(File file) throws IOException {
+        try {
+            return new MP3File(file);
+        } catch (TagException e) {
+            throw new IOException(e.getMessage(), e);
+        } catch (ReadOnlyFileException e) {
+            throw new IOException(e.getMessage(), e);
+        } catch (InvalidAudioFrameException e) {
+            throw new IOException(e.getMessage(), e);
+        }
     }
 }

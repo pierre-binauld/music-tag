@@ -1,37 +1,41 @@
-package binauld.pierre.musictag.file;
+package binauld.pierre.musictag.io;
 
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.BaseAdapter;
 
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import binauld.pierre.musictag.file.factory.LibraryItemFactory;
+import binauld.pierre.musictag.adapter.LibraryItem;
+import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.factory.LibraryItemFactory;
 
+/**
+ * Load all the audio files and directories from a folder to an adapter.
+ * This task is executed asynchronously when execute is called.
+ */
 public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
 
     public static int UPDATE_STEP = 5;
 
     private BaseAdapter adapter;
-    private LibraryItemFilter filter;
-    private List<LibraryItem> items;
+    private FileFilter filter;
     private Comparator<LibraryItem> comparator;
-    private LibraryItemFactory libraryItemFactory;
+    private LibraryItemFactory factory;
 
-    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, Comparator<LibraryItem> comparator, LibraryItemFilter filter) {
+    private List<LibraryItem> items;
+
+    public LibraryItemLoader(LibraryItemAdapter adapter, Comparator<LibraryItem> comparator, FileFilter filter) {
         this.adapter = adapter;
-        this.filter = filter;
-        this.items = adapter.getItems();
         this.comparator = comparator;
-        this.libraryItemFactory = libraryItemFactory;
+        this.filter = filter;
+        this.factory = new LibraryItemFactory();
+        this.items = adapter.getItems();
     }
 
     @Override
@@ -39,17 +43,17 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
         int count = 0;
         int step = 0;
 
-        for (int f = 0; f < values.length; f++) {
-            File[] files = values[f].listFiles(filter);
+        for (File value : values) {
+            File[] files = value.listFiles(filter);
 
             for (int i = 0; i < files.length; i++) {
 
                 try {
-                    LibraryItem item = libraryItemFactory.build(files[i]);
+                    LibraryItem item = factory.build(files[i]);
                     items.add(item);
                     step++;
                 } catch (IOException e) {
-                    Log.w(this.getClass().toString(), e.getMessage(), e);
+                    Log.w(this.getClass().toString(), e.getMessage());
                 }
 
                 if (step >= UPDATE_STEP || i == files.length - 1) {
@@ -66,7 +70,6 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
 
     @Override
     protected void onProgressUpdate(Void... values) {
-
         adapter.notifyDataSetChanged();
     }
 

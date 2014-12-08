@@ -8,20 +8,17 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import binauld.pierre.musictag.file.LibraryItemAdapter;
-import binauld.pierre.musictag.file.LibraryItemComparator;
-import binauld.pierre.musictag.file.LibraryItemFilter;
-import binauld.pierre.musictag.file.LibraryItemLoader;
-import binauld.pierre.musictag.file.factory.LibraryItemFactory;
-import binauld.pierre.musictag.file.factory.Mp3FileFactory;
+import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.helper.LoaderHelper;
+import binauld.pierre.musictag.io.LibraryItemLoader;
 
-
+/**
+ * Main activity of the app.
+ * Display a list of directories and audio files the user can modify.
+ */
 public class MainActivity extends Activity {
 
     private ListView listView;
@@ -31,21 +28,16 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Switch off JAudioTager log
         Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
 
         listView = (ListView) findViewById(R.id.library_item_list);
 
-//        SimpleAdapter adapter = new SimpleAdapter(
-//                this.getBaseContext(),
-//                songs,
-//                android.R.layout.simple_list_item_2,
-//                new String[]{FieldKey.TITLE.name(), FieldKey.ARTIST.name()},
-//                new int[]{android.R.id.text1, android.R.id.text2}
-//        );
+        LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext());
+        LibraryItemLoader loader = LoaderHelper.buildAlphabeticalLoader(adapter);
 
-        LibraryItemLoader loader = buildAndSetLoaderAndAdapter();
-
-        loader.execute(new File(Environment.getExternalStorageDirectory().toString() + "/Music"));
+        listView.setAdapter(adapter);
+        loader.execute(new File(Environment.getExternalStorageDirectory().toString() + "/Music/test"));
     }
 
 
@@ -71,22 +63,4 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private LibraryItemFactory buildLibraryItemFactory() {
-        LibraryItemFactory factory = new LibraryItemFactory();
-
-        factory.put(new Mp3FileFactory());
-
-        return factory;
-    }
-
-    private LibraryItemLoader buildAndSetLoaderAndAdapter() {
-        LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext());
-
-        LibraryItemFactory factory = buildLibraryItemFactory();
-        LibraryItemComparator sorter = new LibraryItemComparator();
-        LibraryItemFilter filter = new LibraryItemFilter(factory.getSupportedAudioFiles());
-
-        listView.setAdapter(adapter);
-        return new LibraryItemLoader(adapter, factory, sorter, filter);
-    }
 }

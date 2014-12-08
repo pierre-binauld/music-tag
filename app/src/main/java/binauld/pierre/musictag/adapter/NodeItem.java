@@ -1,11 +1,14 @@
-package binauld.pierre.musictag.file;
+package binauld.pierre.musictag.adapter;
 
 
 import android.graphics.Bitmap;
 
 import java.io.File;
 
-public class NodeItem implements LibraryItem{
+/**
+ * Represent a folder in a library.
+ */
+public class NodeItem implements LibraryItem {
 
     private File file;
 
@@ -31,13 +34,5 @@ public class NodeItem implements LibraryItem{
     @Override
     public Bitmap getThumbnail() {
         return null;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
     }
 }

@@ -1,20 +1,25 @@
-package binauld.pierre.musictag.file;
+package binauld.pierre.musictag.adapter;
 
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.datatype.Artwork;
 
-public class SongItem implements LibraryItem {
+import binauld.pierre.musictag.helper.ArtworkHelper;
+
+/**
+ * Represent an audio file in a library.
+ */
+public class AudioItem implements LibraryItem {
 
     private AudioFile song;
+    private Bitmap thumbnail;
 
-    public SongItem(AudioFile song) {
+    public AudioItem(AudioFile song) {
         this.song = song;
+        this.thumbnail = ArtworkHelper.buildBitmap(this.song);
     }
 
     @Override
@@ -38,20 +43,6 @@ public class SongItem implements LibraryItem {
 
     @Override
     public Bitmap getThumbnail() {
-        Artwork artwork = song.getTag().getFirstArtwork();
-        if(null == artwork) {
-            return null;
-        } else {
-            byte[] data = artwork.getBinaryData();
-            return BitmapFactory.decodeByteArray(data, 0, data.length);
-        }
-    }
-
-    public AudioFile getSong() {
-        return song;
-    }
-
-    public void setSong(AudioFile song) {
-        this.song = song;
+        return thumbnail;
     }
 }

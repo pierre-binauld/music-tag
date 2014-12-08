@@ -1,8 +1,14 @@
-package binauld.pierre.musictag.file;
+package binauld.pierre.musictag.io;
 
 
 import java.util.Comparator;
 
+import binauld.pierre.musictag.adapter.LibraryItem;
+
+/**
+ * Allows to compare 2 library items.
+ * Sort files in alphabetical order (Folder first).
+ */
 public class LibraryItemComparator implements Comparator<LibraryItem> {
 
     @Override

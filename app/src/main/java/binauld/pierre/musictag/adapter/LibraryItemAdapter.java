@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.file;
+package binauld.pierre.musictag.adapter;
 
 
 import android.content.Context;
@@ -14,6 +14,9 @@ import java.util.List;
 
 import binauld.pierre.musictag.R;
 
+/**
+ * Adapt a list of library item for a list view.
+ */
 public class LibraryItemAdapter extends BaseAdapter {
 
     static class ViewHolder {
@@ -50,12 +53,6 @@ public class LibraryItemAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
 
-    /*
-     * The convertView argument is essentially a "ScrapView" as described is Lucas post
-     * http://lucasr.org/2012/04/05/performance-tips-for-androids-listview/
-     * It will have a non-null value when ListView is asking you recycle the row layout.
-     * So, when convertView is not null, you should simply update its contents instead of inflating a new row layout.
-     */
         if (convertView == null) {
 
             // inflate the layout
@@ -71,7 +68,6 @@ public class LibraryItemAdapter extends BaseAdapter {
             convertView.setTag(viewHolder);
 
         } else {
-            // we've just avoided calling findViewById() on resource everytime
             // just use the viewHolder
             viewHolder = (ViewHolder) convertView.getTag();
         }
@@ -81,7 +77,6 @@ public class LibraryItemAdapter extends BaseAdapter {
 
         // assign values if the object is not null
         if (item != null) {
-            // get the TextView from the ViewHolder and then set the text (item name) and tag (item ID) values
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
             viewHolder.thumbnail.setImageBitmap(item.getThumbnail());
@@ -91,6 +86,10 @@ public class LibraryItemAdapter extends BaseAdapter {
         return convertView;
     }
 
+    /**
+     * Get the data model from the adapter.
+     * @return A list of library items.
+     */
     public List<LibraryItem> getItems() {
         return items;
     }

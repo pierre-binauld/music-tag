@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Switch off JAudioTager log
+        // Switch off JAudioTagger log
         Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
 
         listView = (ListView) findViewById(R.id.library_item_list);

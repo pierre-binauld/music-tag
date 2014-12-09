@@ -25,13 +25,11 @@ public class LibraryItemAdapter extends BaseAdapter {
         ImageView thumbnail;
     }
 
-    private Context context;
     private LayoutInflater inflater;
     private List<LibraryItem> items = new ArrayList<LibraryItem>();
 
     public LibraryItemAdapter(Context baseContext) {
-        this.context = baseContext;
-        this.inflater = LayoutInflater.from(this.context);
+        this.inflater = LayoutInflater.from(baseContext);
     }
 
     @Override

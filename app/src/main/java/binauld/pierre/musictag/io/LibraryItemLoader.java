@@ -21,7 +21,7 @@ import binauld.pierre.musictag.factory.LibraryItemFactory;
  */
 public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
 
-    public static int UPDATE_STEP = 5;
+    private static int UPDATE_STEP = 5;
 
     private BaseAdapter adapter;
     private FileFilter filter;

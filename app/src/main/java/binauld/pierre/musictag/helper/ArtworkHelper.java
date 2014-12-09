@@ -7,7 +7,7 @@ import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.datatype.Artwork;
 
 /**
- * Help to buil artwork from audio file.
+ * Help to build artwork from audio file.
  */
 public class ArtworkHelper {
 

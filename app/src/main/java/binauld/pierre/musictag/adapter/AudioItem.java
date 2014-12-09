@@ -14,8 +14,8 @@ import binauld.pierre.musictag.helper.ArtworkHelper;
  */
 public class AudioItem implements LibraryItem {
 
-    private AudioFile song;
-    private Bitmap thumbnail;
+    private final AudioFile song;
+    private final Bitmap thumbnail;
 
     public AudioItem(AudioFile song) {
         this.song = song;

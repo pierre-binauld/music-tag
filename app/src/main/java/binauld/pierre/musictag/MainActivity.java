@@ -21,8 +21,6 @@ import binauld.pierre.musictag.io.LibraryItemLoader;
  */
 public class MainActivity extends Activity {
 
-    private ListView listView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +29,7 @@ public class MainActivity extends Activity {
         // Switch off JAudioTagger log
         Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
 
-        listView = (ListView) findViewById(R.id.library_item_list);
+        ListView listView = (ListView) findViewById(R.id.library_item_list);
 
         LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext());
         LibraryItemLoader loader = LoaderHelper.buildAlphabeticalLoader(adapter);

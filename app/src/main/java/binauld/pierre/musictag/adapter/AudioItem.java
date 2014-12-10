@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.FieldKey;
 
-import binauld.pierre.musictag.helper.ArtworkHelper;
+import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * Represent an audio file in a library.
@@ -17,9 +17,9 @@ public class AudioItem implements LibraryItem {
     private final AudioFile song;
     private final Bitmap thumbnail;
 
-    public AudioItem(AudioFile song) {
+    public AudioItem(AudioFile song, Bitmap thumbnail) {
         this.song = song;
-        this.thumbnail = ArtworkHelper.buildBitmap(this.song);
+        this.thumbnail = thumbnail;
     }
 
     @Override

@@ -1,6 +1,9 @@
 package binauld.pierre.musictag.factory;
 
 
+import android.graphics.Bitmap;
+
+import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
@@ -13,12 +16,19 @@ import java.io.IOException;
 import binauld.pierre.musictag.adapter.AudioItem;
 import binauld.pierre.musictag.adapter.LibraryItem;
 import binauld.pierre.musictag.adapter.NodeItem;
+import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * Build a library item from a source file.
  * Allows activity to use item as folder or audio file.
  */
 public class LibraryItemFactory {
+
+    private ThumbnailService thumbnailService;
+
+    public LibraryItemFactory(ThumbnailService thumbnailService) {
+        this.thumbnailService = thumbnailService;
+    }
 
     /**
      * Build a library item from a source file.
@@ -28,10 +38,11 @@ public class LibraryItemFactory {
      */
     public LibraryItem build(File file) throws IOException {
         if(file.isDirectory()) {
-            return new NodeItem(file);
+            return new NodeItem(file, thumbnailService.getFolder());
         } else {
             try {
-                return new AudioItem(AudioFileIO.read(file));
+                AudioFile audio = AudioFileIO.read(file);
+                return new AudioItem(audio, thumbnailService.getArtwork(audio));
             } catch (CannotReadException e) {
                 throw new IOException(e);
             } catch (TagException e) {

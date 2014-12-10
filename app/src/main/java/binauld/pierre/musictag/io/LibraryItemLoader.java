@@ -30,11 +30,11 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
 
     private List<LibraryItem> items;
 
-    public LibraryItemLoader(LibraryItemAdapter adapter, Comparator<LibraryItem> comparator, FileFilter filter) {
+    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, Comparator<LibraryItem> comparator, FileFilter filter) {
         this.adapter = adapter;
         this.comparator = comparator;
         this.filter = filter;
-        this.factory = new LibraryItemFactory();
+        this.factory = libraryItemFactory;
         this.items = adapter.getItems();
     }
 

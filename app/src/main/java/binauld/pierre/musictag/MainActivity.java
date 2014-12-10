@@ -1,6 +1,7 @@
 package binauld.pierre.musictag;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Menu;
@@ -14,6 +15,7 @@ import java.util.logging.Logger;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.helper.LoaderHelper;
 import binauld.pierre.musictag.io.LibraryItemLoader;
+import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * Main activity of the app.
@@ -29,10 +31,13 @@ public class MainActivity extends Activity {
         // Switch off JAudioTagger log
         Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
 
+        // Init service(s)
+        ThumbnailService thumbnailService = new ThumbnailService(this, R.drawable.song, R.drawable.folder);
+
         ListView listView = (ListView) findViewById(R.id.library_item_list);
 
         LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext());
-        LibraryItemLoader loader = LoaderHelper.buildAlphabeticalLoader(adapter);
+        LibraryItemLoader loader = LoaderHelper.buildAlphabeticalLoader(adapter, thumbnailService);
 
         listView.setAdapter(adapter);
         loader.execute(new File(Environment.getExternalStorageDirectory().toString() + "/Music/test"));

@@ -2,6 +2,8 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +88,7 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     /**
      * Get the data model from the adapter.
+     *
      * @return A list of library items.
      */
     public List<LibraryItem> getItems() {

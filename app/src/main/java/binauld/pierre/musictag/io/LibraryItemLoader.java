@@ -19,49 +19,40 @@ import binauld.pierre.musictag.factory.LibraryItemFactory;
  * Load all the audio files and directories from a folder to an adapter.
  * This task is executed asynchronously when execute is called.
  */
-public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
+public class LibraryItemLoader extends AsyncTask<File, LibraryItem, Integer> {
 
     private static int UPDATE_STEP = 5;
 
-    private BaseAdapter adapter;
+    private LibraryItemAdapter adapter;
     private FileFilter filter;
-    private Comparator<LibraryItem> comparator;
     private LibraryItemFactory factory;
 
-    private List<LibraryItem> items;
-
-    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, Comparator<LibraryItem> comparator, FileFilter filter) {
+    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter) {
         this.adapter = adapter;
-        this.comparator = comparator;
+//        this.comparator = comparator;
         this.filter = filter;
         this.factory = libraryItemFactory;
-        this.items = adapter.getItems();
     }
 
     @Override
     protected Integer doInBackground(File... values) {
         int count = 0;
-        int step = 0;
 
         for (File value : values) {
             File[] files = value.listFiles(filter);
             if (null == files) {
-                Log.w(this.getClass().toString(), "'"+value.getAbsolutePath()+"' does not contains readable files.");
+                Log.w(this.getClass().toString(), "'"+value.getAbsolutePath()+"' does not contains readable file.");
             } else {
+                LibraryItem[] items = new LibraryItem[UPDATE_STEP];
                 for (int i = 0; i < files.length; i++) {
 
                     try {
-                        LibraryItem item = factory.build(files[i]);
-                        items.add(item);
-                        step++;
+                        items[i%UPDATE_STEP] = factory.build(files[i]);
+                        if(hasToPublish(i, files.length)) {
+                            publishProgress(items);
+                        }
                     } catch (IOException e) {
                         Log.w(this.getClass().toString(), e.getMessage());
-                    }
-
-                    if (step >= UPDATE_STEP || i == files.length - 1) {
-                        Collections.sort(items, comparator);
-                        publishProgress();
-                        step = 0;
                     }
                 }
             }
@@ -71,12 +62,23 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
     }
 
     @Override
-    protected void onProgressUpdate(Void... values) {
+    protected void onProgressUpdate(LibraryItem... values) {
+        adapter.add(values);
         adapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
+    }
+
+    private boolean hasToPublish(int i, int fileCount) {
+        if(i > 0 && i % UPDATE_STEP == 0) {
+            return true;
+        } else if (i - 1 >= fileCount) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.helper.LoaderHelper;
+import binauld.pierre.musictag.io.LibraryItemComparator;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.service.ThumbnailService;
 
@@ -50,7 +51,9 @@ public class MainActivity extends Activity {
         // Init view
         ListView listView = (ListView) findViewById(R.id.library_item_list);
 
-        LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext());
+        //TODO: Create a helper for adapter
+        LibraryItemComparator comparator = new LibraryItemComparator();
+        LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext(), comparator);
         LibraryItemLoader loader = LoaderHelper.buildAlphabeticalLoader(adapter, thumbnailService);
 
         listView.setAdapter(adapter);

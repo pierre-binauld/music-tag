@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import binauld.pierre.musictag.R;
@@ -27,9 +30,11 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
     private List<LibraryItem> items = new ArrayList<LibraryItem>();
+    private Comparator<LibraryItem> comparator;
 
-    public LibraryItemAdapter(Context baseContext) {
+    public LibraryItemAdapter(Context baseContext, Comparator<LibraryItem> comparator) {
         this.inflater = LayoutInflater.from(baseContext);
+        this.comparator = comparator;
     }
 
     @Override
@@ -85,12 +90,13 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     /**
-     * Get the data model from the adapter.
-     *
-     * @return A list of library items.
+     * Add items to the list view.
+     * @param item The item to add.
      */
-    public List<LibraryItem> getItems() {
-        return items;
+    public void add(LibraryItem... item) {
+        items.addAll(Arrays.asList(item));
+        //TODO: Implement a list with sorted insert
+        Collections.sort(items, comparator);
     }
 
 }

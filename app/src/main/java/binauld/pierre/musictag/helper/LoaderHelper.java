@@ -13,6 +13,7 @@ import binauld.pierre.musictag.service.ThumbnailService;
  * Help to build the AsyncTask loading library items list.
  */
 public class LoaderHelper {
+
     /**
      * Help to build the AsyncTask loading library items list.
      * @param adapter The adapter used to adapt library items for the list view.
@@ -22,10 +23,9 @@ public class LoaderHelper {
         FileFilterFactory filterFactory = new FileFilterFactory();
 
         FileFilter filter = filterFactory.build();
-        LibraryItemComparator sorter = new LibraryItemComparator();
 
         LibraryItemFactory factory = new LibraryItemFactory(thumbnailService);
 
-        return new LibraryItemLoader(adapter, factory, sorter, filter);
+        return new LibraryItemLoader(adapter, factory, filter);
     }
 }

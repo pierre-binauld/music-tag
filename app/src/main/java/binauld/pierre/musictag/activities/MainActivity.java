@@ -1,13 +1,11 @@
-package binauld.pierre.musictag;
+package binauld.pierre.musictag.activities;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -16,6 +14,7 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.helper.LoaderHelper;
 import binauld.pierre.musictag.io.LibraryItemLoader;
@@ -32,19 +31,23 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Get resources
+        Resources res = getResources();
+
         // Switch off JAudioTagger log
-        //TODO: put it into res
-        Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
+        Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //TODO: Put source folder into res
-        String sourceFolder = sharedPrefs.getString(SettingsActivity.KEY_SOURCE_FOLDER, "");
+        String sourceFolder = sharedPrefs.getString(
+                res.getString(R.string.source_folder_preference_key),
+                res.getString(R.string.source_folder_preference_default));
 
         // Init service(s)
         ThumbnailService thumbnailService = new ThumbnailService(this, R.drawable.song, R.drawable.folder);
 
+        // Init view
         ListView listView = (ListView) findViewById(R.id.library_item_list);
 
         LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext());
@@ -67,8 +70,6 @@ public class MainActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        boolean result = false;
 
         switch (item.getItemId()) {
             case R.id.action_settings:

@@ -3,10 +3,8 @@ package binauld.pierre.musictag.service;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.datatype.Artwork;
 
 /**
@@ -17,9 +15,9 @@ public class ThumbnailService {
     private Bitmap defaultArtwork;
     private Bitmap folder;
 
-    public ThumbnailService(Context context, int defaultArtwork, int folder) {
-        this.defaultArtwork = BitmapFactory.decodeResource(context.getResources(), defaultArtwork);
-        this.folder = BitmapFactory.decodeResource(context.getResources(), folder);
+    public ThumbnailService(Context context, int defaultArtworkRes, int folderRes) {
+        this.defaultArtwork = BitmapFactory.decodeResource(context.getResources(), defaultArtworkRes);
+        this.folder = BitmapFactory.decodeResource(context.getResources(), folderRes);
     }
 
     /**

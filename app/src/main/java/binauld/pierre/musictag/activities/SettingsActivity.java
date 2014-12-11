@@ -1,13 +1,15 @@
-package binauld.pierre.musictag;
+package binauld.pierre.musictag.activities;
 
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-public class SettingsActivity extends PreferenceActivity {
+import binauld.pierre.musictag.Fragments.SettingsFragment;
 
-    //TODO: May be put it into res
-    public static final String KEY_SOURCE_FOLDER = "binauld.pierre.musictag.sourceFolder";
+/**
+ * Activity for application settings
+ */
+public class SettingsActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

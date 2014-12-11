@@ -46,7 +46,7 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
         for (File value : values) {
             File[] files = value.listFiles(filter);
             if (null == files) {
-                Log.wtf(this.getClass().toString(), value.getAbsolutePath());
+                Log.w(this.getClass().toString(), "'"+value.getAbsolutePath()+"' does not contains readable files.");
             } else {
                 for (int i = 0; i < files.length; i++) {
 

@@ -7,5 +7,11 @@
     <string name="thumbnail">Thumbnail</string>
     <string name="setting_preference_activity">Settings</string>
 
+    <string name="source_folder_title">Source Folder</string>
+    <string name="source_folder_summary">Choose the source folder where the file will be retrieve.</string>
 
+    <string name="file">file</string>
+    <string name="files">files</string>
+
+    <string name="jaudiotagger_logger">org.jaudiotagger</string>
 </resources>

@@ -1,8 +1,6 @@
 package binauld.pierre.musictag.factory;
 
 
-import android.graphics.Bitmap;
-
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;

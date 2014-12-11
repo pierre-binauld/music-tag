@@ -1,9 +1,14 @@
-package binauld.pierre.musictag;
+package binauld.pierre.musictag.Fragments;
 
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
+import binauld.pierre.musictag.R;
+
+/**
+ * Fragment for the settings activity
+ */
 public class SettingsFragment extends PreferenceFragment {
 
     @Override

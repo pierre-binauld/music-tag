@@ -7,8 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.FieldKey;
 
-import binauld.pierre.musictag.service.ThumbnailService;
-
 /**
  * Represent an audio file in a library.
  */

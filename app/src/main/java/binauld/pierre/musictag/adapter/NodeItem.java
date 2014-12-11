@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 
 import java.io.File;
 
-import binauld.pierre.musictag.service.ThumbnailService;
-
 /**
  * Represent a folder in a library.
  */

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="source_folder_preference_key">binauld.pierre.musictag.sourceFolder</string>
+    <string name="source_folder_preference_default">/storage/emulated/0/Music</string>
+</resources>

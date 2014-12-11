@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Input/Output">
+        <EditTextPreference
+            android:key="binauld.pierre.musictag.sourceFolder"
+            android:title="Source Folder"
+            android:summary="Choose the source folder where the file will be fetch."
+            android:defaultValue="/storage/emulated/0/Music"></EditTextPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

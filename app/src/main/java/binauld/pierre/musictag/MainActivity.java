@@ -1,9 +1,13 @@
 package binauld.pierre.musictag;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -29,7 +33,14 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         // Switch off JAudioTagger log
+        //TODO: put it into res
         Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
+
+        // Init preference(s)
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //TODO: Put source folder into res
+        String sourceFolder = sharedPrefs.getString(SettingsActivity.KEY_SOURCE_FOLDER, "");
 
         // Init service(s)
         ThumbnailService thumbnailService = new ThumbnailService(this, R.drawable.song, R.drawable.folder);
@@ -40,7 +51,7 @@ public class MainActivity extends Activity {
         LibraryItemLoader loader = LoaderHelper.buildAlphabeticalLoader(adapter, thumbnailService);
 
         listView.setAdapter(adapter);
-        loader.execute(new File(Environment.getExternalStorageDirectory().toString() + "/Music/test"));
+        loader.execute(new File(sourceFolder));
     }
 
 
@@ -57,13 +68,16 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        boolean result = false;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
 }

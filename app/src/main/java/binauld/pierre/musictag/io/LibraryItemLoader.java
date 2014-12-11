@@ -45,23 +45,25 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
 
         for (File value : values) {
             File[] files = value.listFiles(filter);
+            if (null == files) {
+                Log.wtf(this.getClass().toString(), value.getAbsolutePath());
+            } else {
+                for (int i = 0; i < files.length; i++) {
 
-            for (int i = 0; i < files.length; i++) {
+                    try {
+                        LibraryItem item = factory.build(files[i]);
+                        items.add(item);
+                        step++;
+                    } catch (IOException e) {
+                        Log.w(this.getClass().toString(), e.getMessage());
+                    }
 
-                try {
-                    LibraryItem item = factory.build(files[i]);
-                    items.add(item);
-                    step++;
-                } catch (IOException e) {
-                    Log.w(this.getClass().toString(), e.getMessage());
+                    if (step >= UPDATE_STEP || i == files.length - 1) {
+                        Collections.sort(items, comparator);
+                        publishProgress();
+                        step = 0;
+                    }
                 }
-
-                if (step >= UPDATE_STEP || i == files.length - 1) {
-                    Collections.sort(items, comparator);
-                    publishProgress();
-                    step = 0;
-                }
-
             }
         }
 

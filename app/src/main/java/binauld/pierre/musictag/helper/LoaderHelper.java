@@ -5,7 +5,6 @@ import java.io.FileFilter;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.io.LibraryItemComparator;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.service.ThumbnailService;
 

@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.helper.LoaderHelper;
-import binauld.pierre.musictag.io.LibraryItemComparator;
+import binauld.pierre.musictag.adapter.LibraryItemComparator;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.service.ThumbnailService;
 
@@ -26,6 +26,8 @@ import binauld.pierre.musictag.service.ThumbnailService;
  * Display a list of directories and audio files the user can modify.
  */
 public class MainActivity extends Activity {
+
+    private LibraryItemLoader loader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,7 @@ public class MainActivity extends Activity {
         //TODO: Create a helper for adapter
         LibraryItemComparator comparator = new LibraryItemComparator();
         LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext(), comparator);
-        LibraryItemLoader loader = LoaderHelper.buildAlphabeticalLoader(adapter, thumbnailService);
+        loader = LoaderHelper.buildAlphabeticalLoader(adapter, thumbnailService);
 
         listView.setAdapter(adapter);
         loader.execute(new File(sourceFolder));
@@ -84,4 +86,9 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        loader.cancel(true);
+    }
 }

@@ -2,6 +2,7 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.util.SortedArrayList;
 
 /**
  * Adapt a list of library item for a list view.
@@ -29,12 +31,13 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     private LayoutInflater inflater;
-    private List<LibraryItem> items = new ArrayList<LibraryItem>();
+    private SortedArrayList<LibraryItem> items;
     private Comparator<LibraryItem> comparator;
 
     public LibraryItemAdapter(Context baseContext, Comparator<LibraryItem> comparator) {
         this.inflater = LayoutInflater.from(baseContext);
         this.comparator = comparator;
+        this.items = new SortedArrayList<LibraryItem>(this.comparator);
     }
 
     @Override
@@ -91,12 +94,10 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     /**
      * Add items to the list view.
-     * @param item The item to add.
+     * @param items The items to add.
      */
-    public void add(LibraryItem... item) {
-        items.addAll(Arrays.asList(item));
-        //TODO: Implement a list with sorted insert
-        Collections.sort(items, comparator);
+    public void add(LibraryItem... items) {
+        this.items.sortedInsertAll(items);
     }
 
 }

@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.io;
+package binauld.pierre.musictag.adapter;
 
 
 import java.util.Comparator;
@@ -18,8 +18,8 @@ public class LibraryItemComparator implements Comparator<LibraryItem> {
         } else if (item1.isSong() && !item2.isSong()) {
             return 1;
         } else {
-            return item1.getPrimaryInformation()
-                    .compareTo(item2.getPrimaryInformation());
+            return item1.getPrimaryInformation().toLowerCase()
+                    .compareTo(item2.getPrimaryInformation().toLowerCase());
         }
     }
 }

@@ -21,7 +21,7 @@ import binauld.pierre.musictag.factory.LibraryItemFactory;
  */
 public class LibraryItemLoader extends AsyncTask<File, LibraryItem, Integer> {
 
-    private static int UPDATE_STEP = 5;
+    private static int UPDATE_STEP = 10;
 
     private LibraryItemAdapter adapter;
     private FileFilter filter;
@@ -43,13 +43,19 @@ public class LibraryItemLoader extends AsyncTask<File, LibraryItem, Integer> {
             if (null == files) {
                 Log.w(this.getClass().toString(), "'"+value.getAbsolutePath()+"' does not contains readable file.");
             } else {
+                int j = 0;
                 LibraryItem[] items = new LibraryItem[UPDATE_STEP];
                 for (int i = 0; i < files.length; i++) {
 
                     try {
-                        items[i%UPDATE_STEP] = factory.build(files[i]);
-                        if(hasToPublish(i, files.length)) {
+//                        items[i%UPDATE_STEP] = factory.build(files[i]);
+                        LibraryItem item = factory.build(files[i]);
+
+                        items[j] = item;
+                        j = ++j % UPDATE_STEP;
+                        if(j == 0) {
                             publishProgress(items);
+                            items = new LibraryItem[UPDATE_STEP];
                         }
                     } catch (IOException e) {
                         Log.w(this.getClass().toString(), e.getMessage());

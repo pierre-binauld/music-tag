@@ -33,4 +33,5 @@ public interface LibraryItem {
      * @return A Bitmap.
      */
     Bitmap getThumbnail();
+
 }

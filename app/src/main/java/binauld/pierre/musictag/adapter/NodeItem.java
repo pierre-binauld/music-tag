@@ -2,28 +2,37 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Represent a folder in a library.
  */
-public class NodeItem implements LibraryItem {
+public abstract class NodeItem extends ChildItem {
 
-    private File file;
-    private final Bitmap thumbnail;
-    private String secondaryInformation;
+    private Comparator<LibraryItem> comparator;
+    private Bitmap thumbnail;
+    private List<LibraryItem> children = new ArrayList<LibraryItem>();
+    private boolean isLoaded;
 
-    public NodeItem(File file, Bitmap thumbnail) {
-        this.file = file;
+    public NodeItem(Bitmap thumbnail, Comparator<LibraryItem> comparator) {
+        this.init(thumbnail);
+        this.comparator = comparator;
+    }
+
+    public NodeItem(Bitmap thumbnail, NodeItem parent) {
+        this.init(thumbnail);
+        this.parent = parent;
+        this.comparator = parent.getComparator();
+    }
+
+    private void init(Bitmap thumbnail) {
         this.thumbnail = thumbnail;
-
-        // TODO: Add local logic
-        int fileNumber = file.list().length;
-        this.secondaryInformation = fileNumber + " file";
-        if(fileNumber > 1) {
-            this.secondaryInformation += "s";
-        }
+        this.isLoaded = false;
     }
 
     @Override
@@ -32,17 +41,48 @@ public class NodeItem implements LibraryItem {
     }
 
     @Override
-    public String getPrimaryInformation() {
-        return file.getName();
-    }
-
-    @Override
-    public String getSecondaryInformation() {
-        return secondaryInformation;
-    }
-
-    @Override
     public Bitmap getThumbnail() {
         return thumbnail;
+    }
+
+    public void add(LibraryItem item) {
+        children.add(item);
+    }
+
+    public void add(LibraryItem[] elements) {
+        for (int i = 0; i < elements.length; i++) {
+            children.add(elements[i]);
+        }
+        Collections.sort(children, comparator);
+    }
+
+    public int size() {
+        return  children.size();
+    }
+
+    public LibraryItem getChild(int i) {
+        return  children.get(i);
+    }
+
+    public boolean isLoaded() {
+        return isLoaded;
+    }
+
+    public void setIsLoaded(boolean isLoaded) {
+        this.isLoaded = isLoaded;
+    }
+
+    public Comparator<LibraryItem> getComparator() {
+        if(null != comparator) {
+            return comparator;
+        } else if (null != parent) {
+            return parent.getComparator();
+        } else {
+            return null;
+        }
+    }
+
+    public void setComparator(Comparator<LibraryItem> comparator) {
+        this.comparator = comparator;
     }
 }

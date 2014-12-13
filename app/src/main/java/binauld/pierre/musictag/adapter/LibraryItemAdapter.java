@@ -2,7 +2,6 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,19 +9,15 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.util.SortedArrayList;
 
 /**
  * Adapt a list of library item for a list view.
  */
 public class LibraryItemAdapter extends BaseAdapter {
+
 
     static class ViewHolder {
         TextView firstLine;
@@ -30,24 +25,25 @@ public class LibraryItemAdapter extends BaseAdapter {
         ImageView thumbnail;
     }
 
+    private NodeItem currentNode;
     private LayoutInflater inflater;
-    private SortedArrayList<LibraryItem> items;
+//    private SortedArrayList<LibraryItem> items;
     private Comparator<LibraryItem> comparator;
 
     public LibraryItemAdapter(Context baseContext, Comparator<LibraryItem> comparator) {
         this.inflater = LayoutInflater.from(baseContext);
         this.comparator = comparator;
-        this.items = new SortedArrayList<LibraryItem>(this.comparator);
+//        this.items = new SortedArrayList<LibraryItem>(this.comparator);
     }
 
     @Override
     public int getCount() {
-        return items.size();
+        return currentNode.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return items.get(i);
+        return currentNode.getChild(i);
     }
 
     @Override
@@ -79,7 +75,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         }
 
         // object item based on the position
-        LibraryItem item = items.get(position);
+        LibraryItem item = currentNode.getChild(position);
 
         // assign values if the object is not null
         if (item != null) {
@@ -92,12 +88,23 @@ public class LibraryItemAdapter extends BaseAdapter {
         return convertView;
     }
 
-    /**
-     * Add items to the list view.
-     * @param items The items to add.
-     */
-    public void add(LibraryItem... items) {
-        this.items.sortedInsertAll(items);
+
+    public boolean backToParent() {
+        NodeItem parent = currentNode.getParent();
+        if(parent == null) {
+            return false;
+        } else {
+            currentNode = parent;
+            return true;
+        }
+    }
+
+    public void setCurrentNode(NodeItem currentNode) {
+        this.currentNode = currentNode;
+    }
+
+    public NodeItem getCurrentNode() {
+        return currentNode;
     }
 
 }

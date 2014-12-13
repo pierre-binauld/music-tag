@@ -10,7 +10,7 @@ import org.jaudiotagger.tag.FieldKey;
 /**
  * Represent an audio file in a library.
  */
-public class AudioItem implements LibraryItem {
+public class AudioItem extends ChildItem {
 
     private final AudioFile song;
     private final Bitmap thumbnail;

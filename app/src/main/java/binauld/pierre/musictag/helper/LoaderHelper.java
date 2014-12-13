@@ -18,7 +18,7 @@ public class LoaderHelper {
      * @param adapter The adapter used to adapt library items for the list view.
      * @return The loader built.
      */
-    public static LibraryItemLoader buildAlphabeticalLoader(LibraryItemAdapter adapter, ThumbnailService thumbnailService) {
+    public static LibraryItemLoader buildLoader(LibraryItemAdapter adapter, ThumbnailService thumbnailService) {
         FileFilterFactory filterFactory = new FileFilterFactory();
 
         FileFilter filter = filterFactory.build();

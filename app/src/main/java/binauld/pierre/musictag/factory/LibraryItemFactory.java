@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 
 import binauld.pierre.musictag.adapter.AudioItem;
+import binauld.pierre.musictag.adapter.FolderItem;
 import binauld.pierre.musictag.adapter.LibraryItem;
 import binauld.pierre.musictag.adapter.NodeItem;
 import binauld.pierre.musictag.service.ThumbnailService;
@@ -31,16 +32,20 @@ public class LibraryItemFactory {
     /**
      * Build a library item from a source file.
      * @param file The source file. It has to be either a folder or a supported audio file.
+     * @param parent The parent of the item
      * @return A library item
      * @throws IOException Exception is thrown when a problem occurs with the reading, tags or the format.
      */
-    public LibraryItem build(File file) throws IOException {
+    public LibraryItem build(File file, NodeItem parent) throws IOException {
         if(file.isDirectory()) {
-            return new NodeItem(file, thumbnailService.getFolder());
+            FolderItem folder = new FolderItem(file, thumbnailService.getFolder(), parent);
+            return folder;
         } else {
             try {
                 AudioFile audio = AudioFileIO.read(file);
-                return new AudioItem(audio, thumbnailService.getArtwork(audio));
+                AudioItem audioItem = new AudioItem(audio, thumbnailService.getArtwork(audio));
+                audioItem.setParent(parent);
+                return audioItem;
             } catch (CannotReadException e) {
                 throw new IOException(e);
             } catch (TagException e) {

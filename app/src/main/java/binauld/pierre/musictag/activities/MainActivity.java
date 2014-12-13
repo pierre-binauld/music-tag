@@ -6,8 +6,12 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.io.File;
@@ -15,53 +19,82 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.adapter.FolderItem;
+import binauld.pierre.musictag.adapter.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
-import binauld.pierre.musictag.helper.LoaderHelper;
 import binauld.pierre.musictag.adapter.LibraryItemComparator;
 import binauld.pierre.musictag.io.LibraryItemLoader;
+import binauld.pierre.musictag.io.LibraryItemLoaderManager;
 import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * Main activity of the app.
  * Display a list of directories and audio files the user can modify.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AdapterView.OnItemClickListener {
 
-    private LibraryItemLoader loader;
+    private LibraryItemLoaderManager manager;
+    private LibraryItemAdapter adapter;
+
+    private Resources res;
+    private SharedPreferences sharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //TODO: create progress bar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // Get resources
-        Resources res = getResources();
+        res = getResources();
 
         // Switch off JAudioTagger log
         Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String sourceFolder = sharedPrefs.getString(
-                res.getString(R.string.source_folder_preference_key),
-                res.getString(R.string.source_folder_preference_default));
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Init service(s)
         ThumbnailService thumbnailService = new ThumbnailService(this, R.drawable.song, R.drawable.folder);
 
-        // Init view
-        ListView listView = (ListView) findViewById(R.id.library_item_list);
 
         //TODO: Create a helper for adapter
         LibraryItemComparator comparator = new LibraryItemComparator();
-        LibraryItemAdapter adapter = new LibraryItemAdapter(this.getBaseContext(), comparator);
-        loader = LoaderHelper.buildAlphabeticalLoader(adapter, thumbnailService);
+        adapter = new LibraryItemAdapter(this.getBaseContext(), comparator);
+        adapter.setCurrentNode(getSourceNode());
 
+        // Init manager(s)
+        manager = new LibraryItemLoaderManager(adapter, thumbnailService);
+        LibraryItemLoader loader = manager.get();
+
+
+        // Init view
+        ListView listView = (ListView) findViewById(R.id.library_item_list);
+        listView.setOnItemClickListener(this);
         listView.setAdapter(adapter);
-        loader.execute(new File(sourceFolder));
+
+        // Load items
+        loader.execute();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.wtf(this.getClass().toString(), "onStart");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.wtf(this.getClass().toString(), "onRestart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.wtf(this.getClass().toString(), "onResume");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -89,6 +122,50 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        loader.cancel(true);
+        manager.cancelAll(true);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
+        if (!item.isSong()) {
+            FolderItem node = (FolderItem) item;
+            adapter.setCurrentNode(node);
+            if (!node.isLoaded()) {
+                //TODO: Why a loader wait for the previous has finished ?
+                //TODO: Load image when they are displayed
+                manager.get().execute();
+                node.setIsLoaded(true);
+            }
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if(adapter.backToParent()) {
+            adapter.notifyDataSetChanged();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public FolderItem getSourceNode() {
+        //TODO: When source folder settings change, reload list view
+        String sourceFolder = null;
+        Bundle extras = getIntent().getExtras();
+        if (null != extras) {
+            //TODO: Put string in res
+            sourceFolder = extras.getString("source_folder");
+        }
+
+        if (null == sourceFolder) {
+            sourceFolder = sharedPrefs.getString(
+                    res.getString(R.string.source_folder_preference_key),
+                    res.getString(R.string.source_folder_preference_default));
+        }
+
+        return new FolderItem(new File(sourceFolder), new LibraryItemComparator());
     }
 }

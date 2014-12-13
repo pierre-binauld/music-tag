@@ -28,16 +28,18 @@ public class LibraryItemLoader extends AsyncTask<Void, LibraryItem, Integer> {
     private static int UPDATE_STEP = 13;
 
     private final NodeItem node;
+    private final LibraryItemLoaderManager manager;
     private LibraryItemAdapter adapter;
     private FileFilter filter;
     private LibraryItemFactory factory;
 
-    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter) {
+    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter, LibraryItemLoaderManager manager) {
         this.adapter = adapter;
         this.node = adapter.getCurrentNode();
 //        this.comparator = comparator;
         this.filter = filter;
         this.factory = libraryItemFactory;
+        this.manager = manager;
     }
 
     @Override
@@ -85,6 +87,7 @@ public class LibraryItemLoader extends AsyncTask<Void, LibraryItem, Integer> {
     @Override
     protected void onPostExecute(Integer count) {
         super.onPostExecute(count);
+        manager.remove(this);
         Log.i(this.getClass().toString(), count + " item(s) loaded from " + node.getPrimaryInformation());
     }
 

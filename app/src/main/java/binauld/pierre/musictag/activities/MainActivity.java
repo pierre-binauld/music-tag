@@ -23,6 +23,7 @@ import binauld.pierre.musictag.adapter.FolderItem;
 import binauld.pierre.musictag.adapter.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.adapter.LibraryItemComparator;
+import binauld.pierre.musictag.helper.AdapterHelper;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
 import binauld.pierre.musictag.service.ThumbnailService;
@@ -31,7 +32,7 @@ import binauld.pierre.musictag.service.ThumbnailService;
  * Main activity of the app.
  * Display a list of directories and audio files the user can modify.
  */
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener {
+public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private LibraryItemLoaderManager manager;
     private LibraryItemAdapter adapter;
@@ -54,28 +55,25 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
         // Init service(s)
         ThumbnailService thumbnailService = new ThumbnailService(this, R.drawable.song, R.drawable.folder);
 
-
-        //TODO: Create a helper for adapter
-        LibraryItemComparator comparator = new LibraryItemComparator();
-        adapter = new LibraryItemAdapter(this.getBaseContext(), comparator);
-        adapter.setCurrentNode(getSourceNode());
+        // Init adapter
+        adapter = AdapterHelper.buildAdapter(this.getBaseContext(), new LibraryItemComparator());
 
         // Init manager(s)
         manager = new LibraryItemLoaderManager(adapter, thumbnailService);
-        LibraryItemLoader loader = manager.get();
 
+        // Load items
+        loadItemList();
 
         // Init view
         ListView listView = (ListView) findViewById(R.id.library_item_list);
         listView.setOnItemClickListener(this);
         listView.setAdapter(adapter);
 
-        // Load items
-        loader.execute();
     }
 
     @Override
@@ -142,8 +140,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
-        if(adapter.backToParent()) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (adapter.backToParent()) {
             adapter.notifyDataSetChanged();
             return true;
         }
@@ -151,21 +149,25 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         return super.onKeyDown(keyCode, event);
     }
 
-    public FolderItem getSourceNode() {
-        //TODO: When source folder settings change, reload list view
-        String sourceFolder = null;
-        Bundle extras = getIntent().getExtras();
-        if (null != extras) {
-            //TODO: Put string in res
-            sourceFolder = extras.getString("source_folder");
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(res.getString(R.string.source_folder_preference_key))) {
+            loadItemList();
         }
+    }
 
-        if (null == sourceFolder) {
-            sourceFolder = sharedPrefs.getString(
-                    res.getString(R.string.source_folder_preference_key),
-                    res.getString(R.string.source_folder_preference_default));
-        }
+    public FolderItem getSourceNode() {
+        String sourceFolder = sharedPrefs.getString(
+                res.getString(R.string.source_folder_preference_key),
+                res.getString(R.string.source_folder_preference_default));
 
         return new FolderItem(new File(sourceFolder), new LibraryItemComparator());
+    }
+
+
+
+    private void loadItemList() {
+        adapter.setCurrentNode(getSourceNode());
+        manager.get().execute();
     }
 }

@@ -1,19 +1,20 @@
 package binauld.pierre.musictag.io;
 
 
-import android.os.AsyncTask;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.helper.LoaderHelper;
-import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.service.ThumbnailService;
 
+/**
+ * A manager to handle all loader.
+ * Enable to cancel loading when app is closed.
+ */
 public class LibraryItemLoaderManager {
 
-    List<LibraryItemLoader> loaders = new ArrayList<LibraryItemLoader>();
+    Set<LibraryItemLoader> loaders = new HashSet<LibraryItemLoader>();
     private LibraryItemAdapter adapter;
     private ThumbnailService thumbnailService;
 
@@ -22,16 +23,27 @@ public class LibraryItemLoaderManager {
         this.thumbnailService = thumbnailService;
     }
 
-    //TODO: Find a way to remove a loader when it is finished
+    /**
+     * Create and register a new loader.
+     * @return The created loader.
+     */
     public LibraryItemLoader get() {
-        LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, thumbnailService);
+        LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, thumbnailService, this);
         loaders.add(loader);
         return loader;
     }
 
+    /**
+     * Cancel all loader running.
+     * @param mayInterruptIfRunning true if the thread executing this task should be interrupted; otherwise, in-progress tasks are allowed to complete.
+     */
     public void cancelAll(boolean mayInterruptIfRunning) {
         for (LibraryItemLoader loader : loaders) {
             loader.cancel(mayInterruptIfRunning);
         }
+    }
+
+    public void remove(LibraryItemLoader loader) {
+        loaders.remove(loader);
     }
 }

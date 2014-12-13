@@ -6,6 +6,7 @@ import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.io.LibraryItemLoader;
+import binauld.pierre.musictag.io.LibraryItemLoaderManager;
 import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
@@ -16,15 +17,17 @@ public class LoaderHelper {
     /**
      * Help to build the AsyncTask loading library items list.
      * @param adapter The adapter used to adapt library items for the list view.
+     * @param thumbnailService The thumbnailService used by the loader
+     * @param manager The manager to the loader.
      * @return The loader built.
      */
-    public static LibraryItemLoader buildLoader(LibraryItemAdapter adapter, ThumbnailService thumbnailService) {
+    public static LibraryItemLoader buildLoader(LibraryItemAdapter adapter, ThumbnailService thumbnailService, LibraryItemLoaderManager manager) {
         FileFilterFactory filterFactory = new FileFilterFactory();
 
         FileFilter filter = filterFactory.build();
 
         LibraryItemFactory factory = new LibraryItemFactory(thumbnailService);
 
-        return new LibraryItemLoader(adapter, factory, filter);
+        return new LibraryItemLoader(adapter, factory, filter, manager);
     }
 }

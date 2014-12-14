@@ -15,6 +15,7 @@ public class ThumbnailService {
     private Bitmap defaultArtwork;
     private Bitmap folder;
 
+    //TODO: may be we can make one method getThumbnail which take the item as parameter ?
     public ThumbnailService(Context context, int defaultArtworkRes, int folderRes) {
         this.defaultArtwork = BitmapFactory.decodeResource(context.getResources(), defaultArtworkRes);
         this.folder = BitmapFactory.decodeResource(context.getResources(), folderRes);
@@ -30,9 +31,6 @@ public class ThumbnailService {
     public Bitmap getArtwork(AudioFile song) {
         Artwork artworkTag = song.getTag().getFirstArtwork();
         if (null == artworkTag) {
-//            Log.wtf(this.getClass().toString(), song.getTag().getFirst(FieldKey.TITLE));
-//            Log.wtf(this.getClass().toString(), defaultArtwork + "");
-
             return defaultArtwork;
         }
 
@@ -42,10 +40,13 @@ public class ThumbnailService {
             return defaultArtwork;
         }
 
-//        Log.wtf(this.getClass().toString(), song.getTag().getFirst(FieldKey.TITLE) + " - " + artwork);
         return artwork;
     }
 
+    /**
+     * Get the folder thumbnail.
+     * @return The folder thumbnail.
+     */
     public Bitmap getFolder() {
         return folder;
     }

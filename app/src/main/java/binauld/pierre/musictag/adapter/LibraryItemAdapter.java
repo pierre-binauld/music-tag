@@ -18,7 +18,6 @@ import binauld.pierre.musictag.R;
  */
 public class LibraryItemAdapter extends BaseAdapter {
 
-
     static class ViewHolder {
         TextView firstLine;
         TextView secondLine;
@@ -27,13 +26,9 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     private NodeItem currentNode;
     private LayoutInflater inflater;
-//    private SortedArrayList<LibraryItem> items;
-    private Comparator<LibraryItem> comparator;
 
     public LibraryItemAdapter(Context baseContext, Comparator<LibraryItem> comparator) {
         this.inflater = LayoutInflater.from(baseContext);
-        this.comparator = comparator;
-//        this.items = new SortedArrayList<LibraryItem>(this.comparator);
     }
 
     @Override
@@ -88,7 +83,10 @@ public class LibraryItemAdapter extends BaseAdapter {
         return convertView;
     }
 
-
+    /**
+     * Switch the current node to the parent node.
+     * @return True if the adapter has switch to the parent node.
+     */
     public boolean backToParent() {
         NodeItem parent = currentNode.getParent();
         if(parent == null) {
@@ -99,10 +97,18 @@ public class LibraryItemAdapter extends BaseAdapter {
         }
     }
 
+    /**
+     * Set the current node of the library tree list.
+     * @param currentNode The current node to set.
+     */
     public void setCurrentNode(NodeItem currentNode) {
         this.currentNode = currentNode;
     }
 
+    /**
+     * Get the current node display by the list.
+     * @return The current node to get.
+     */
     public NodeItem getCurrentNode() {
         return currentNode;
     }

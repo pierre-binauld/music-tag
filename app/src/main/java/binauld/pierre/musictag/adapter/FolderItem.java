@@ -41,6 +41,10 @@ public class FolderItem extends NodeItem {
         return secondaryInformation;
     }
 
+    /**
+     * Get the file.
+     * @return The file.
+     */
     public File getFile() {
         return file;
     }

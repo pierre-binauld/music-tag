@@ -43,6 +43,10 @@ public class LibraryItemLoaderManager {
         }
     }
 
+    /**
+     * Remove a loader from the manager.
+     * @param loader The loader to remove.
+     */
     public void remove(LibraryItemLoader loader) {
         loaders.remove(loader);
     }

@@ -38,8 +38,7 @@ public class LibraryItemFactory {
      */
     public LibraryItem build(File file, NodeItem parent) throws IOException {
         if(file.isDirectory()) {
-            FolderItem folder = new FolderItem(file, thumbnailService.getFolder(), parent);
-            return folder;
+            return new FolderItem(file, thumbnailService.getFolder(), parent);
         } else {
             try {
                 AudioFile audio = AudioFileIO.read(file);

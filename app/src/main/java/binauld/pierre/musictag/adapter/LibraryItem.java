@@ -34,4 +34,10 @@ public interface LibraryItem {
      */
     Bitmap getThumbnail();
 
+    /**
+     * Return the item's parent.
+     * @return The parent.
+     */
+    NodeItem getParent();
+
 }

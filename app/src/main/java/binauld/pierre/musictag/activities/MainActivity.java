@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -67,7 +69,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         manager = new LibraryItemLoaderManager(adapter, thumbnailService);
 
         // Load items
-        loadItemList();
+        switchNode(getSourceNode());
 
         // Init view
         ListView listView = (ListView) findViewById(R.id.library_item_list);
@@ -128,13 +130,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
         if (!item.isSong()) {
             FolderItem node = (FolderItem) item;
-            adapter.setCurrentNode(node);
-            if (!node.isLoaded()) {
-                //TODO: Why a loader wait for the previous has finished ?
-                //TODO: Load image when they are displayed
-                manager.get().execute();
-                node.setIsLoaded(true);
-            }
+            //TODO: Load image when they are displayed
+            switchNode(node);
             adapter.notifyDataSetChanged();
         }
     }
@@ -151,11 +148,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals(res.getString(R.string.source_folder_preference_key))) {
-            loadItemList();
+        if (key.equals(res.getString(R.string.source_folder_preference_key))) {
+            switchNode(getSourceNode());
         }
     }
 
+    /**
+     * Get the source folder item from shared preferences.
+     * @return The source folder item.
+     */
     public FolderItem getSourceNode() {
         String sourceFolder = sharedPrefs.getString(
                 res.getString(R.string.source_folder_preference_key),
@@ -164,10 +165,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         return new FolderItem(new File(sourceFolder), new LibraryItemComparator());
     }
 
-
-
-    private void loadItemList() {
-        adapter.setCurrentNode(getSourceNode());
-        manager.get().execute();
+    /**
+     * Switch the view to the specified node.
+     * If the node has not been loaded yet, then it is loaded.
+     * @param folder The node to switch to.
+     */
+    private void switchNode(FolderItem folder) {
+        adapter.setCurrentNode(folder);
+        if (!folder.isLoaded()) {
+            LibraryItemLoader loader = manager.get();
+            if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ) {
+                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, folder);
+            } else {
+                loader.execute(folder);
+            }
+//          node.setIsLoaded(true);
+        }
     }
 }

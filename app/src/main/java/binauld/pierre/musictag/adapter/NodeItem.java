@@ -2,7 +2,6 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,28 +49,47 @@ public abstract class NodeItem extends ChildItem {
     }
 
     public void add(LibraryItem[] elements) {
-        for (int i = 0; i < elements.length; i++) {
-            children.add(elements[i]);
-        }
+        Collections.addAll(children, elements);
         Collections.sort(children, comparator);
     }
 
+    /**
+     * Get the number of children node.
+     * @return The number of children node.
+     */
     public int size() {
-        return  children.size();
+        return children.size();
     }
 
+    /**
+     * Get a child.
+     * @param i Index of the child.
+     * @return A child.
+     */
     public LibraryItem getChild(int i) {
-        return  children.get(i);
+        return children.get(i);
     }
 
+    /**
+     * Check if the node is loaded or loading.
+     * @return
+     */
     public boolean isLoaded() {
         return isLoaded;
     }
 
+    /**
+     * Set the loaded state of the node.
+     * @param isLoaded The loaded state.
+     */
     public void setIsLoaded(boolean isLoaded) {
         this.isLoaded = isLoaded;
     }
 
+    /**
+     * Get the comparator used to sort children.
+     * @return The comparator.
+     */
     public Comparator<LibraryItem> getComparator() {
         if(null != comparator) {
             return comparator;
@@ -82,6 +100,10 @@ public abstract class NodeItem extends ChildItem {
         }
     }
 
+    /**
+     * Set the comparator used to sort children.
+     * @param comparator The comparator.
+     */
     public void setComparator(Comparator<LibraryItem> comparator) {
         this.comparator = comparator;
     }

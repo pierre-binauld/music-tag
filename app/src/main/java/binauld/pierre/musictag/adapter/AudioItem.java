@@ -12,11 +12,11 @@ import org.jaudiotagger.tag.FieldKey;
  */
 public class AudioItem extends ChildItem {
 
-    private final AudioFile song;
+    private final AudioFile audio;
     private final Bitmap thumbnail;
 
-    public AudioItem(AudioFile song, Bitmap thumbnail) {
-        this.song = song;
+    public AudioItem(AudioFile audio, Bitmap thumbnail) {
+        this.audio = audio;
         this.thumbnail = thumbnail;
     }
 
@@ -27,20 +27,24 @@ public class AudioItem extends ChildItem {
 
     @Override
     public String getPrimaryInformation() {
-        String primary = song.getTag().getFirst(FieldKey.TITLE);
+        String primary = audio.getTag().getFirst(FieldKey.TITLE);
         if(StringUtils.isBlank(primary)) {
-            primary = song.getFile().getName();
+            primary = audio.getFile().getName();
         }
         return primary;
     }
 
     @Override
     public String getSecondaryInformation() {
-        return song.getTag().getFirst(FieldKey.ARTIST);
+        return audio.getTag().getFirst(FieldKey.ARTIST);
     }
 
     @Override
     public Bitmap getThumbnail() {
         return thumbnail;
+    }
+
+    public Object getAudio() {
+        return audio;
     }
 }

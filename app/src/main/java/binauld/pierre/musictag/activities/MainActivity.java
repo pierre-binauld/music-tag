@@ -17,11 +17,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.google.gson.Gson;
+
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.adapter.AudioItem;
 import binauld.pierre.musictag.adapter.FolderItem;
 import binauld.pierre.musictag.adapter.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
@@ -138,6 +141,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             //TODO: Load image when they are displayed
             switchNode(node);
             adapter.notifyDataSetChanged();
+        }
+        else {
+            AudioItem audio = (AudioItem) item;
+            Intent intent = new Intent(this, TagFormActivity.class);
+            intent.putExtra("song", new Gson().toJson(audio.getAudio()));
+            startActivity(intent);
         }
     }
 

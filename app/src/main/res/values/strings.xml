@@ -3,15 +3,17 @@
 
     <string name="app_name">Music Tag</string>
     <string name="action_settings">Settings</string>
-
     <string name="thumbnail">Thumbnail</string>
     <string name="setting_preference_activity">Settings</string>
-
     <string name="source_folder_title">Source Folder</string>
     <string name="source_folder_summary">Choose the source folder where the file will be retrieve.</string>
-
     <string name="file">file</string>
     <string name="files">files</string>
-
     <string name="jaudiotagger_logger">org.jaudiotagger</string>
+    <string name="title_activity_tag_form">TagFormActivity</string>
+    <string name="title">Title</string>
+    <string name="artist">Artist</string>
+    <string name="album">Album</string>
+    <string name="validate">Confirm</string>
+
 </resources>

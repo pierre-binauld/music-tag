@@ -1,6 +1,8 @@
 package binauld.pierre.musictag.io;
 
 
+import android.widget.ProgressBar;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,13 +16,16 @@ import binauld.pierre.musictag.service.ThumbnailService;
  */
 public class LibraryItemLoaderManager {
 
-    Set<LibraryItemLoader> loaders = new HashSet<LibraryItemLoader>();
+    private Set<LibraryItemLoader> loaders = new HashSet<LibraryItemLoader>();
+
     private LibraryItemAdapter adapter;
     private ThumbnailService thumbnailService;
+    private ProgressBar progressBar;
 
-    public LibraryItemLoaderManager(LibraryItemAdapter adapter, ThumbnailService thumbnailService) {
+    public LibraryItemLoaderManager(LibraryItemAdapter adapter, ThumbnailService thumbnailService, ProgressBar progressBar) {
         this.adapter = adapter;
         this.thumbnailService = thumbnailService;
+        this.progressBar = progressBar;
     }
 
     /**
@@ -29,6 +34,7 @@ public class LibraryItemLoaderManager {
      */
     public LibraryItemLoader get() {
         LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, thumbnailService, this);
+        loader.setProgressBar(progressBar);
         loaders.add(loader);
         return loader;
     }

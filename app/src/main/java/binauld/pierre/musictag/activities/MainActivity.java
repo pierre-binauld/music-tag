@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -65,8 +66,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Init adapter
         adapter = AdapterHelper.buildAdapter(this.getBaseContext(), new LibraryItemComparator());
 
+        // Init progress bar
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+//        progressBar.setProgress(50);
+
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(adapter, thumbnailService);
+        manager = new LibraryItemLoaderManager(adapter, thumbnailService, progressBar);
 
         // Load items
         switchNode(getSourceNode());
@@ -171,6 +176,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      * @param folder The node to switch to.
      */
     private void switchNode(FolderItem folder) {
+        //TODO: Progress bar improvement: make an enum for the progression state and switch the progress bar when node is loading.
         adapter.setCurrentNode(folder);
         if (!folder.isLoaded()) {
             LibraryItemLoader loader = manager.get();

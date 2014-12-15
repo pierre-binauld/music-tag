@@ -2,6 +2,7 @@ package binauld.pierre.musictag.helper;
 
 
 import android.content.Context;
+import android.widget.ProgressBar;
 
 import java.util.Comparator;
 

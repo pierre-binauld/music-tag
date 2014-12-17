@@ -45,7 +45,6 @@
             android:ellipsize="marquee"
             android:singleLine="true"
             android:textStyle="bold"
-            android:textColor="@android:color/darker_gray"
             android:textSize="12sp" />
     </LinearLayout>
 

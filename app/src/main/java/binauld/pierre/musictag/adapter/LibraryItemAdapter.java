@@ -77,7 +77,12 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
+<<<<<<< Updated upstream
             viewHolder.thumbnail.setImageBitmap(item.getThumbnail());
+=======
+            thumbnailService.loadThumbnail(item, viewHolder.thumbnail);
+//            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
+>>>>>>> Stashed changes
             convertView.setTag(viewHolder);
         }
 

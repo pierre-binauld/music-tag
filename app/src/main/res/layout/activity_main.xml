@@ -15,7 +15,7 @@
 
     </ListView>
 
-    <binauld.pierre.musictag.widget.AnimatingProgressBar
+    <ProgressBar
         android:id="@+id/progress_bar"
         style="@style/horizontalProgressBar"
         android:layout_width="match_parent"

@@ -88,8 +88,15 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
 //        node.add(items);
         //TODO: When architecture will stabilize, comparator will may be used here.
         items[0].getParent().add(items);
+<<<<<<< Updated upstream
         progressBar.incrementProgressBy(items.length);
         Log.wtf(this.getClass().toString(), "" + progressBar.getProgress());
+=======
+        if (null != progressBar) {
+            Log.wtf(this.getClass().toString(), items.length + " - " + progressBar.getProgress() + "/" + progressBar.getMax());
+            progressBar.incrementProgressBy(items.length);
+        }
+>>>>>>> Stashed changes
         adapter.notifyDataSetChanged();
     }
 

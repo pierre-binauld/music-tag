@@ -1,6 +1,9 @@
 package binauld.pierre.musictag.factory;
 
 
+import android.content.res.Resources;
+import android.util.Log;
+
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -11,10 +14,14 @@ import org.jaudiotagger.tag.TagException;
 import java.io.File;
 import java.io.IOException;
 
-import binauld.pierre.musictag.adapter.AudioItem;
-import binauld.pierre.musictag.adapter.FolderItem;
-import binauld.pierre.musictag.adapter.LibraryItem;
-import binauld.pierre.musictag.adapter.NodeItem;
+import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.decoder.AudioFileBitmapDecoder;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
+import binauld.pierre.musictag.item.AudioItem;
+import binauld.pierre.musictag.item.FolderItem;
+import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.NodeItem;
 import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
@@ -23,10 +30,10 @@ import binauld.pierre.musictag.service.ThumbnailService;
  */
 public class LibraryItemFactory {
 
-    private ThumbnailService thumbnailService;
+    private BitmapDecoder folderBitmapDecoder;
 
-    public LibraryItemFactory(ThumbnailService thumbnailService) {
-        this.thumbnailService = thumbnailService;
+    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder) {
+        this.folderBitmapDecoder = folderBitmapDecoder;
     }
 
     /**
@@ -38,11 +45,13 @@ public class LibraryItemFactory {
      */
     public LibraryItem build(File file, NodeItem parent) throws IOException {
         if(file.isDirectory()) {
-            return new FolderItem(file, thumbnailService.getFolder(), parent);
+            FolderItem folder = new FolderItem(file, parent);
+            folder.setDecoder(folderBitmapDecoder);
+            return folder;
         } else {
             try {
                 AudioFile audio = AudioFileIO.read(file);
-                AudioItem audioItem = new AudioItem(audio, thumbnailService.getArtwork(audio));
+                AudioItem audioItem = new AudioItem(audio);
                 audioItem.setParent(parent);
                 return audioItem;
             } catch (CannotReadException e) {

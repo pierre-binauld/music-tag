@@ -4,21 +4,18 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
-import binauld.pierre.musictag.activities.MainActivity;
-import binauld.pierre.musictag.adapter.FolderItem;
-import binauld.pierre.musictag.adapter.LibraryItem;
+import binauld.pierre.musictag.item.FolderItem;
+import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
-import binauld.pierre.musictag.adapter.NodeItem;
+import binauld.pierre.musictag.item.LoadingState;
+import binauld.pierre.musictag.item.NodeItem;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 
 /**
@@ -48,13 +45,14 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
     @Override
     protected Integer doInBackground(FolderItem... values) {
         int count = 0;
-
+Log.wtf(this.getClass().toString(), values.length + "");
         this.initProgressBar(values);
 
         for (FolderItem folderItem : values) {
-            folderItem.setIsLoaded(true);
+            folderItem.setState(LoadingState.LOADING);
             File folder = folderItem.getFile();
             File[] files = folder.listFiles(filter);
+            Log.wtf(this.getClass().toString(), files.length + "");
             if (null == files) {
                 Log.w(this.getClass().toString(), "'" + folder.getAbsolutePath() + "' does not contains readable file.");
             } else {
@@ -78,6 +76,7 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
                     }
                 }
             }
+            folderItem.setState(LoadingState.LOADED);
         }
 
         return count;
@@ -86,10 +85,12 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
     @Override
     protected void onProgressUpdate(LibraryItem... items) {
 //        node.add(items);
+
         //TODO: When architecture will stabilize, comparator will may be used here.
         items[0].getParent().add(items);
-        progressBar.incrementProgressBy(items.length);
-        Log.wtf(this.getClass().toString(), "" + progressBar.getProgress());
+        if (null != progressBar) {
+            progressBar.incrementProgressBy(items.length);
+        }
         adapter.notifyDataSetChanged();
     }
 
@@ -97,49 +98,55 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
     protected void onPostExecute(Integer count) {
         super.onPostExecute(count);
         manager.remove(this);
-        progressBar.setVisibility(View.GONE);
-        Log.wtf(this.getClass().toString(), "onPostExecute" + progressBar.getProgress());
-        Log.i(this.getClass().toString(), count + " item(s) loaded from " + node.getPrimaryInformation());
+        if (null != progressBar) {
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     /**
      * Initialize the max of progress bar with the list of folder items.
+     *
      * @param items The list of folder items.
      */
     private void initProgressBar(FolderItem[] items) {
-        int max = 0;
-        for(FolderItem folder : items) {
-            max += folder.getFile().list().length;
-        }
-
-        Log.wtf(this.getClass().toString(), max + " ");
-        final int finalMax = max;
-        progressBar.post(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisibility(View.VISIBLE);
-                progressBar.setMax(finalMax);
-                Log.wtf(this.getClass().toString(), finalMax + " ");
+        if (null != progressBar) {
+            int max = 0;
+            for (FolderItem folder : items) {
+                max += folder.getFile().list().length;
             }
-        });
+
+            Log.wtf(this.getClass().toString(), max + " ");
+            final int finalMax = max;
+            progressBar.post(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setMax(finalMax);
+                }
+            });
+        }
     }
 
     /**
      * Increment the progress bar from any thread.
      * Used in case of unreadable file.
+     *
      * @param progress
      */
     private void incrementProgressBarBy(final int progress) {
-        progressBar.post(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.incrementProgressBy(progress);
-            }
-        });
+        if (null != progressBar) {
+            progressBar.post(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.incrementProgressBy(progress);
+                }
+            });
+        }
     }
 
     /**
      * Set the progress bar used to display the loading progression.
+     *
      * @param progressBar The progress bar.
      */
     public void setProgressBar(ProgressBar progressBar) {
@@ -148,6 +155,7 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
 
     /**
      * Get the progress bar used to display the loading progression.
+     *
      * @return The progress bar.
      */
     public ProgressBar getProgressBar() {

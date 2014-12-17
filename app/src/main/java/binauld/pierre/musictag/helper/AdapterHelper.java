@@ -2,12 +2,12 @@ package binauld.pierre.musictag.helper;
 
 
 import android.content.Context;
-import android.widget.ProgressBar;
 
 import java.util.Comparator;
 
-import binauld.pierre.musictag.adapter.LibraryItem;
+import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.service.ThumbnailService;
 
 public class AdapterHelper {
 
@@ -17,7 +17,7 @@ public class AdapterHelper {
      * @param comparator The comparator used to sort items.
      * @return The LibraryAdapter built.
      */
-    public static LibraryItemAdapter buildAdapter(Context context, Comparator<LibraryItem> comparator) {
-        return new LibraryItemAdapter(context, comparator);
+    public static LibraryItemAdapter buildAdapter(Context context, ThumbnailService thumbnailService, Comparator<LibraryItem> comparator) {
+        return new LibraryItemAdapter(context, thumbnailService, comparator);
     }
 }

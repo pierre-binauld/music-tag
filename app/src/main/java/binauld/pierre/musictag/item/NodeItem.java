@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.adapter;
+package binauld.pierre.musictag.item;
 
 
 import android.graphics.Bitmap;
@@ -14,35 +14,33 @@ import java.util.List;
 public abstract class NodeItem extends ChildItem {
 
     private Comparator<LibraryItem> comparator;
-    private Bitmap thumbnail;
     private List<LibraryItem> children = new ArrayList<LibraryItem>();
-    private boolean isLoaded;
+    private LoadingState state;
 
-    public NodeItem(Bitmap thumbnail, Comparator<LibraryItem> comparator) {
-        this.init(thumbnail);
+    public NodeItem(Comparator<LibraryItem> comparator) {
+        this.init();
         this.comparator = comparator;
     }
 
-    public NodeItem(Bitmap thumbnail, NodeItem parent) {
-        this.init(thumbnail);
+    public NodeItem(NodeItem parent) {
+        this.init();
         this.parent = parent;
         this.comparator = parent.getComparator();
     }
 
-    private void init(Bitmap thumbnail) {
-        this.thumbnail = thumbnail;
-        this.isLoaded = false;
+    private void init() {
+        this.state = LoadingState.NOT_LOADED;
     }
 
     @Override
-    public boolean isSong() {
+    public boolean getAudio() {
         return false;
     }
 
-    @Override
-    public Bitmap getThumbnail() {
-        return thumbnail;
-    }
+//    @Override
+//    public Bitmap getThumbnail() {
+//        return thumbnail;
+//    }
 
     public void add(LibraryItem item) {
         children.add(item);
@@ -71,22 +69,6 @@ public abstract class NodeItem extends ChildItem {
     }
 
     /**
-     * Check if the node is loaded or loading.
-     * @return
-     */
-    public boolean isLoaded() {
-        return isLoaded;
-    }
-
-    /**
-     * Set the loaded state of the node.
-     * @param isLoaded The loaded state.
-     */
-    public void setIsLoaded(boolean isLoaded) {
-        this.isLoaded = isLoaded;
-    }
-
-    /**
      * Get the comparator used to sort children.
      * @return The comparator.
      */
@@ -106,5 +88,21 @@ public abstract class NodeItem extends ChildItem {
      */
     public void setComparator(Comparator<LibraryItem> comparator) {
         this.comparator = comparator;
+    }
+
+    /**
+     * Get the loading state from the item.
+     * @return The loading state.
+     */
+    public LoadingState getState() {
+        return state;
+    }
+
+    /**
+     * Set the loading state to the item.
+     * @param state The loading state.
+     */
+    public void setState(LoadingState state) {
+        this.state = state;
     }
 }

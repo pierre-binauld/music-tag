@@ -3,7 +3,7 @@ package binauld.pierre.musictag.adapter;
 
 import java.util.Comparator;
 
-import binauld.pierre.musictag.adapter.LibraryItem;
+import binauld.pierre.musictag.item.LibraryItem;
 
 /**
  * Allows to compare 2 library items.
@@ -13,9 +13,9 @@ public class LibraryItemComparator implements Comparator<LibraryItem> {
 
     @Override
     public int compare(LibraryItem item1, LibraryItem item2) {
-        if(!item1.isSong() && item2.isSong()) {
+        if(!item1.getAudio() && item2.getAudio()) {
             return -1;
-        } else if (item1.isSong() && !item2.isSong()) {
+        } else if (item1.getAudio() && !item2.getAudio()) {
             return 1;
         } else {
             return item1.getPrimaryInformation().toLowerCase()

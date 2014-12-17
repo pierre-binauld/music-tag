@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.Fragments;
+package binauld.pierre.musictag.fragments;
 
 
 import android.os.Bundle;

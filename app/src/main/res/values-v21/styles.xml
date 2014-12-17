@@ -13,4 +13,9 @@
 
         <!--<item name="android:textColorPrimary">@android:color/primary_text_dark</item>-->
     </style>
+
+    <!--Progress bar style.-->
+    <style name="horizontalProgressBar" parent="android:Widget.Material.ProgressBar.Horizontal">
+
+    </style>
 </resources>

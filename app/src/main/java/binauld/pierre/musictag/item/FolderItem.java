@@ -1,9 +1,12 @@
-package binauld.pierre.musictag.adapter;
+package binauld.pierre.musictag.item;
 
 import android.graphics.Bitmap;
 
 import java.io.File;
 import java.util.Comparator;
+
+import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 
 public class FolderItem extends NodeItem {
 
@@ -11,12 +14,12 @@ public class FolderItem extends NodeItem {
     private String secondaryInformation;
 
     public FolderItem(File file, Comparator<LibraryItem> comparator) {
-        super(null, comparator);
+        super(comparator);
         init(file);
     }
 
-    public FolderItem(File file, Bitmap thumbnail, NodeItem parent) {
-        super(thumbnail, parent);
+    public FolderItem(File file, NodeItem parent) {
+        super(parent);
         init(file);
     }
 

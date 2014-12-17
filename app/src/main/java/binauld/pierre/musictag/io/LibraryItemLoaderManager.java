@@ -1,6 +1,7 @@
 package binauld.pierre.musictag.io;
 
 
+import android.content.res.Resources;
 import android.widget.ProgressBar;
 
 import java.util.HashSet;

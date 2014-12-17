@@ -2,17 +2,20 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.Comparator;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * Adapt a list of library item for a list view.
@@ -27,8 +30,10 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     private NodeItem currentNode;
     private LayoutInflater inflater;
+    private final ThumbnailService thumbnailService;
 
-    public LibraryItemAdapter(Context baseContext, Comparator<LibraryItem> comparator) {
+    public LibraryItemAdapter(Context baseContext, ThumbnailService thumbnailService, Comparator<LibraryItem> comparator) {
+        this.thumbnailService = thumbnailService;
         this.inflater = LayoutInflater.from(baseContext);
     }
 
@@ -77,12 +82,9 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-<<<<<<< Updated upstream
-            viewHolder.thumbnail.setImageBitmap(item.getThumbnail());
-=======
+            Log.wtf(this.getClass().toString(), item.getPrimaryInformation());
             thumbnailService.loadThumbnail(item, viewHolder.thumbnail);
 //            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
->>>>>>> Stashed changes
             convertView.setTag(viewHolder);
         }
 

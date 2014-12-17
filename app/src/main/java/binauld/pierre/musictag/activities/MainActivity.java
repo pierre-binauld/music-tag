@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,13 +23,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.adapter.FolderItem;
-import binauld.pierre.musictag.adapter.LibraryItem;
+import binauld.pierre.musictag.io.Cache;
+import binauld.pierre.musictag.item.FolderItem;
+import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.adapter.LibraryItemComparator;
 import binauld.pierre.musictag.helper.AdapterHelper;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
+import binauld.pierre.musictag.item.LoadingState;
 import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
@@ -45,7 +48,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //TODO: create progress bar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -60,11 +62,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
+        // Init cache
+        Cache<Bitmap> cache = new Cache<Bitmap>();
+
         // Init service(s)
-        ThumbnailService thumbnailService = new ThumbnailService(this, R.drawable.song, R.drawable.folder);
+        ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song, R.drawable.folder);
 
         // Init adapter
-        adapter = AdapterHelper.buildAdapter(this.getBaseContext(), new LibraryItemComparator());
+        adapter = AdapterHelper.buildAdapter(this.getBaseContext(), thumbnailService, new LibraryItemComparator());
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -133,7 +138,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
-        if (!item.isSong()) {
+        if (!item.getAudio()) {
             FolderItem node = (FolderItem) item;
             //TODO: Load image when they are displayed
             switchNode(node);
@@ -160,6 +165,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     /**
      * Get the source folder item from shared preferences.
+     *
      * @return The source folder item.
      */
     public FolderItem getSourceNode() {
@@ -173,19 +179,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     /**
      * Switch the view to the specified node.
      * If the node has not been loaded yet, then it is loaded.
-     * @param folder The node to switch to.
+     *
+     * @param node The node to switch to.
      */
-    private void switchNode(FolderItem folder) {
-        //TODO: Progress bar improvement: make an enum for the progression state and switch the progress bar when node is loading.
-        adapter.setCurrentNode(folder);
-        if (!folder.isLoaded()) {
+    private void switchNode(FolderItem node) {
+        adapter.setCurrentNode(node);
+        if (node.getState() == LoadingState.NOT_LOADED) {
             LibraryItemLoader loader = manager.get();
-            if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ) {
-                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, folder);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, node);
             } else {
-                loader.execute(folder);
+                loader.execute(node);
             }
 //          node.setIsLoaded(true);
+        } else if (node.getState() == LoadingState.LOADING) {
+            //TODO: Progress bar improvement: switch the progress bar when node is loading.
         }
     }
 }

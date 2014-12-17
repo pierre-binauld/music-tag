@@ -1,5 +1,7 @@
 package binauld.pierre.musictag.helper;
 
+import android.content.res.Resources;
+
 import java.io.FileFilter;
 
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
@@ -17,7 +19,7 @@ public class LoaderHelper {
     /**
      * Help to build the AsyncTask loading library items list.
      * @param adapter The adapter used to adapt library items for the list view.
-     * @param thumbnailService The thumbnailService used by the loader
+     * @param res
      * @param manager The manager to the loader.
      * @return The loader built.
      */
@@ -26,7 +28,7 @@ public class LoaderHelper {
 
         FileFilter filter = filterFactory.build();
 
-        LibraryItemFactory factory = new LibraryItemFactory(thumbnailService);
+        LibraryItemFactory factory = new LibraryItemFactory(thumbnailService.getFolderBitmapDecoder());
 
         return new LibraryItemLoader(adapter, factory, filter, manager);
     }

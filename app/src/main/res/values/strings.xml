@@ -11,9 +11,6 @@
     <string name="files">files</string>
     <string name="jaudiotagger_logger">org.jaudiotagger</string>
     <string name="title_activity_tag_form">TagFormActivity</string>
-    <string name="title">Title</string>
-    <string name="artist">Artist</string>
-    <string name="album">Album</string>
-    <string name="validate">Confirm</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

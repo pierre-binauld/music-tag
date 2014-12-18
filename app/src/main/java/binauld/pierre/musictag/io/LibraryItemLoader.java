@@ -8,9 +8,11 @@ import android.widget.ProgressBar;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
+import binauld.pierre.musictag.adapter.LibraryItemComparator;
+import binauld.pierre.musictag.collection.MultipleBufferedList;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
@@ -34,18 +36,24 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
     private LibraryItemFactory factory;
     private ProgressBar progressBar;
 
+    private MultipleBufferedList<LibraryItem> items;
+    private int invalidItemCount;
+    private Comparator<LibraryItem> comparator;
+
     public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter, LibraryItemLoaderManager manager) {
         this.adapter = adapter;
         this.node = adapter.getCurrentNode();
         this.filter = filter;
         this.factory = libraryItemFactory;
         this.manager = manager;
+
+        this.items = this.node.getChildren();
+        this.comparator = new LibraryItemComparator();
     }
 
     @Override
     protected Integer doInBackground(FolderItem... values) {
         int count = 0;
-Log.wtf(this.getClass().toString(), values.length + "");
         this.initProgressBar(values);
 
         for (FolderItem folderItem : values) {
@@ -57,21 +65,26 @@ Log.wtf(this.getClass().toString(), values.length + "");
                 Log.w(this.getClass().toString(), "'" + folder.getAbsolutePath() + "' does not contains readable file.");
             } else {
                 int j = 0;
-                List<LibraryItem> items = new ArrayList<LibraryItem>();
+//                List<LibraryItem> items = new ArrayList<LibraryItem>();
                 for (int i = 0; i < files.length; i++) {
 
                     try {
                         LibraryItem item = factory.build(files[i], folderItem);
 
-                        items.add(item);
+//                        items.add(item);
+                        this.items.add(item);
                         j = ++j % UPDATE_STEP;
                         if (j == 0 || i == files.length - 1) {
-                            publishProgress(items.toArray(new LibraryItem[items.size()]));
-                            count += items.size();
-                            items = new ArrayList<LibraryItem>();
+                            Collections.sort(this.items.getTail(), comparator);
+                            this.items.push();
+                            publishProgress(/*items.toArray(new LibraryItem[items.size()])*/);
+//                            count += items.size();
+                            count = items.size();
+//                            items = new ArrayList<LibraryItem>();incrementProgressBy
                         }
                     } catch (IOException e) {
-                        incrementProgressBarBy(1);
+                        invalidItemCount++;
+                        updateProgressBar();
                         Log.w(this.getClass().toString(), e.getMessage());
                     }
                 }
@@ -87,9 +100,10 @@ Log.wtf(this.getClass().toString(), values.length + "");
 //        node.add(items);
 
         //TODO: When architecture will stabilize, comparator will may be used here.
-        items[0].getParent().add(items);
+//        items[0].getParent().add(items);
+        this.items.pull();
         if (null != progressBar) {
-            progressBar.incrementProgressBy(items.length);
+            progressBar.setProgress(this.items.size() + invalidItemCount);
         }
         adapter.notifyDataSetChanged();
     }
@@ -128,17 +142,16 @@ Log.wtf(this.getClass().toString(), values.length + "");
     }
 
     /**
-     * Increment the progress bar from any thread.
+     * Update the progress bar from any thread.
      * Used in case of unreadable file.
-     *
-     * @param progress
      */
-    private void incrementProgressBarBy(final int progress) {
+    private void updateProgressBar() {
         if (null != progressBar) {
+            final int progress = this.items.size() + invalidItemCount;
             progressBar.post(new Runnable() {
                 @Override
                 public void run() {
-                    progressBar.incrementProgressBy(progress);
+                    progressBar.setProgress(progress);
                 }
             });
         }

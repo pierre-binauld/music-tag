@@ -83,7 +83,7 @@ public class ThumbnailService {
     public void loadThumbnail(LibraryItem item, ImageView imageView) {
 
 //        final String key = item.getDecoder().getKey();
-//
+////
 //        final Bitmap bitmap = cache.get(key);
 //        if (bitmap != null) {
             imageView.setImageBitmap(defaultArtwork);

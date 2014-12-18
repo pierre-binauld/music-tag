@@ -1,12 +1,11 @@
 package binauld.pierre.musictag.item;
 
 
-import android.graphics.Bitmap;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import binauld.pierre.musictag.collection.MultipleBufferedList;
 
 /**
  * Represent a folder in a library.
@@ -14,7 +13,7 @@ import java.util.List;
 public abstract class NodeItem extends ChildItem {
 
     private Comparator<LibraryItem> comparator;
-    private List<LibraryItem> children = new ArrayList<LibraryItem>();
+    private MultipleBufferedList<LibraryItem> children = new MultipleBufferedList<>();
     private LoadingState state;
 
     public NodeItem(Comparator<LibraryItem> comparator) {
@@ -104,5 +103,9 @@ public abstract class NodeItem extends ChildItem {
      */
     public void setState(LoadingState state) {
         this.state = state;
+    }
+
+    public MultipleBufferedList<LibraryItem> getChildren() {
+        return children;
     }
 }

@@ -82,7 +82,6 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-            Log.wtf(this.getClass().toString(), item.getPrimaryInformation());
             thumbnailService.loadThumbnail(item, viewHolder.thumbnail);
 //            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
             convertView.setTag(viewHolder);

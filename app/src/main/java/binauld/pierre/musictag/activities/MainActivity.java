@@ -46,21 +46,27 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     private Resources res;
     private SharedPreferences sharedPrefs;
 
+    private ListView listView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         // Get resources
         res = getResources();
-
-        // Switch off JAudioTagger log
-        Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
+
+        // Init theme
+        this.setTheme(SettingsActivity.getTheme(res, sharedPrefs));
+        setContentView(R.layout.activity_main);
+
+
+        // Switch off JAudioTagger log
+        Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
         // Init cache
         Cache<Bitmap> cache = new Cache<Bitmap>();
@@ -82,7 +88,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         switchNode(getSourceNode());
 
         // Init view
-        ListView listView = (ListView) findViewById(R.id.library_item_list);
+        listView = (ListView) findViewById(R.id.library_item_list);
         listView.setOnItemClickListener(this);
         listView.setAdapter(adapter);
 
@@ -160,6 +166,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(res.getString(R.string.source_folder_preference_key))) {
             switchNode(getSourceNode());
+        } else if (key.equals(res.getString(R.string.dark_theme_preference_key))) {
+            this.finish();
+            this.startActivity(new Intent(this, this.getClass()));
+//            this.setTheme(SettingsActivity.getTheme(res, sharedPrefs));
+//            listView.invalidate();
         }
     }
 

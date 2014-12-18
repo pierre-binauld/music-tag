@@ -9,6 +9,14 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
+/**
+ * Allow to modify an ArrayList on some thread without hinder read method.
+ * Furthermore modification can be retrieve for reading with the push/pull method.
+ * Tail represent the most updated list. It is this list you working on.
+ *
+ * Optimisation: find a way to choose the list implementation used (ArrayList, LinkedList...).
+ * @param <E> @see List
+ */
 public class MultipleBufferedList<E> implements List<E> {
 
     private Queue<List<E>> queue;
@@ -16,6 +24,9 @@ public class MultipleBufferedList<E> implements List<E> {
     private List<E> head;
     private List<E> tail;
 
+    /**
+     * Default constructor.
+      */
     public MultipleBufferedList() {
         this.queue = new LinkedList<>();
         this.tail = new ArrayList<>();
@@ -24,15 +35,26 @@ public class MultipleBufferedList<E> implements List<E> {
         this.pull();
     }
 
+    /**
+     * Get the tail for more modifying possibilities.
+     * Tail represent the most updated list. It is this list you working on.
+     * @return The tail.
+     */
     public List<E> getTail() {
         return tail;
     }
 
+    /**
+     * Push changes made on the tail.
+     */
     public void push() {
         tail = new ArrayList<>(tail);
         queue.add(tail);
     }
 
+    /**
+     * Get the waiting changes pushed for reading.
+     */
     public void pull() {
         while(queue.size() > 1) {
             head = queue.poll();

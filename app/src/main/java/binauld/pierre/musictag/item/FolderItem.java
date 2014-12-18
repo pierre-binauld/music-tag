@@ -13,8 +13,8 @@ public class FolderItem extends NodeItem {
     private File file;
     private String secondaryInformation;
 
-    public FolderItem(File file, Comparator<LibraryItem> comparator) {
-        super(comparator);
+    public FolderItem(File file) {
+        super();
         init(file);
     }
 

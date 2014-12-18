@@ -145,7 +145,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
         if (!item.getAudio()) {
             FolderItem node = (FolderItem) item;
-            //TODO: Load image when they are displayed
             switchNode(node);
             adapter.notifyDataSetChanged();
         }
@@ -178,7 +177,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 res.getString(R.string.source_folder_preference_key),
                 res.getString(R.string.source_folder_preference_default));
 
-        return new FolderItem(new File(sourceFolder), new LibraryItemComparator());
+        return new FolderItem(new File(sourceFolder));
     }
 
     /**
@@ -198,7 +197,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             }
 //          node.setIsLoaded(true);
         } else if (node.getState() == LoadingState.LOADING) {
-            //TODO: Progress bar improvement: switch the progress bar when node is loading.
+            //TODO: Progress bar improvement: switch back the progress bar when node is loading.
         }
     }
 }

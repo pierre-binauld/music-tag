@@ -12,19 +12,16 @@ import binauld.pierre.musictag.collection.MultipleBufferedList;
  */
 public abstract class NodeItem extends ChildItem {
 
-    private Comparator<LibraryItem> comparator;
     private MultipleBufferedList<LibraryItem> children = new MultipleBufferedList<>();
     private LoadingState state;
 
-    public NodeItem(Comparator<LibraryItem> comparator) {
+    public NodeItem() {
         this.init();
-        this.comparator = comparator;
     }
 
     public NodeItem(NodeItem parent) {
         this.init();
         this.parent = parent;
-        this.comparator = parent.getComparator();
     }
 
     private void init() {
@@ -34,20 +31,6 @@ public abstract class NodeItem extends ChildItem {
     @Override
     public boolean getAudio() {
         return false;
-    }
-
-//    @Override
-//    public Bitmap getThumbnail() {
-//        return thumbnail;
-//    }
-
-    public void add(LibraryItem item) {
-        children.add(item);
-    }
-
-    public void add(LibraryItem[] elements) {
-        Collections.addAll(children, elements);
-        Collections.sort(children, comparator);
     }
 
     /**
@@ -65,28 +48,6 @@ public abstract class NodeItem extends ChildItem {
      */
     public LibraryItem getChild(int i) {
         return children.get(i);
-    }
-
-    /**
-     * Get the comparator used to sort children.
-     * @return The comparator.
-     */
-    public Comparator<LibraryItem> getComparator() {
-        if(null != comparator) {
-            return comparator;
-        } else if (null != parent) {
-            return parent.getComparator();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Set the comparator used to sort children.
-     * @param comparator The comparator.
-     */
-    public void setComparator(Comparator<LibraryItem> comparator) {
-        this.comparator = comparator;
     }
 
     /**

@@ -24,7 +24,7 @@ import binauld.pierre.musictag.factory.LibraryItemFactory;
  * Load all the audio files and directories from a folder to an adapter.
  * This task is executed asynchronously when execute is called.
  */
-public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Integer> {
+public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
 
     //TODO: Parameterize this for different screen size
     private static int UPDATE_STEP = 10;
@@ -40,7 +40,7 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
     private int invalidItemCount;
     private Comparator<LibraryItem> comparator;
 
-    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter, LibraryItemLoaderManager manager) {
+    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter, Comparator<LibraryItem> comparator, LibraryItemLoaderManager manager) {
         this.adapter = adapter;
         this.node = adapter.getCurrentNode();
         this.filter = filter;
@@ -48,43 +48,38 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
         this.manager = manager;
 
         this.items = this.node.getChildren();
-        this.comparator = new LibraryItemComparator();
+        this.comparator = comparator;
     }
 
     @Override
     protected Integer doInBackground(FolderItem... values) {
-        int count = 0;
         this.initProgressBar(values);
 
         for (FolderItem folderItem : values) {
             folderItem.setState(LoadingState.LOADING);
             File folder = folderItem.getFile();
             File[] files = folder.listFiles(filter);
-            Log.wtf(this.getClass().toString(), files.length + "");
+
             if (null == files) {
                 Log.w(this.getClass().toString(), "'" + folder.getAbsolutePath() + "' does not contains readable file.");
             } else {
                 int j = 0;
-//                List<LibraryItem> items = new ArrayList<LibraryItem>();
                 for (int i = 0; i < files.length; i++) {
 
                     try {
                         LibraryItem item = factory.build(files[i], folderItem);
 
-//                        items.add(item);
                         this.items.add(item);
+
                         j = ++j % UPDATE_STEP;
                         if (j == 0 || i == files.length - 1) {
                             Collections.sort(this.items.getTail(), comparator);
                             this.items.push();
-                            publishProgress(/*items.toArray(new LibraryItem[items.size()])*/);
-//                            count += items.size();
-                            count = items.size();
-//                            items = new ArrayList<LibraryItem>();incrementProgressBy
+                            publishProgress();
                         }
                     } catch (IOException e) {
                         invalidItemCount++;
-                        updateProgressBar();
+                        updateProgressBarOnUiThread();
                         Log.w(this.getClass().toString(), e.getMessage());
                     }
                 }
@@ -92,19 +87,13 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
             folderItem.setState(LoadingState.LOADED);
         }
 
-        return count;
+        return items.size();
     }
 
     @Override
-    protected void onProgressUpdate(LibraryItem... items) {
-//        node.add(items);
-
-        //TODO: When architecture will stabilize, comparator will may be used here.
-//        items[0].getParent().add(items);
-        this.items.pull();
-        if (null != progressBar) {
-            progressBar.setProgress(this.items.size() + invalidItemCount);
-        }
+    protected void onProgressUpdate(Void... voids) {
+        items.pull();
+        updateProgressBar();
         adapter.notifyDataSetChanged();
     }
 
@@ -129,7 +118,6 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
                 max += folder.getFile().list().length;
             }
 
-            Log.wtf(this.getClass().toString(), max + " ");
             final int finalMax = max;
             progressBar.post(new Runnable() {
                 @Override
@@ -145,15 +133,23 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, LibraryItem, Intege
      * Update the progress bar from any thread.
      * Used in case of unreadable file.
      */
-    private void updateProgressBar() {
+    private void updateProgressBarOnUiThread() {
         if (null != progressBar) {
-            final int progress = this.items.size() + invalidItemCount;
             progressBar.post(new Runnable() {
                 @Override
                 public void run() {
-                    progressBar.setProgress(progress);
+                    updateProgressBar();
                 }
             });
+        }
+    }
+
+    /**
+     * Update the progress bar with the items count and the invalid item count.
+     */
+    public void updateProgressBar() {
+        if (null != progressBar) {
+            progressBar.setProgress(items.size() + invalidItemCount);
         }
     }
 

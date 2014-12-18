@@ -61,7 +61,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
         // Init theme
-        this.setTheme(SettingsActivity.getTheme(res, sharedPrefs));
         setContentView(R.layout.activity_main);
 
 
@@ -166,11 +165,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(res.getString(R.string.source_folder_preference_key))) {
             switchNode(getSourceNode());
-        } else if (key.equals(res.getString(R.string.dark_theme_preference_key))) {
-            this.finish();
-            this.startActivity(new Intent(this, this.getClass()));
-//            this.setTheme(SettingsActivity.getTheme(res, sharedPrefs));
-//            listView.invalidate();
         }
     }
 

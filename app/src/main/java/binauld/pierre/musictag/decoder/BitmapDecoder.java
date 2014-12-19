@@ -5,9 +5,15 @@ import android.graphics.Bitmap;
 
 public interface BitmapDecoder {
 
+    /**
+     * Decode the associated file to Bitmap.
+     * @return
+     */
     Bitmap decode();
 
+    /**
+     * Get the cache key of the Bitmap.
+     * @return
+     */
     String getKey();
-
-//    int getDefaultSourceResId();
 }

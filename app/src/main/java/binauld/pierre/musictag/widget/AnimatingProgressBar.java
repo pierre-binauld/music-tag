@@ -10,7 +10,7 @@ import android.widget.ProgressBar;
 
 public class AnimatingProgressBar extends ProgressBar {
 
-    private static final Interpolator DEFAULT_INTERPOLATER = new AccelerateDecelerateInterpolator();
+    private static final Interpolator DEFAULT_INTERPOLATOR = new AccelerateDecelerateInterpolator();
 
     private ValueAnimator animator;
     private ValueAnimator animatorSecondary;
@@ -46,7 +46,7 @@ public class AnimatingProgressBar extends ProgressBar {
             animator.cancel();
         if (animator == null) {
             animator = ValueAnimator.ofInt(getProgress(), progress);
-            animator.setInterpolator(DEFAULT_INTERPOLATER);
+            animator.setInterpolator(DEFAULT_INTERPOLATOR);
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
                 @Override
@@ -70,7 +70,7 @@ public class AnimatingProgressBar extends ProgressBar {
             animatorSecondary.cancel();
         if (animatorSecondary == null) {
             animatorSecondary = ValueAnimator.ofInt(getProgress(), secondaryProgress);
-            animatorSecondary.setInterpolator(DEFAULT_INTERPOLATER);
+            animatorSecondary.setInterpolator(DEFAULT_INTERPOLATOR);
             animatorSecondary.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
                 @Override

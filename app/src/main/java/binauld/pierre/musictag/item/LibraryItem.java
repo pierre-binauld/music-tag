@@ -34,7 +34,15 @@ public interface LibraryItem {
      */
     NodeItem getParent();
 
+    /**
+     * Get the bitmap decoder.
+     * @return The bitmap decoder.
+     */
     BitmapDecoder getDecoder();
 
+    /**
+     * Allow to change the bitmap decoder.
+     * @param bitmapDecoder The bitmap decoder.
+     */
     void switchDecoder(BitmapDecoder bitmapDecoder);
 }

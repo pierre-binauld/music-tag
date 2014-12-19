@@ -1,12 +1,6 @@
 package binauld.pierre.musictag.item;
 
-import android.graphics.Bitmap;
-
 import java.io.File;
-import java.util.Comparator;
-
-import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 
 public class FolderItem extends NodeItem {
 

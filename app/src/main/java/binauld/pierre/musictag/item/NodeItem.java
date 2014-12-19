@@ -72,6 +72,10 @@ public abstract class NodeItem extends ChildItem {
         this.state = state;
     }
 
+    /**
+     * Get the list of children for modification.
+     * @return The list of children
+     */
     public MultipleBufferedList<LibraryItem> getChildren() {
         return children;
     }

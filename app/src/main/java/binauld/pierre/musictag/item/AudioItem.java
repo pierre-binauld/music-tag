@@ -38,9 +38,4 @@ public class AudioItem extends ChildItem {
         return audio.getTag().getFirst(FieldKey.ARTIST);
     }
 
-
-//    @Override
-//    public Bitmap getThumbnail() {
-//        return thumbnail;
-//    }
 }

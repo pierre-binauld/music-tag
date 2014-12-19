@@ -44,7 +44,7 @@ public class AudioItem extends ChildItem {
         return thumbnail;
     }
 
-    public Object getAudio() {
+    public AudioFile getAudio() {
         return audio;
     }
 }

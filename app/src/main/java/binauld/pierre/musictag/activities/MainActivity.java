@@ -145,7 +145,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         else {
             AudioItem audio = (AudioItem) item;
             Intent intent = new Intent(this, TagFormActivity.class);
-            intent.putExtra("song", new Gson().toJson(audio.getAudio()));
+            intent.putExtra("file", audio.getAudio().getFile());
             startActivity(intent);
         }
     }

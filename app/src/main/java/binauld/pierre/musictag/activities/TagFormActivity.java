@@ -5,10 +5,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -115,7 +114,7 @@ public class TagFormActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void sendConfirmation(){
+    public void sendConfirmation(View view){
         String title = txt_title.getText().toString();
         String artist = txt_artist.getText().toString();
         String album = txt_album.getText().toString();
@@ -132,22 +131,35 @@ public class TagFormActivity extends Activity {
             tags.setField(FieldKey.TITLE,title);
             tags.setField(FieldKey.ARTIST,artist);
             tags.setField(FieldKey.ALBUM,album);
-            tags.setField(FieldKey.YEAR,year);
+            if(isInteger(year)){tags.setField(FieldKey.YEAR,year);}
             tags.setField(FieldKey.ALBUM_ARTIST,album_artist);
             tags.setField(FieldKey.COMPOSER,composer);
             tags.setField(FieldKey.GROUPING,grouping);
             tags.setField(FieldKey.GENRE,genre);
-            tags.setField(FieldKey.DISC_NO,disk);
-            tags.setField(FieldKey.TRACK,track);
+            if(isInteger(disk)){tags.setField(FieldKey.DISC_NO,disk);}
+            if(isInteger(track)){tags.setField(FieldKey.TRACK,track);}
         } catch (FieldDataInvalidException e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT);
             Log.e(this.getClass().toString(), e.getMessage(), e);
         }
         audio.setTag(tags);
+
         try {
-            audio.commit();
+            AudioFileIO.write(audio);
         } catch (CannotWriteException e) {
             e.printStackTrace();
         }
+        finish();
+    }
+
+
+    public boolean isInteger(String string) {
+        try {
+            Integer.parseInt(string);
+        } catch (NumberFormatException e){
+            return false;
+        }
+
+        return true;
     }
 }

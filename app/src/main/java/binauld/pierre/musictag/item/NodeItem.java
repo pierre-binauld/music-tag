@@ -1,6 +1,7 @@
 package binauld.pierre.musictag.item;
 
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -12,7 +13,7 @@ import binauld.pierre.musictag.collection.MultipleBufferedList;
  */
 public abstract class NodeItem extends ChildItem {
 
-    private MultipleBufferedList<LibraryItem> children = new MultipleBufferedList<>();
+    private MultipleBufferedList<LibraryItem> children;
     private LoadingState state;
 
     public NodeItem() {
@@ -25,6 +26,11 @@ public abstract class NodeItem extends ChildItem {
     }
 
     private void init() {
+        this.children = new MultipleBufferedList<LibraryItem>(new MultipleBufferedList.ListFactory<LibraryItem>() {
+            public List<LibraryItem> buildEmptyList() {
+                return new ArrayList<>();
+            }
+        });
         this.state = LoadingState.NOT_LOADED;
     }
 

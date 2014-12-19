@@ -1,7 +1,6 @@
 package binauld.pierre.musictag.collection;
 
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,10 +13,19 @@ import java.util.Queue;
  * Furthermore modification can be retrieve for reading with the push/pull method.
  * Tail represent the most updated list. It is this list you working on.
  *
- * Optimisation: find a way to choose the list implementation used (ArrayList, LinkedList...).
  * @param <E> @see List
  */
 public class MultipleBufferedList<E> implements List<E> {
+
+    /**
+     * A factory to build the implementation of lists used by MultipleBufferedList.
+     * @param <E> @see List
+     */
+    public static abstract class ListFactory<E> {
+        public abstract List<E> buildEmptyList();
+    }
+
+    private ListFactory factory;
 
     private Queue<List<E>> queue;
 
@@ -26,10 +34,12 @@ public class MultipleBufferedList<E> implements List<E> {
 
     /**
      * Default constructor.
-      */
-    public MultipleBufferedList() {
+     * @param factory A factory used to build empty implementation of lists internally used.
+     */
+    public MultipleBufferedList(ListFactory<E> factory) {
+        this.factory = factory;
         this.queue = new LinkedList<>();
-        this.tail = new ArrayList<>();
+        this.tail = this.factory.buildEmptyList();
         this.queue.add(tail);
         this.push();
         this.pull();
@@ -48,7 +58,9 @@ public class MultipleBufferedList<E> implements List<E> {
      * Push changes made on the tail.
      */
     public void push() {
-        tail = new ArrayList<>(tail);
+        List<E> list = factory.buildEmptyList();
+        list.addAll(tail);
+        tail = list;
         queue.add(tail);
     }
 

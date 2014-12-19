@@ -3,7 +3,6 @@ package binauld.pierre.musictag.service;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.widget.ImageView;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
@@ -82,20 +81,19 @@ public class ThumbnailService {
 
     public void loadThumbnail(LibraryItem item, ImageView imageView) {
 
-//        final String key = item.getDecoder().getKey();
-////
-//        final Bitmap bitmap = cache.get(key);
-//        if (bitmap != null) {
-            imageView.setImageBitmap(defaultArtwork);
-//            imageView.setImageBitmap(bitmap);
-//        } if (cancelPotentialWork(item, imageView)) {
-//            Resources res = imageView.getResources();
-//            final ThumbnailLoader task = new ThumbnailLoader(imageView, cache, defaultArtworkDecoder);
-//            final AsyncDrawable asyncDrawable = new AsyncDrawable(res, cache.get(defaultArtworkResID), task);
-//            Log.wtf(this.getClass().toString(), ""+cache.get(defaultArtworkResID));
-//            imageView.setImageDrawable(asyncDrawable);
-//            task.execute(item);
-//        }
+        final String key = item.getDecoder().getKey();
+//
+        final Bitmap bitmap = cache.get(key);
+        if (bitmap != null) {
+//            imageView.setImageBitmap(defaultArtwork);
+            imageView.setImageBitmap(bitmap);
+        } if (cancelPotentialWork(item, imageView)) {
+            Resources res = imageView.getResources();
+            final ThumbnailLoader task = new ThumbnailLoader(imageView, cache, defaultArtworkDecoder);
+            final AsyncDrawable asyncDrawable = new AsyncDrawable(res, cache.get(defaultArtworkResID), task);
+            imageView.setImageDrawable(asyncDrawable);
+            task.execute(item);
+        }
 
 
 

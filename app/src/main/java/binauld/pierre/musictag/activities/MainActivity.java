@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.io.Cache;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
@@ -73,15 +75,18 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Init service(s)
         ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song, R.drawable.folder);
 
+        // Init factory
+        //TODO: Cache improvement put the thumbnail in the cache with the artist/album as key
+        LibraryItemFactory itemFactory = new LibraryItemFactory(thumbnailService.getFolderBitmapDecoder(), getThumbnailSize());
+
         // Init adapter
         adapter = AdapterHelper.buildAdapter(this.getBaseContext(), thumbnailService, new LibraryItemComparator());
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-//        progressBar.setProgress(50);
 
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(adapter, thumbnailService, progressBar);
+        manager = new LibraryItemLoaderManager(adapter, itemFactory, progressBar);
 
         // Load items
         switchNode(getSourceNode());
@@ -143,7 +148,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
-        if (!item.getAudio()) {
+        if (!item.isAudioItem()) {
             FolderItem node = (FolderItem) item;
             switchNode(node);
             adapter.notifyDataSetChanged();
@@ -199,5 +204,18 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         } else if (node.getState() == LoadingState.LOADING) {
             //TODO: Progress bar improvement: switch back the progress bar when node is loading.
         }
+    }
+
+    /**
+     * Retrieve the thumbnail size from listPreferredItemHeight theme attribute.
+     * @return The thumbnail size.
+     */
+    private int getThumbnailSize() {
+        TypedValue thumbnailSize = new android.util.TypedValue();
+        getTheme().resolveAttribute(android.R.attr.listPreferredItemHeight, thumbnailSize, true);
+        TypedValue.coerceToString(thumbnailSize.type, thumbnailSize.data);
+        android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return (int)thumbnailSize.getDimension(metrics);
     }
 }

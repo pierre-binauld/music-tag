@@ -1,9 +1,6 @@
 package binauld.pierre.musictag.factory;
 
 
-import android.content.res.Resources;
-import android.util.Log;
-
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -14,15 +11,12 @@ import org.jaudiotagger.tag.TagException;
 import java.io.File;
 import java.io.IOException;
 
-import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.AudioFileBitmapDecoder;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * Build a library item from a source file.
@@ -31,9 +25,11 @@ import binauld.pierre.musictag.service.ThumbnailService;
 public class LibraryItemFactory {
 
     private BitmapDecoder folderBitmapDecoder;
+    private int thumbnailSize;
 
-    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder) {
+    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, int thumbnailSize) {
         this.folderBitmapDecoder = folderBitmapDecoder;
+        this.thumbnailSize = thumbnailSize;
     }
 
     /**
@@ -52,6 +48,7 @@ public class LibraryItemFactory {
             try {
                 AudioFile audio = AudioFileIO.read(file);
                 AudioItem audioItem = new AudioItem(audio);
+                audioItem.setDecoder(new AudioFileBitmapDecoder(audioItem.getAudioFile(), thumbnailSize, thumbnailSize));
                 audioItem.setParent(parent);
                 return audioItem;
             } catch (CannotReadException e) {

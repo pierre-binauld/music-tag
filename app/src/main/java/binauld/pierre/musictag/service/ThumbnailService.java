@@ -3,6 +3,8 @@ package binauld.pierre.musictag.service;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
@@ -24,11 +26,13 @@ public class ThumbnailService {
     private BitmapDecoder defaultArtworkDecoder;
     private BitmapDecoder folderBitmapDecoder;
 
-    private Bitmap defaultArtwork;
+//    private Bitmap defaultArtwork;
 
     private Cache<Bitmap> cache;
 
     //TODO: may be we can make one method getThumbnail which take the item as parameter ?
+    //TODO: clean up
+    //TODO: animation when thumbnail is charged.
     public ThumbnailService(Cache<Bitmap> cache, Context context, int defaultArtworkResId, int folderResId) {
         Resources res = context.getResources();
 
@@ -38,12 +42,12 @@ public class ThumbnailService {
         this.defaultArtworkDecoder = new ResourceBitmapDecoder(res, this.defaultArtworkResID);
         this.folderBitmapDecoder = new ResourceBitmapDecoder(res, folderResId);
 
-        this.defaultArtwork = defaultArtworkDecoder.decode();
+//        this.defaultArtwork = defaultArtworkDecoder.decode();
 
         BitmapDecoder[] decoders = new BitmapDecoder[2];
         decoders[0] = this.defaultArtworkDecoder;
         decoders[1] = this.folderBitmapDecoder;
-        DefaultThumbnailLoader loader = new DefaultThumbnailLoader(cache);
+        DefaultThumbnailLoader loader = new DefaultThumbnailLoader(this.cache);
         loader.execute(decoders);
     }
 
@@ -84,10 +88,11 @@ public class ThumbnailService {
         final String key = item.getDecoder().getKey();
 //
         final Bitmap bitmap = cache.get(key);
+
         if (bitmap != null) {
 //            imageView.setImageBitmap(defaultArtwork);
             imageView.setImageBitmap(bitmap);
-        } if (cancelPotentialWork(item, imageView)) {
+        } else if (cancelPotentialWork(item, imageView)) {
             Resources res = imageView.getResources();
             final ThumbnailLoader task = new ThumbnailLoader(imageView, cache, defaultArtworkDecoder);
             final AsyncDrawable asyncDrawable = new AsyncDrawable(res, cache.get(defaultArtworkResID), task);
@@ -100,7 +105,7 @@ public class ThumbnailService {
     }
 
     private boolean cancelPotentialWork(LibraryItem item, ImageView imageView) {
-        final ThumbnailLoader thumbnailLoader = AsyncDrawable.getBitmapWorkerTask(imageView);
+        final ThumbnailLoader thumbnailLoader = AsyncDrawable.getBitmapLoader(imageView);
 
         if (thumbnailLoader != null) {
             final LibraryItem taskItem = thumbnailLoader.getWorkingItem();

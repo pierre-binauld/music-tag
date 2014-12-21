@@ -21,6 +21,10 @@ import binauld.pierre.musictag.service.ThumbnailService;
  */
 public class LibraryItemAdapter extends BaseAdapter {
 
+    //TODO: Try to implement animation when data changed.
+    //TODO: Use RecyclerView
+    //TODO: Clip a view
+
     static class ViewHolder {
         TextView firstLine;
         TextView secondLine;

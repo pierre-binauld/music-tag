@@ -35,7 +35,7 @@ public abstract class NodeItem extends ChildItem {
     }
 
     @Override
-    public boolean getAudio() {
+    public boolean isAudioItem() {
         return false;
     }
 

@@ -1,8 +1,11 @@
 package binauld.pierre.musictag.helper;
 
+import android.content.res.Resources;
+
 import java.io.FileFilter;
 import java.util.Comparator;
 
+import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.adapter.LibraryItemComparator;
 import binauld.pierre.musictag.factory.FileFilterFactory;
@@ -24,12 +27,10 @@ public class LoaderHelper {
      * @param manager The manager to the loader.
      * @return The loader built.
      */
-    public static LibraryItemLoader buildLoader(LibraryItemAdapter adapter, ThumbnailService thumbnailService, LibraryItemLoaderManager manager) {
+    public static LibraryItemLoader buildLoader(LibraryItemAdapter adapter, LibraryItemFactory factory, LibraryItemLoaderManager manager) {
         FileFilterFactory filterFactory = new FileFilterFactory();
 
         FileFilter filter = filterFactory.build();
-
-        LibraryItemFactory factory = new LibraryItemFactory(thumbnailService.getFolderBitmapDecoder());
 
         Comparator<LibraryItem> comparator = new LibraryItemComparator();
 

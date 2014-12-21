@@ -2,6 +2,7 @@ package binauld.pierre.musictag.io;
 
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
@@ -23,7 +24,7 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
     public ThumbnailLoader(ImageView imageView, Cache<Bitmap> cache, BitmapDecoder defaultThumbnailDecoder) {
 //        this.decoder = decoder;
         // Use a WeakReference to ensure the ImageView can be garbage collected
-        this.imageViewReference = new WeakReference<ImageView>(imageView);
+        this.imageViewReference = new WeakReference<>(imageView);
         this.cache = cache;
         this.defaultThumbnailDecoder = defaultThumbnailDecoder;
     }
@@ -54,7 +55,7 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
 
         if (imageViewReference != null && bitmap != null) {
             final ImageView imageView = imageViewReference.get();
-            final ThumbnailLoader thumbnailLoader = AsyncDrawable.getBitmapWorkerTask(imageView);
+            final ThumbnailLoader thumbnailLoader = AsyncDrawable.getBitmapLoader(imageView);
             if (this == thumbnailLoader && imageView != null) {
                 imageView.setImageBitmap(bitmap);
             }

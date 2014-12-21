@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LoaderHelper;
 import binauld.pierre.musictag.service.ThumbnailService;
 
@@ -20,12 +21,12 @@ public class LibraryItemLoaderManager {
     private Set<WeakReference<LibraryItemLoader>> loaders = new HashSet<>();
 
     private LibraryItemAdapter adapter;
-    private ThumbnailService thumbnailService;
+    private LibraryItemFactory itemFactory;
     private ProgressBar progressBar;
 
-    public LibraryItemLoaderManager(LibraryItemAdapter adapter, ThumbnailService thumbnailService, ProgressBar progressBar) {
+    public LibraryItemLoaderManager(LibraryItemAdapter adapter, LibraryItemFactory itemFactory, ProgressBar progressBar) {
         this.adapter = adapter;
-        this.thumbnailService = thumbnailService;
+        this.itemFactory = itemFactory;
         this.progressBar = progressBar;
     }
 
@@ -34,7 +35,7 @@ public class LibraryItemLoaderManager {
      * @return The created loader.
      */
     public LibraryItemLoader get() {
-        LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, thumbnailService, this);
+        LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, itemFactory, this);
         loader.setProgressBar(progressBar);
         loaders.add(new WeakReference<>(loader));
         return loader;

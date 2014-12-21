@@ -16,11 +16,10 @@ public class AudioItem extends ChildItem {
 
     public AudioItem(AudioFile audio) {
         this.audio = audio;
-        this.decoder = new AudioFileBitmapDecoder(this.audio);
     }
 
     @Override
-    public boolean getAudio() {
+    public boolean isAudioItem() {
         return true;
     }
 
@@ -36,6 +35,10 @@ public class AudioItem extends ChildItem {
     @Override
     public String getSecondaryInformation() {
         return audio.getTag().getFirst(FieldKey.ARTIST);
+    }
+
+    public AudioFile getAudioFile() {
+        return audio;
     }
 
 }

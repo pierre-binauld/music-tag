@@ -2,6 +2,7 @@ package binauld.pierre.musictag.decoder;
 
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 public interface BitmapDecoder {
 

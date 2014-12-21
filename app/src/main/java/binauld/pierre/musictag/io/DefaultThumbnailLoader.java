@@ -2,7 +2,6 @@ package binauld.pierre.musictag.io;
 
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
@@ -19,7 +18,7 @@ public class DefaultThumbnailLoader extends AsyncTask<BitmapDecoder, Void, Integ
     @Override
     protected Integer doInBackground(BitmapDecoder... decoders) {
         for(BitmapDecoder decoder : decoders) {
-            cache.put(decoder.getKey(), decoder.decode());
+            cache.put(decoder.getId(), decoder.decode());
         }
         return decoders.length;
     }

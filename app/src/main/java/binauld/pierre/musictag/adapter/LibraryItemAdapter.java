@@ -35,7 +35,7 @@ public class LibraryItemAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private final ThumbnailService thumbnailService;
 
-    public LibraryItemAdapter(Context baseContext, ThumbnailService thumbnailService, Comparator<LibraryItem> comparator) {
+    public LibraryItemAdapter(Context baseContext, ThumbnailService thumbnailService) {
         this.thumbnailService = thumbnailService;
         this.inflater = LayoutInflater.from(baseContext);
     }

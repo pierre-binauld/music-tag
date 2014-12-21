@@ -16,5 +16,5 @@ public interface BitmapDecoder {
      * Get the cache key of the Bitmap.
      * @return
      */
-    String getKey();
+    String getId();
 }

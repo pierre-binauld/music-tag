@@ -46,11 +46,11 @@ public class MultipleBufferedList<E> implements List<E> {
     }
 
     /**
-     * Get the tail for more modifying possibilities.
-     * Tail represent the most updated list. It is this list you working on.
-     * @return The tail.
+     * Get the working list for more modifying possibilities.
+     * The working list represent the most updated list. It is this list you working on.
+     * @return The working list.
      */
-    public List<E> getTail() {
+    public List<E> getWorkingList() {
         return tail;
     }
 

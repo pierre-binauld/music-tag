@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.adapter;
+package binauld.pierre.musictag.collection;
 
 
 import java.util.Comparator;

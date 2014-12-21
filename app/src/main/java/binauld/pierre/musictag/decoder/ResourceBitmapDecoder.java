@@ -20,7 +20,7 @@ public class ResourceBitmapDecoder implements BitmapDecoder {
     }
 
     @Override
-    public String getKey() {
+    public String getId() {
         return String.valueOf(id);
     }
 }

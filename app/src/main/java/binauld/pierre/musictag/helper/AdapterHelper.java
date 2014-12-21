@@ -17,7 +17,7 @@ public class AdapterHelper {
      * @param comparator The comparator used to sort items.
      * @return The LibraryAdapter built.
      */
-    public static LibraryItemAdapter buildAdapter(Context context, ThumbnailService thumbnailService, Comparator<LibraryItem> comparator) {
-        return new LibraryItemAdapter(context, thumbnailService, comparator);
+    public static LibraryItemAdapter buildAdapter(Context context, ThumbnailService thumbnailService) {
+        return new LibraryItemAdapter(context, thumbnailService);
     }
 }

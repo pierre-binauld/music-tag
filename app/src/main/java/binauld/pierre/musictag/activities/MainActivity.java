@@ -24,12 +24,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.io.Cache;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
-import binauld.pierre.musictag.adapter.LibraryItemComparator;
 import binauld.pierre.musictag.helper.AdapterHelper;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
@@ -65,7 +66,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Init theme
         setContentView(R.layout.activity_main);
 
-
         // Switch off JAudioTagger log
         Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
@@ -73,20 +73,20 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         Cache<Bitmap> cache = new Cache<Bitmap>();
 
         // Init service(s)
-        ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song, R.drawable.folder);
+        ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song);
 
         // Init factory
-        //TODO: Cache improvement put the thumbnail in the cache with the artist/album as key
-        LibraryItemFactory itemFactory = new LibraryItemFactory(thumbnailService.getFolderBitmapDecoder(), getThumbnailSize());
+        BitmapDecoder folderBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.folder);
+        LibraryItemFactory itemFactory = new LibraryItemFactory(folderBitmapDecoder, getThumbnailSize());
 
         // Init adapter
-        adapter = AdapterHelper.buildAdapter(this.getBaseContext(), thumbnailService, new LibraryItemComparator());
+        adapter = AdapterHelper.buildAdapter(this.getBaseContext(), thumbnailService);
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(adapter, itemFactory, progressBar);
+        manager = new LibraryItemLoaderManager(adapter, itemFactory, progressBar, res.getInteger(R.integer.thumbnail_loader_update_step));
 
         // Load items
         switchNode(getSourceNode());
@@ -95,7 +95,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         listView = (ListView) findViewById(R.id.library_item_list);
         listView.setOnItemClickListener(this);
         listView.setAdapter(adapter);
-
     }
 
     @Override
@@ -208,6 +207,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     /**
      * Retrieve the thumbnail size from listPreferredItemHeight theme attribute.
+     *
      * @return The thumbnail size.
      */
     private int getThumbnailSize() {
@@ -216,6 +216,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         TypedValue.coerceToString(thumbnailSize.type, thumbnailSize.data);
         android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        return (int)thumbnailSize.getDimension(metrics);
+        return (int) thumbnailSize.getDimension(metrics);
     }
 }

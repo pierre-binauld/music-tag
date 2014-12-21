@@ -56,7 +56,7 @@ public class AudioFileBitmapDecoder implements BitmapDecoder {
     }
 
     @Override
-    public String getKey() {
+    public String getId() {
         return audioFile.getFile().getAbsolutePath();
     }
 }

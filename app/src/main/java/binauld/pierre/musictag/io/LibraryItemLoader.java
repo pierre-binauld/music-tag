@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 
-import binauld.pierre.musictag.adapter.LibraryItemComparator;
 import binauld.pierre.musictag.collection.MultipleBufferedList;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
@@ -26,26 +25,27 @@ import binauld.pierre.musictag.factory.LibraryItemFactory;
  */
 public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
 
-    //TODO: Parameterize this for different screen size
-    private static int UPDATE_STEP = 10;
+    private int updateStep;
 
     private final NodeItem node;
-    private final LibraryItemLoaderManager manager;
+    private MultipleBufferedList<LibraryItem> items;
+    private LibraryItemFactory factory;
+    private int invalidItemCount;
+
     private LibraryItemAdapter adapter;
     private FileFilter filter;
-    private LibraryItemFactory factory;
-    private ProgressBar progressBar;
-
-    private MultipleBufferedList<LibraryItem> items;
-    private int invalidItemCount;
     private Comparator<LibraryItem> comparator;
 
-    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter, Comparator<LibraryItem> comparator, LibraryItemLoaderManager manager) {
+    private ProgressBar progressBar;
+
+
+    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter, Comparator<LibraryItem> comparator, int updateStep) {
+        this.updateStep = updateStep;
+
         this.adapter = adapter;
         this.node = adapter.getCurrentNode();
         this.filter = filter;
         this.factory = libraryItemFactory;
-        this.manager = manager;
 
         this.items = this.node.getChildren();
         this.comparator = comparator;
@@ -71,10 +71,10 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
 
                         this.items.add(item);
 
-                        j = ++j % UPDATE_STEP;
+                        j = ++j % updateStep;
                         if (j == 0 || i == files.length - 1) {
-                            Collections.sort(this.items.getTail(), comparator);
-                            this.items.push();
+                            Collections.sort(items.getWorkingList(), comparator);
+                            items.push();
                             publishProgress();
                         }
                     } catch (IOException e) {

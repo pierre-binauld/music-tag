@@ -23,11 +23,13 @@ public class LibraryItemLoaderManager {
     private LibraryItemAdapter adapter;
     private LibraryItemFactory itemFactory;
     private ProgressBar progressBar;
+    private int updateStep;
 
-    public LibraryItemLoaderManager(LibraryItemAdapter adapter, LibraryItemFactory itemFactory, ProgressBar progressBar) {
+    public LibraryItemLoaderManager(LibraryItemAdapter adapter, LibraryItemFactory itemFactory, ProgressBar progressBar, int updateStep) {
         this.adapter = adapter;
         this.itemFactory = itemFactory;
         this.progressBar = progressBar;
+        this.updateStep = updateStep;
     }
 
     /**
@@ -35,7 +37,7 @@ public class LibraryItemLoaderManager {
      * @return The created loader.
      */
     public LibraryItemLoader get() {
-        LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, itemFactory, this);
+        LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, itemFactory, this, updateStep);
         loader.setProgressBar(progressBar);
         loaders.add(new WeakReference<>(loader));
         return loader;

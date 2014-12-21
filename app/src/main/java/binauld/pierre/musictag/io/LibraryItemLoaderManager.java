@@ -1,9 +1,9 @@
 package binauld.pierre.musictag.io;
 
 
-import android.content.res.Resources;
 import android.widget.ProgressBar;
 
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,7 +17,7 @@ import binauld.pierre.musictag.service.ThumbnailService;
  */
 public class LibraryItemLoaderManager {
 
-    private Set<LibraryItemLoader> loaders = new HashSet<LibraryItemLoader>();
+    private Set<WeakReference<LibraryItemLoader>> loaders = new HashSet<>();
 
     private LibraryItemAdapter adapter;
     private ThumbnailService thumbnailService;
@@ -36,7 +36,7 @@ public class LibraryItemLoaderManager {
     public LibraryItemLoader get() {
         LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, thumbnailService, this);
         loader.setProgressBar(progressBar);
-        loaders.add(loader);
+        loaders.add(new WeakReference<>(loader));
         return loader;
     }
 
@@ -45,16 +45,11 @@ public class LibraryItemLoaderManager {
      * @param mayInterruptIfRunning true if the thread executing this task should be interrupted; otherwise, in-progress tasks are allowed to complete.
      */
     public void cancelAll(boolean mayInterruptIfRunning) {
-        for (LibraryItemLoader loader : loaders) {
-            loader.cancel(mayInterruptIfRunning);
+        for (WeakReference<LibraryItemLoader> ref : loaders) {
+            LibraryItemLoader loader = ref.get();
+            if(null != loader) {
+                loader.cancel(mayInterruptIfRunning);
+            }
         }
-    }
-
-    /**
-     * Remove a loader from the manager.
-     * @param loader The loader to remove.
-     */
-    public void remove(LibraryItemLoader loader) {
-        loaders.remove(loader);
     }
 }

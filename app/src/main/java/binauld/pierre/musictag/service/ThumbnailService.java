@@ -79,7 +79,7 @@ public class ThumbnailService {
 //    }
 
 
-    public void loadThumbnail(LibraryItem item, ImageView imageView) {
+    public void setThumbnail(LibraryItem item, ImageView imageView) {
 
         final String key = item.getDecoder().getKey();
 //

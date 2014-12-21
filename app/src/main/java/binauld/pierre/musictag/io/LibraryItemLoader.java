@@ -100,7 +100,6 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
     @Override
     protected void onPostExecute(Integer count) {
         super.onPostExecute(count);
-        manager.remove(this);
         if (null != progressBar) {
             progressBar.setVisibility(View.GONE);
         }

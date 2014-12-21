@@ -2,7 +2,6 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,7 +81,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-            thumbnailService.loadThumbnail(item, viewHolder.thumbnail);
+            thumbnailService.setThumbnail(item, viewHolder.thumbnail);
 //            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
             convertView.setTag(viewHolder);
         }

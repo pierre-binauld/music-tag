@@ -11,11 +11,12 @@ import org.jaudiotagger.tag.TagException;
 import java.io.File;
 import java.io.IOException;
 
-import binauld.pierre.musictag.adapter.AudioItem;
-import binauld.pierre.musictag.adapter.FolderItem;
-import binauld.pierre.musictag.adapter.LibraryItem;
-import binauld.pierre.musictag.adapter.NodeItem;
-import binauld.pierre.musictag.service.ThumbnailService;
+import binauld.pierre.musictag.decoder.AudioFileBitmapDecoder;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.item.AudioItem;
+import binauld.pierre.musictag.item.FolderItem;
+import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.NodeItem;
 
 /**
  * Build a library item from a source file.
@@ -23,10 +24,12 @@ import binauld.pierre.musictag.service.ThumbnailService;
  */
 public class LibraryItemFactory {
 
-    private ThumbnailService thumbnailService;
+    private BitmapDecoder folderBitmapDecoder;
+    private int thumbnailSize;
 
-    public LibraryItemFactory(ThumbnailService thumbnailService) {
-        this.thumbnailService = thumbnailService;
+    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, int thumbnailSize) {
+        this.folderBitmapDecoder = folderBitmapDecoder;
+        this.thumbnailSize = thumbnailSize;
     }
 
     /**
@@ -38,20 +41,17 @@ public class LibraryItemFactory {
      */
     public LibraryItem build(File file, NodeItem parent) throws IOException {
         if(file.isDirectory()) {
-            return new FolderItem(file, thumbnailService.getFolder(), parent);
+            FolderItem folder = new FolderItem(file, parent);
+            folder.switchDecoder(folderBitmapDecoder);
+            return folder;
         } else {
             try {
                 AudioFile audio = AudioFileIO.read(file);
-                AudioItem audioItem = new AudioItem(audio, thumbnailService.getArtwork(audio));
+                AudioItem audioItem = new AudioItem(audio);
+                audioItem.switchDecoder(new AudioFileBitmapDecoder(audioItem.getAudioFile(), thumbnailSize, thumbnailSize));
                 audioItem.setParent(parent);
                 return audioItem;
-            } catch (CannotReadException e) {
-                throw new IOException(e);
-            } catch (TagException e) {
-                throw new IOException(e);
-            } catch (ReadOnlyFileException e) {
-                throw new IOException(e);
-            } catch (InvalidAudioFrameException e) {
+            } catch (CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
                 throw new IOException(e);
             }
         }

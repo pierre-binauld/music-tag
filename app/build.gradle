@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 20
+    compileSdkVersion 21
     buildToolsVersion "20.0.0"
 
     defaultConfig {
         applicationId "binauld.pierre.musictag"
         minSdkVersion 16
-        targetSdkVersion 20
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
@@ -28,7 +28,6 @@ dependencies {
 
     // Remote binary dependency
     compile 'org:jaudiotagger:2.0.3'
-    compile 'commons-io:commons-io:2.4'
     compile 'commons-lang:commons-lang:2.6'
     compile 'com.pkmmte.view:circularimageview:1.1'
     compile 'com.google.code.gson:gson:2.3.1'

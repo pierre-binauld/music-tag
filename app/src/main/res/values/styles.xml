@@ -1,8 +1,12 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="android:Theme.Holo">
         <!-- Customize your theme here. -->
     </style>
 
+    <!--Progress bar style.-->
+    <style name="horizontalProgressBar" parent="android:Widget.Holo.ProgressBar.Horizontal">
+
+    </style>
 </resources>

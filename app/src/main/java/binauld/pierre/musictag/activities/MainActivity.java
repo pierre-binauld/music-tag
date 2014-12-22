@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,14 +24,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.adapter.AudioItem;
-import binauld.pierre.musictag.adapter.FolderItem;
-import binauld.pierre.musictag.adapter.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
-import binauld.pierre.musictag.adapter.LibraryItemComparator;
-import binauld.pierre.musictag.helper.AdapterHelper;
+import binauld.pierre.musictag.factory.LibraryItemFactory;
+import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
+import binauld.pierre.musictag.io.Cache;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
+import binauld.pierre.musictag.item.FolderItem;
+import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.LoadingState;
 import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
@@ -48,33 +49,39 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //TODO: create progress bar
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         // Get resources
         res = getResources();
-
-        // Switch off JAudioTagger log
-        Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
+        // Init theme
+        setContentView(R.layout.activity_main);
+
+        // Switch off JAudioTagger log
+        Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
+
+        // Init cache
+        Cache<Bitmap> cache = new Cache<>();
+
         // Init service(s)
-        ThumbnailService thumbnailService = new ThumbnailService(this, R.drawable.song, R.drawable.folder);
+        ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song);
+
+        // Init factory
+        LibraryItemFactory itemFactory = LibraryItemFactoryHelper.buildFactory(this);
 
         // Init adapter
-        adapter = AdapterHelper.buildAdapter(this.getBaseContext(), new LibraryItemComparator());
+        adapter = new LibraryItemAdapter(thumbnailService);
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-//        progressBar.setProgress(50);
 
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(adapter, thumbnailService, progressBar);
+        manager = new LibraryItemLoaderManager(adapter, itemFactory, progressBar, res.getInteger(R.integer.thumbnail_loader_update_step));
 
         // Load items
         switchNode(getSourceNode());
@@ -83,25 +90,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         ListView listView = (ListView) findViewById(R.id.library_item_list);
         listView.setOnItemClickListener(this);
         listView.setAdapter(adapter);
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.wtf(this.getClass().toString(), "onStart");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.wtf(this.getClass().toString(), "onRestart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.wtf(this.getClass().toString(), "onResume");
     }
 
     @Override
@@ -136,7 +139,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
-        if (!item.isSong()) {
+        if (!item.isAudioItem()) {
             FolderItem node = (FolderItem) item;
             //TODO: Load image when they are displayed
             switchNode(node);
@@ -176,25 +179,25 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 res.getString(R.string.source_folder_preference_key),
                 res.getString(R.string.source_folder_preference_default));
 
-        return new FolderItem(new File(sourceFolder), new LibraryItemComparator());
+        return new FolderItem(new File(sourceFolder));
     }
 
     /**
      * Switch the view to the specified node.
      * If the node has not been loaded yet, then it is loaded.
-     * @param folder The node to switch to.
+     * @param node The node to switch to.
      */
-    private void switchNode(FolderItem folder) {
-        //TODO: Progress bar improvement: make an enum for the progression state and switch the progress bar when node is loading.
-        adapter.setCurrentNode(folder);
-        if (!folder.isLoaded()) {
+    private void switchNode(FolderItem node) {
+        adapter.setCurrentNode(node);
+        if (node.getState() == LoadingState.NOT_LOADED) {
             LibraryItemLoader loader = manager.get();
-            if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ) {
-                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, folder);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, node);
             } else {
-                loader.execute(folder);
+                loader.execute(node);
             }
-//          node.setIsLoaded(true);
+        } else if (node.getState() == LoadingState.LOADING) {
+            //Progress bar improvement: switch back the progress bar when node is loading.
         }
     }
 }

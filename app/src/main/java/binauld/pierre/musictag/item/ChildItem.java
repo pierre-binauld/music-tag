@@ -1,4 +1,6 @@
-package binauld.pierre.musictag.adapter;
+package binauld.pierre.musictag.item;
+
+import binauld.pierre.musictag.decoder.BitmapDecoder;
 
 /**
  * Implement the parent management from the LibraryItem interface.
@@ -6,6 +8,7 @@ package binauld.pierre.musictag.adapter;
 public abstract class ChildItem implements LibraryItem {
 
     protected NodeItem parent;
+    protected BitmapDecoder decoder;
 
     @Override
     public NodeItem getParent() {
@@ -18,5 +21,15 @@ public abstract class ChildItem implements LibraryItem {
      */
     public void setParent(NodeItem parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public BitmapDecoder getDecoder() {
+        return decoder;
+    }
+
+    @Override
+    public void switchDecoder(BitmapDecoder decoder) {
+        this.decoder = decoder;
     }
 }

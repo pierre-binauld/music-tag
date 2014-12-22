@@ -3,8 +3,8 @@
     package="binauld.pierre.musictag" >
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              " />
-    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              " />
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -26,7 +26,10 @@
                 <action android:name="android.intent.action.EDIT" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
+        </activity>
+        <activity
+            android:name=".activities.TagFormActivity"
+            android:label="@string/title_activity_tag_form" >
         </activity>
     </application>
 

@@ -28,6 +28,7 @@ import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
 import binauld.pierre.musictag.io.Cache;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
+import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
@@ -141,6 +142,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             FolderItem node = (FolderItem) item;
             switchNode(node);
             adapter.notifyDataSetChanged();
+        } else {
+            AudioItem audio = (AudioItem) item;
+            Intent intent = new Intent(this, TagFormActivity.class);
+            intent.putExtra("file", audio.getAudioFile().getFile());
+            startActivity(intent);
         }
     }
 

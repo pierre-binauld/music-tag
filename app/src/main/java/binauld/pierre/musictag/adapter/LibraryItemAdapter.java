@@ -1,18 +1,17 @@
 package binauld.pierre.musictag.adapter;
 
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.Comparator;
-
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * Adapt a list of library item for a list view.
@@ -26,10 +25,10 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     private NodeItem currentNode;
-    private LayoutInflater inflater;
+    private final ThumbnailService thumbnailService;
 
-    public LibraryItemAdapter(Context baseContext, Comparator<LibraryItem> comparator) {
-        this.inflater = LayoutInflater.from(baseContext);
+    public LibraryItemAdapter(ThumbnailService thumbnailService) {
+        this.thumbnailService = thumbnailService;
     }
 
     @Override
@@ -54,7 +53,8 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (convertView == null) {
 
             // inflate the layout
-            convertView = inflater.inflate(R.layout.library_item_view, parent, false);
+            convertView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.library_item_view, parent, false);
 
             // well set up the ViewHolder
             viewHolder = new ViewHolder();
@@ -77,12 +77,8 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-<<<<<<< Updated upstream
-            viewHolder.thumbnail.setImageBitmap(item.getThumbnail());
-=======
-            thumbnailService.loadThumbnail(item, viewHolder.thumbnail);
+            thumbnailService.setThumbnail(item, viewHolder.thumbnail);
 //            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
->>>>>>> Stashed changes
             convertView.setTag(viewHolder);
         }
 
@@ -91,11 +87,12 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     /**
      * Switch the current node to the parent node.
+     *
      * @return True if the adapter has switch to the parent node.
      */
     public boolean backToParent() {
         NodeItem parent = currentNode.getParent();
-        if(parent == null) {
+        if (parent == null) {
             return false;
         } else {
             currentNode = parent;
@@ -105,6 +102,7 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     /**
      * Set the current node of the library tree list.
+     *
      * @param currentNode The current node to set.
      */
     public void setCurrentNode(NodeItem currentNode) {
@@ -113,6 +111,7 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     /**
      * Get the current node display by the list.
+     *
      * @return The current node to get.
      */
     public NodeItem getCurrentNode() {

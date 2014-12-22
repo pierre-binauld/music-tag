@@ -1,7 +1,7 @@
-package binauld.pierre.musictag.adapter;
+package binauld.pierre.musictag.item;
 
 
-import android.graphics.Bitmap;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
 
 /**
  * Item from audio library (Song or folder).
@@ -12,7 +12,7 @@ public interface LibraryItem {
      * Check if the item contain an audio file.
      * @return Return true if it is an audio file.
      */
-    public boolean isSong();
+    public boolean isAudioItem();
 
     /**
      * Get the primary information of the item (Like song title or folder name).
@@ -29,15 +29,20 @@ public interface LibraryItem {
     String getSecondaryInformation();
 
     /**
-     * Get the thumbnail of the item.
-     * @return A Bitmap.
-     */
-    Bitmap getThumbnail();
-
-    /**
      * Return the item's parent.
      * @return The parent.
      */
     NodeItem getParent();
 
+    /**
+     * Get the bitmap decoder.
+     * @return The bitmap decoder.
+     */
+    BitmapDecoder getDecoder();
+
+    /**
+     * Allow to change the bitmap decoder.
+     * @param bitmapDecoder The bitmap decoder.
+     */
+    void switchDecoder(BitmapDecoder bitmapDecoder);
 }

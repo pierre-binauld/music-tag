@@ -1,53 +1,88 @@
 package binauld.pierre.musictag.service;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.widget.ImageView;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.tag.datatype.Artwork;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
+import binauld.pierre.musictag.io.AsyncDrawable;
+import binauld.pierre.musictag.io.Cache;
+import binauld.pierre.musictag.io.DefaultThumbnailLoader;
+import binauld.pierre.musictag.io.ThumbnailLoader;
+import binauld.pierre.musictag.item.LibraryItem;
 
 /**
  * Help to build artwork from audio file.
  */
 public class ThumbnailService {
 
-    private Bitmap defaultArtwork;
-    private Bitmap folder;
+    private int defaultThumbnailResId;
 
-    //TODO: may be we can make one method getThumbnail which take the item as parameter ?
-    public ThumbnailService(Context context, int defaultArtworkRes, int folderRes) {
-        this.defaultArtwork = BitmapFactory.decodeResource(context.getResources(), defaultArtworkRes);
-        this.folder = BitmapFactory.decodeResource(context.getResources(), folderRes);
+    private BitmapDecoder defaultThumbnailDecoder;
+
+    private Cache<Bitmap> cache;
+
+    public ThumbnailService(Cache<Bitmap> cache, Context context, int defaultThumbnailResId) {
+        Resources res = context.getResources();
+
+        this.defaultThumbnailResId = defaultThumbnailResId;
+
+        this.cache = cache;
+        this.defaultThumbnailDecoder = new ResourceBitmapDecoder(res, defaultThumbnailResId);
+
+        DefaultThumbnailLoader loader = new DefaultThumbnailLoader(this.cache);
+        loader.execute(this.defaultThumbnailDecoder);
     }
 
     /**
-     * Build an artwork Bitmap from a source audio file.
-     * If the source file does not contains an Artwork, then return an defined image.
-     *
-     * @param song The source audio file.
-     * @return The artwork as Bitmap.
+     * Set the thumbnail associated to item to the imageView.
+     * If the thumbnail has not been yet loaded, then it is loaded a placeholder is put in the image view while loading.
+     * @param item Current item.
+     * @param imageView Associated image view.
      */
-    public Bitmap getArtwork(AudioFile song) {
-        Artwork artworkTag = song.getTag().getFirstArtwork();
-        if (null == artworkTag) {
-            return defaultArtwork;
+    public void setThumbnail(LibraryItem item, ImageView imageView) {
+
+        final String key = item.getDecoder().getId();
+//
+        final Bitmap bitmap = cache.get(key);
+
+        if (bitmap != null) {
+            imageView.setImageBitmap(bitmap);
+        } else if (cancelPotentialWork(item, imageView)) {
+            Resources res = imageView.getResources();
+            final ThumbnailLoader task = new ThumbnailLoader(imageView, cache, defaultThumbnailDecoder);
+            final AsyncDrawable asyncDrawable = new AsyncDrawable(res, cache.get(defaultThumbnailResId), task);
+            imageView.setImageDrawable(asyncDrawable);
+            task.execute(item);
         }
 
-        byte[] artworkData = artworkTag.getBinaryData();
-        Bitmap artwork = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
-        if (null == artwork) {
-            return defaultArtwork;
-        }
 
-        return artwork;
+
     }
 
     /**
-     * Get the folder thumbnail.
-     * @return The folder thumbnail.
+     * Cancel a potential AsyncTask from anAsyncDrawable of the ImageView if the AsyncTask is outdated.
+     * @param item The item that the thumbnail must be load.
+     * @param imageView The image view which has to display thmbnail.
+     * @return False if the same work is in progress.
      */
-    public Bitmap getFolder() {
-        return folder;
+    private boolean cancelPotentialWork(LibraryItem item, ImageView imageView) {
+        final ThumbnailLoader thumbnailLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
+
+        if (thumbnailLoader != null) {
+            final LibraryItem taskItem = thumbnailLoader.getWorkingItem();
+            // If bitmapData is not yet set or it differs from the new data
+            if (taskItem == null || taskItem != item) {
+                // Cancel previous task
+                thumbnailLoader.cancel(true);
+            } else {
+                // The same work is already in progress
+                return false;
+            }
+        }
+        // No task associated with the ImageView, or an existing task was cancelled
+        return true;
     }
 }

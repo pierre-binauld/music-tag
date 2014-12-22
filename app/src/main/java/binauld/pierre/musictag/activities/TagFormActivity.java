@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -107,14 +105,18 @@ public class TagFormActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id) {
+            case R.id.action_settings :
+                return true;
+            case R.id.action_valid :
+                saveChange();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void sendConfirmation(View view){
+    public void saveChange() {
         String title = txt_title.getText().toString();
         String artist = txt_artist.getText().toString();
         String album = txt_album.getText().toString();
@@ -139,7 +141,6 @@ public class TagFormActivity extends Activity {
             if(isInteger(disk)){tags.setField(FieldKey.DISC_NO,disk);}
             if(isInteger(track)){tags.setField(FieldKey.TRACK,track);}
         } catch (FieldDataInvalidException e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT);
             Log.e(this.getClass().toString(), e.getMessage(), e);
         }
         audio.setTag(tags);

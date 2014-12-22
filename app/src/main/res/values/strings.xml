@@ -3,6 +3,7 @@
 
     <string name="app_name">Music Tag</string>
     <string name="action_settings">Settings</string>
+    <string name="action_valid">Valid</string>
     <string name="thumbnail">Thumbnail</string>
     <string name="setting_preference_activity">Settings</string>
     <string name="source_folder_title">Source Folder</string>

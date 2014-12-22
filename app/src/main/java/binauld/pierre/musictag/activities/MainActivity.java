@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,10 +24,8 @@ import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
-import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.helper.AdapterHelper;
+import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
 import binauld.pierre.musictag.io.Cache;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
@@ -74,11 +71,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song);
 
         // Init factory
-        BitmapDecoder folderBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.folder);
-        LibraryItemFactory itemFactory = new LibraryItemFactory(folderBitmapDecoder, getThumbnailSize());
+        LibraryItemFactory itemFactory = LibraryItemFactoryHelper.buildFactory(this);
 
         // Init adapter
-        adapter = AdapterHelper.buildAdapter(thumbnailService);
+        adapter = new LibraryItemAdapter(thumbnailService);
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -201,19 +197,5 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         } else if (node.getState() == LoadingState.LOADING) {
             //Progress bar improvement: switch back the progress bar when node is loading.
         }
-    }
-
-    /**
-     * Retrieve the thumbnail size from listPreferredItemHeight theme attribute.
-     *
-     * @return The thumbnail size.
-     */
-    private int getThumbnailSize() {
-        TypedValue thumbnailSize = new android.util.TypedValue();
-        getTheme().resolveAttribute(android.R.attr.listPreferredItemHeight, thumbnailSize, true);
-        TypedValue.coerceToString(thumbnailSize.type, thumbnailSize.data);
-        android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        return (int) thumbnailSize.getDimension(metrics);
     }
 }

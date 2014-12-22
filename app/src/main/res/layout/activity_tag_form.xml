@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="vertical">
@@ -7,252 +8,143 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
-        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/card_view"
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_title_artist_album"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             card_view:cardCornerRadius="0dp"
-            android:layout_margin="20dp">
+            android:layout_marginBottom="16dp"
+            card_view:contentPadding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Hello"
-                    android:inputType="text"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp" />
+                    android:hint="@string/title"
+                    android:inputType="text" />
+
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/artist"
+                    android:inputType="text" />
+
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_album"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/album"
+                    android:inputType="text" />
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
-        <LinearLayout
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_year_disk_track"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="0dp"
+            android:layout_marginBottom="16dp"
+            card_view:contentPadding="16dp">
 
-            <TextView
-                android:id="@+id/label_title"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/title"
-                android:textSize="24sp"
-                android:layout_weight="2" />
+                android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/txt_title"
-                android:layout_height="wrap_content"
-                android:hint="@string/title"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_year"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/year"
+                    android:inputType="date"
+                    android:layout_weight="1" />
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:orientation="horizontal"
-            android:layout_height="fill_parent">
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_disk"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/disk"
+                    android:inputType="number"
+                    android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/label_artist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/artist"
-                android:textSize="24sp"
-                android:layout_weight="2" />
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_track"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/track"
+                    android:inputType="number"
+                    android:layout_weight="1" />
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/txt_artist"
-                android:layout_height="wrap_content"
-                android:hint="@string/artist"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
+        </android.support.v7.widget.CardView>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:orientation="horizontal"
-            android:layout_height="fill_parent">
 
-            <TextView
-                android:id="@+id/label_album"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/album"
-                android:textSize="24sp"
-                android:layout_weight="2" />
-
-            <EditText
-                android:id="@+id/txt_album"
-                android:layout_height="wrap_content"
-                android:hint="@string/album"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_others"
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="0dp"
+            android:layout_marginBottom="16dp"
+            card_view:contentPadding="16dp">
 
-            <TextView
-                android:id="@+id/label_year"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/year"
-                android:textSize="24sp"
-                android:layout_weight="2" />
+                android:orientation="vertical"
+                android:layout_height="match_parent">
 
-            <EditText
-                android:id="@+id/txt_year"
-                android:layout_height="wrap_content"
-                android:hint="@string/year"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_album_artist"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:hint="@string/album_artist"
+                    android:inputType="text" />
 
-        <LinearLayout
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_composer"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:hint="@string/composer"
+                    android:inputType="text" />
+
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_grouping"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:hint="@string/grouping"
+                    android:inputType="text" />
+
+                <com.iangclifton.android.floatlabel.FloatLabel
+                    android:id="@+id/txt_genre"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:hint="@string/genre"
+                    android:inputType="text" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_artwork"
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="0dp"
+            android:layout_marginBottom="16dp"
+            card_view:contentPadding="16dp">
 
-            <TextView
-                android:id="@+id/label_album_artist"
+            <ImageView
+                android:id="@+id/img_artwork"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/album_artist"
-                android:textSize="24sp"
-                android:layout_weight="2" />
+                android:layout_height="wrap_content"/>
+        </android.support.v7.widget.CardView>
 
-            <EditText
-                android:id="@+id/txt_album_artist"
-                android:layout_height="wrap_content"
-                android:hint="@string/title"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/label_composer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/composer"
-                android:textSize="24sp"
-                android:layout_weight="2" />
-
-            <EditText
-                android:id="@+id/txt_composer"
-                android:layout_height="wrap_content"
-                android:hint="@string/composer"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/label_grouping"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/grouping"
-                android:textSize="24sp"
-                android:layout_weight="2" />
-
-            <EditText
-                android:id="@+id/txt_grouping"
-                android:layout_height="wrap_content"
-                android:hint="@string/grouping"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/label_genre"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/genre"
-                android:textSize="24sp"
-                android:layout_weight="2" />
-
-            <EditText
-                android:id="@+id/txt_genre"
-                android:layout_height="wrap_content"
-                android:hint="@string/genre"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/label_disk"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/disk"
-                android:textSize="24sp"
-                android:layout_weight="2" />
-
-            <EditText
-                android:id="@+id/txt_disk"
-                android:layout_height="wrap_content"
-                android:hint="@string/disk"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/label_track"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/track"
-                android:textSize="24sp"
-                android:layout_weight="2" />
-
-            <EditText
-                android:id="@+id/txt_track"
-                android:layout_height="wrap_content"
-                android:hint="@string/track"
-                android:inputType="text"
-                android:layout_width="match_parent"
-                android:layout_weight="1" />
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>

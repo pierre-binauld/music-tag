@@ -1,11 +1,17 @@
 package binauld.pierre.musictag.activities;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+
+import com.iangclifton.android.floatlabel.FloatLabel;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -17,6 +23,7 @@ import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.datatype.Artwork;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +32,7 @@ import binauld.pierre.musictag.R;
 
 public class TagFormActivity extends Activity {
     private AudioFile audio;
+    private ImageView img_artwork;
     private EditText txt_title;
     private EditText txt_artist;
     private EditText txt_album;
@@ -60,28 +68,37 @@ public class TagFormActivity extends Activity {
                 e.printStackTrace();
             }
 
-            txt_title = (EditText) findViewById(R.id.txt_title);
-            txt_artist = (EditText) findViewById(R.id.txt_artist);
-            txt_album = (EditText) findViewById(R.id.txt_album);
-            txt_year = (EditText) findViewById(R.id.txt_year);
-            txt_album_artist = (EditText) findViewById(R.id.txt_album_artist);
-            txt_composer = (EditText) findViewById(R.id.txt_composer);
-            txt_grouping = (EditText) findViewById(R.id.txt_grouping);
-            txt_genre = (EditText) findViewById(R.id.txt_genre);
-            txt_disk = (EditText) findViewById(R.id.txt_disk);
-            txt_track = (EditText) findViewById(R.id.txt_track);
+            img_artwork = (ImageView) findViewById(R.id.img_artwork);
+            txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
+            txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
+            txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
+            txt_year = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
+            txt_disk = ((FloatLabel) findViewById(R.id.txt_disk)).getEditText();
+            txt_track = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
+            txt_album_artist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
+            txt_composer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
+            txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
+            txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
 
             Tag tags = audio.getTag();
+            Artwork artwork = tags.getFirstArtwork();
+            if(null != artwork) {
+                byte[] artworkData = artwork.getBinaryData();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
+                img_artwork.setImageBitmap(bitmap);
+            } else {
+                findViewById(R.id.card_artwork).setVisibility(View.GONE);
+            }
             txt_title.setText(tags.getFirst(FieldKey.TITLE));
             txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
             txt_album.setText(tags.getFirst(FieldKey.ALBUM));
             txt_year.setText(tags.getFirst(FieldKey.YEAR));
+            txt_disk.setText(tags.getFirst(FieldKey.DISC_NO));
+            txt_track.setText(tags.getFirst(FieldKey.TRACK));
             txt_album_artist.setText(tags.getFirst(FieldKey.ALBUM_ARTIST));
             txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
             txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
             txt_genre.setText(tags.getFirst(FieldKey.GENRE));
-            txt_disk.setText(tags.getFirst(FieldKey.DISC_NO));
-            txt_track.setText(tags.getFirst(FieldKey.TRACK));
         }
         else{
             finish();

@@ -17,8 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.google.gson.Gson;
-
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +28,7 @@ import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
 import binauld.pierre.musictag.io.Cache;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
+import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
@@ -141,14 +140,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
         if (!item.isAudioItem()) {
             FolderItem node = (FolderItem) item;
-            //TODO: Load image when they are displayed
             switchNode(node);
             adapter.notifyDataSetChanged();
-        }
-        else {
+        } else {
             AudioItem audio = (AudioItem) item;
             Intent intent = new Intent(this, TagFormActivity.class);
-            intent.putExtra("file", audio.getAudio().getFile());
+            intent.putExtra("file", audio.getAudioFile().getFile());
             startActivity(intent);
         }
     }
@@ -172,6 +169,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     /**
      * Get the source folder item from shared preferences.
+     *
      * @return The source folder item.
      */
     public FolderItem getSourceNode() {
@@ -185,6 +183,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     /**
      * Switch the view to the specified node.
      * If the node has not been loaded yet, then it is loaded.
+     *
      * @param node The node to switch to.
      */
     private void switchNode(FolderItem node) {

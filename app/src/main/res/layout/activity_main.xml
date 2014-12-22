@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ListView
+    <com.github.ksoichiro.android.observablescrollview.ObservableListView
         android:id="@+id/library_item_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -13,7 +13,7 @@
         android:footerDividersEnabled="false"
         android:headerDividersEnabled="false">
 
-    </ListView>
+    </com.github.ksoichiro.android.observablescrollview.ObservableListView>
 
     <binauld.pierre.musictag.widget.AnimatedProgressBar
         android:id="@+id/progress_bar"

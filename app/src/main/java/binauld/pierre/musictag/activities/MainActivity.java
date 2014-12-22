@@ -1,5 +1,6 @@
 package binauld.pierre.musictag.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,8 +15,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
+
+import com.github.ksoichiro.android.observablescrollview.ObservableListView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -38,10 +42,12 @@ import binauld.pierre.musictag.service.ThumbnailService;
  * Main activity of the app.
  * Display a list of directories and audio files the user can modify.
  */
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, ObservableScrollViewCallbacks {
 
     private LibraryItemLoaderManager manager;
     private LibraryItemAdapter adapter;
+
+    private ObservableListView listView;
 
     private Resources res;
     private SharedPreferences sharedPrefs;
@@ -86,8 +92,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         switchNode(getSourceNode());
 
         // Init view
-        ListView listView = (ListView) findViewById(R.id.library_item_list);
+        listView = (ObservableListView) findViewById(R.id.library_item_list);
         listView.setOnItemClickListener(this);
+        listView.setScrollViewCallbacks(this);
         listView.setAdapter(adapter);
     }
 
@@ -164,6 +171,30 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(res.getString(R.string.source_folder_preference_key))) {
             switchNode(getSourceNode());
+        }
+    }
+
+    @Override
+    public void onScrollChanged(int i, boolean b, boolean b2) {
+
+    }
+
+    @Override
+    public void onDownMotionEvent() {
+
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+        ActionBar ab = getActionBar();
+        if (scrollState == ScrollState.UP) {
+            if (ab.isShowing()) {
+                ab.hide();
+            }
+        } else if (scrollState == ScrollState.DOWN) {
+            if (!ab.isShowing()) {
+                ab.show();
+            }
         }
     }
 

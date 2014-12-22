@@ -10,7 +10,6 @@ import java.util.Set;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LoaderHelper;
-import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * A manager to handle all loader.

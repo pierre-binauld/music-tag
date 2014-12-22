@@ -17,11 +17,20 @@ public class AsyncDrawable extends BitmapDrawable {
         bitmapWorkerTaskReference = new WeakReference<>(thumbnailLoader);
     }
 
-    public ThumbnailLoader getBitmapLoader() {
+    /**
+     * Get the bitmap loader.
+     * @return The bitmap loader.
+     */
+    ThumbnailLoader getBitmapLoader() {
         return bitmapWorkerTaskReference.get();
     }
 
-    public static ThumbnailLoader getBitmapLoader(ImageView imageView) {
+    /**
+     * Retrieve bitmap loader from an ImageView.
+     * @param imageView The image view containing the bitmap loader.
+     * @return The bitmap loader or null if it does not exist.
+     */
+    public static ThumbnailLoader retrieveBitmapLoader(ImageView imageView) {
         if (imageView != null) {
             final Drawable drawable = imageView.getDrawable();
             if (drawable instanceof AsyncDrawable) {

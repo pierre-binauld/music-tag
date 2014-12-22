@@ -5,8 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.FieldKey;
 
-import binauld.pierre.musictag.decoder.AudioFileBitmapDecoder;
-
 /**
  * Represent an audio file in a library.
  */
@@ -37,6 +35,10 @@ public class AudioItem extends ChildItem {
         return audio.getTag().getFirst(FieldKey.ARTIST);
     }
 
+    /**
+     * Get the AudioFile.
+     * @return The audio file.
+     */
     public AudioFile getAudioFile() {
         return audio;
     }

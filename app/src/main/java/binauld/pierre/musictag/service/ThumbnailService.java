@@ -24,7 +24,6 @@ public class ThumbnailService {
 
     private Cache<Bitmap> cache;
 
-    //TODO: animation when thumbnail is charged.
     public ThumbnailService(Cache<Bitmap> cache, Context context, int defaultThumbnailResId) {
         Resources res = context.getResources();
 
@@ -70,7 +69,7 @@ public class ThumbnailService {
      * @return False if the same work is in progress.
      */
     private boolean cancelPotentialWork(LibraryItem item, ImageView imageView) {
-        final ThumbnailLoader thumbnailLoader = AsyncDrawable.getBitmapLoader(imageView);
+        final ThumbnailLoader thumbnailLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
 
         if (thumbnailLoader != null) {
             final LibraryItem taskItem = thumbnailLoader.getWorkingItem();

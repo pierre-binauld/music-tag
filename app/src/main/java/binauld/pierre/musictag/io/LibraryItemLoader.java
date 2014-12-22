@@ -27,7 +27,6 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
 
     private int updateStep;
 
-    private final NodeItem node;
     private MultipleBufferedList<LibraryItem> items;
     private LibraryItemFactory factory;
     private int invalidItemCount;
@@ -38,16 +37,15 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
 
     private ProgressBar progressBar;
 
-
     public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter, Comparator<LibraryItem> comparator, int updateStep) {
         this.updateStep = updateStep;
 
         this.adapter = adapter;
-        this.node = adapter.getCurrentNode();
+        NodeItem node = adapter.getCurrentNode();
         this.filter = filter;
         this.factory = libraryItemFactory;
 
-        this.items = this.node.getChildren();
+        this.items = node.getChildren();
         this.comparator = comparator;
     }
 

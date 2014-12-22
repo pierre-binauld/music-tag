@@ -1,11 +1,8 @@
 package binauld.pierre.musictag.helper;
 
-import android.content.res.Resources;
-
 import java.io.FileFilter;
 import java.util.Comparator;
 
-import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.collection.LibraryItemComparator;
 import binauld.pierre.musictag.factory.FileFilterFactory;

@@ -48,15 +48,19 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
             bitmap = null;
         }
 
-        if (imageViewReference != null && bitmap != null) {
-            final ImageView imageView = imageViewReference.get();
-            final ThumbnailLoader thumbnailLoader = AsyncDrawable.getBitmapLoader(imageView);
-            if (this == thumbnailLoader && imageView != null) {
+        final ImageView imageView = imageViewReference.get();
+        if (imageView != null && bitmap != null) {
+            final ThumbnailLoader thumbnailLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
+            if (this == thumbnailLoader) {
                 imageView.setImageBitmap(bitmap);
             }
         }
     }
 
+    /**
+     * Get the item which loader working on.
+     * @return The item.
+     */
     public LibraryItem getWorkingItem() {
         return item;
     }

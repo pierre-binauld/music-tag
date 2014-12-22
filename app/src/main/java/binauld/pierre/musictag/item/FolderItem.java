@@ -2,6 +2,9 @@ package binauld.pierre.musictag.item;
 
 import java.io.File;
 
+/**
+ * Represent a folder in the library.
+ */
 public class FolderItem extends NodeItem {
 
     private File file;

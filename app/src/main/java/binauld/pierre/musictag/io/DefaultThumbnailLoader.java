@@ -10,7 +10,6 @@ public class DefaultThumbnailLoader extends AsyncTask<BitmapDecoder, Void, Integ
 
     private Cache<Bitmap> cache;
 
-
     public DefaultThumbnailLoader(Cache<Bitmap> cache) {
         this.cache = cache;
     }

@@ -42,22 +42,16 @@ public class LibraryItemFactory {
     public LibraryItem build(File file, NodeItem parent) throws IOException {
         if(file.isDirectory()) {
             FolderItem folder = new FolderItem(file, parent);
-            folder.setDecoder(folderBitmapDecoder);
+            folder.switchDecoder(folderBitmapDecoder);
             return folder;
         } else {
             try {
                 AudioFile audio = AudioFileIO.read(file);
                 AudioItem audioItem = new AudioItem(audio);
-                audioItem.setDecoder(new AudioFileBitmapDecoder(audioItem.getAudioFile(), thumbnailSize, thumbnailSize));
+                audioItem.switchDecoder(new AudioFileBitmapDecoder(audioItem.getAudioFile(), thumbnailSize, thumbnailSize));
                 audioItem.setParent(parent);
                 return audioItem;
-            } catch (CannotReadException e) {
-                throw new IOException(e);
-            } catch (TagException e) {
-                throw new IOException(e);
-            } catch (ReadOnlyFileException e) {
-                throw new IOException(e);
-            } catch (InvalidAudioFrameException e) {
+            } catch (CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
                 throw new IOException(e);
             }
         }

@@ -24,16 +24,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.io.Cache;
-import binauld.pierre.musictag.item.FolderItem;
-import binauld.pierre.musictag.item.LibraryItem;
-import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.helper.AdapterHelper;
+import binauld.pierre.musictag.io.Cache;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
+import binauld.pierre.musictag.item.FolderItem;
+import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
 import binauld.pierre.musictag.service.ThumbnailService;
 
@@ -48,8 +48,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     private Resources res;
     private SharedPreferences sharedPrefs;
-
-    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +68,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
         // Init cache
-        Cache<Bitmap> cache = new Cache<Bitmap>();
+        Cache<Bitmap> cache = new Cache<>();
 
         // Init service(s)
         ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song);
@@ -80,7 +78,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         LibraryItemFactory itemFactory = new LibraryItemFactory(folderBitmapDecoder, getThumbnailSize());
 
         // Init adapter
-        adapter = AdapterHelper.buildAdapter(this.getBaseContext(), thumbnailService);
+        adapter = AdapterHelper.buildAdapter(thumbnailService);
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -92,11 +90,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         switchNode(getSourceNode());
 
         // Init view
-        listView = (ListView) findViewById(R.id.library_item_list);
+        ListView listView = (ListView) findViewById(R.id.library_item_list);
         listView.setOnItemClickListener(this);
         listView.setAdapter(adapter);
     }
 
+    //TODO: check why library is reload when orientation change
     @Override
     protected void onStart() {
         super.onStart();
@@ -199,9 +198,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             } else {
                 loader.execute(node);
             }
-//          node.setIsLoaded(true);
         } else if (node.getState() == LoadingState.LOADING) {
-            //TODO: Progress bar improvement: switch back the progress bar when node is loading.
+            //Progress bar improvement: switch back the progress bar when node is loading.
         }
     }
 

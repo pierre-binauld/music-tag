@@ -23,12 +23,6 @@ public class AudioFileBitmapDecoder implements BitmapDecoder {
     @Override
     public Bitmap decode() {
         Bitmap bitmap = null;
-//        Artwork artwork = audioFile.getTag().getFirstArtwork();
-//        if(null != artwork) {
-//            byte[] artworkData = artwork.getBinaryData();
-//            bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length, options);
-//        }
-//        return bitmap;
 
         Artwork artwork = audioFile.getTag().getFirstArtwork();
         if(null != artwork) {

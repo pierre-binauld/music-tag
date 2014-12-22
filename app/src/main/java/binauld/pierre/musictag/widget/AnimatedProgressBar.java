@@ -8,7 +8,10 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.ProgressBar;
 
-public class AnimatingProgressBar extends ProgressBar {
+/**
+ * An animated progress bar. It allow to increment the progress bar smoother.
+ */
+public class AnimatedProgressBar extends ProgressBar {
 
     private static final Interpolator DEFAULT_INTERPOLATOR = new AccelerateDecelerateInterpolator();
 
@@ -16,15 +19,15 @@ public class AnimatingProgressBar extends ProgressBar {
     private ValueAnimator animatorSecondary;
     private boolean animate = true;
 
-    public AnimatingProgressBar(Context context, AttributeSet attrs, int defStyle) {
+    public AnimatedProgressBar(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
-    public AnimatingProgressBar(Context context, AttributeSet attrs) {
+    public AnimatedProgressBar(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public AnimatingProgressBar(Context context) {
+    public AnimatedProgressBar(Context context) {
         super(context);
     }
 
@@ -51,7 +54,7 @@ public class AnimatingProgressBar extends ProgressBar {
 
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
-                    AnimatingProgressBar.super.setProgress((Integer) animation.getAnimatedValue());
+                    AnimatedProgressBar.super.setProgress((Integer) animation.getAnimatedValue());
                 }
             });
         } else
@@ -75,7 +78,7 @@ public class AnimatingProgressBar extends ProgressBar {
 
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
-                    AnimatingProgressBar.super.setSecondaryProgress((Integer) animation
+                    AnimatedProgressBar.super.setSecondaryProgress((Integer) animation
                             .getAnimatedValue());
                 }
             });

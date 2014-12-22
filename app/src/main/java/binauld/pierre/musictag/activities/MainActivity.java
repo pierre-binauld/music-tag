@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -91,23 +90,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         listView.setAdapter(adapter);
     }
 
-    //TODO: check why library is reload when orientation change
     @Override
     protected void onStart() {
         super.onStart();
-        Log.wtf(this.getClass().toString(), "onStart");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.wtf(this.getClass().toString(), "onRestart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.wtf(this.getClass().toString(), "onResume");
     }
 
     @Override

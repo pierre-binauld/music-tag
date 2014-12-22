@@ -112,7 +112,7 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
         if (null != progressBar) {
             int max = 0;
             for (FolderItem folder : items) {
-                max += folder.getFile().list().length;
+                max += folder.getLength();
             }
 
             final int finalMax = max;
@@ -159,12 +159,4 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
         this.progressBar = progressBar;
     }
 
-    /**
-     * Get the progress bar used to display the loading progression.
-     *
-     * @return The progress bar.
-     */
-    public ProgressBar getProgressBar() {
-        return progressBar;
-    }
 }

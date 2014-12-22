@@ -20,11 +20,11 @@ public class FolderItem extends NodeItem {
         init(file);
     }
 
+    // TODO: Add local logic
     private void init(File file) {
         this.file = file;
 
-        // TODO: Add local logic
-        int fileNumber = file.list().length;
+        int fileNumber = getLength();
         this.secondaryInformation = fileNumber + " file";
         if(fileNumber > 1) {
             this.secondaryInformation += "s";
@@ -49,4 +49,11 @@ public class FolderItem extends NodeItem {
         return file;
     }
 
+    /**
+     * Get the number of sub file.
+     * @return The number of sub file.
+     */
+    public int getLength() {
+        return file.isDirectory()?file.list().length:0;
+    }
 }

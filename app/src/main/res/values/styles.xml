@@ -2,10 +2,14 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <item name="android:actionBarStyle">@style/actionBarStyle</item>
     </style>
 
-    <style name="SettingsTheme" parent="android:Theme.Holo"/>
+    <style name="actionBarStyle" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="SettingsTheme" parent="android:Theme.Holo" />
 
     <!--Progress bar style.-->
     <style name="horizontalProgressBar" parent="android:Widget.Holo.ProgressBar.Horizontal">

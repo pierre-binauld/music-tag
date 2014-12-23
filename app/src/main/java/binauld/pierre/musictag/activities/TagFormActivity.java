@@ -1,6 +1,7 @@
 package binauld.pierre.musictag.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -82,7 +83,7 @@ public class TagFormActivity extends Activity {
 
             Tag tags = audio.getTag();
             Artwork artwork = tags.getFirstArtwork();
-            if(null != artwork) {
+            if (null != artwork) {
                 byte[] artworkData = artwork.getBinaryData();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
                 img_artwork.setImageBitmap(bitmap);
@@ -99,8 +100,7 @@ public class TagFormActivity extends Activity {
             txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
             txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
             txt_genre.setText(tags.getFirst(FieldKey.GENRE));
-        }
-        else{
+        } else {
             finish();
         }
 
@@ -122,10 +122,10 @@ public class TagFormActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        switch(id) {
-            case R.id.action_settings :
+        switch (id) {
+            case R.id.action_settings:
                 return true;
-            case R.id.action_valid :
+            case R.id.action_valid:
                 saveChange();
                 return true;
         }
@@ -147,26 +147,37 @@ public class TagFormActivity extends Activity {
 
         Tag tags = audio.getTag();
         try {
-            tags.setField(FieldKey.TITLE,title);
-            tags.setField(FieldKey.ARTIST,artist);
-            tags.setField(FieldKey.ALBUM,album);
-            if(isInteger(year)){tags.setField(FieldKey.YEAR,year);}
-            tags.setField(FieldKey.ALBUM_ARTIST,album_artist);
-            tags.setField(FieldKey.COMPOSER,composer);
-            tags.setField(FieldKey.GROUPING,grouping);
-            tags.setField(FieldKey.GENRE,genre);
-            if(isInteger(disk)){tags.setField(FieldKey.DISC_NO,disk);}
-            if(isInteger(track)){tags.setField(FieldKey.TRACK,track);}
+            tags.setField(FieldKey.TITLE, title);
+            tags.setField(FieldKey.ARTIST, artist);
+            tags.setField(FieldKey.ALBUM, album);
+            if (isInteger(year)) {
+                tags.setField(FieldKey.YEAR, year);
+            }
+            tags.setField(FieldKey.ALBUM_ARTIST, album_artist);
+            tags.setField(FieldKey.COMPOSER, composer);
+            tags.setField(FieldKey.GROUPING, grouping);
+            tags.setField(FieldKey.GENRE, genre);
+            if (isInteger(disk)) {
+                tags.setField(FieldKey.DISC_NO, disk);
+            }
+            if (isInteger(track)) {
+                tags.setField(FieldKey.TRACK, track);
+            }
         } catch (FieldDataInvalidException e) {
             Log.e(this.getClass().toString(), e.getMessage(), e);
         }
         audio.setTag(tags);
 
+        Intent intent = new Intent();
         try {
             AudioFileIO.write(audio);
+            intent.putExtra("file", audio.getFile());
+            setResult(RESULT_OK, intent);
         } catch (CannotWriteException e) {
-            e.printStackTrace();
+            Log.e(this.getClass().toString(), e.getMessage(), e);
+            setResult(RESULT_CANCELED, intent);
         }
+
         finish();
     }
 
@@ -174,7 +185,7 @@ public class TagFormActivity extends Activity {
     public boolean isInteger(String string) {
         try {
             Integer.parseInt(string);
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             return false;
         }
 

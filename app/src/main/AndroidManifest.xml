@@ -29,7 +29,8 @@
         </activity>
         <activity
             android:name=".activities.TagFormActivity"
-            android:label="@string/title_activity_tag_form" >
+            android:label="@string/title_activity_tag_form"
+            android:windowSoftInputMode="stateUnchanged">
         </activity>
     </application>
 

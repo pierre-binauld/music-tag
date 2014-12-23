@@ -34,26 +34,39 @@ public class LibraryItemFactory {
 
     /**
      * Build a library item from a source file.
-     * @param file The source file. It has to be either a folder or a supported audio file.
+     *
+     * @param file   The source file. It has to be either a folder or a supported audio file.
      * @param parent The parent of the item
      * @return A library item
      * @throws IOException Exception is thrown when a problem occurs with the reading, tags or the format.
      */
     public LibraryItem build(File file, NodeItem parent) throws IOException {
-        if(file.isDirectory()) {
+        if (file.isDirectory()) {
             FolderItem folder = new FolderItem(file, parent);
             folder.switchDecoder(folderBitmapDecoder);
+
             return folder;
         } else {
+            AudioItem audioItem = new AudioItem();
+            audioItem.setParent(parent);
+            this.update(audioItem, file);
+
+            return audioItem;
+        }
+    }
+
+    public void update(AudioItem updating, File file) throws IOException {
+        if (!file.isDirectory()) {
             try {
                 AudioFile audio = AudioFileIO.read(file);
-                AudioItem audioItem = new AudioItem(audio);
-                audioItem.switchDecoder(new AudioFileBitmapDecoder(audioItem.getAudioFile(), thumbnailSize, thumbnailSize));
-                audioItem.setParent(parent);
-                return audioItem;
+                updating.setAudioFile(audio);
+                updating.switchDecoder(new AudioFileBitmapDecoder(audio, thumbnailSize, thumbnailSize));
+
             } catch (CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
                 throw new IOException(e);
             }
+        } else {
+            throw new IOException(file.getAbsolutePath() + " is not a directory.");
         }
     }
 }

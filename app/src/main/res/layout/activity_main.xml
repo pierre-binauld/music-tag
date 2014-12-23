@@ -11,7 +11,8 @@
         android:divider="@android:color/background_light"
         android:dividerHeight="0px"
         android:footerDividersEnabled="false"
-        android:headerDividersEnabled="false">
+        android:headerDividersEnabled="false"
+        android:choiceMode="multipleChoiceModal">
 
     </com.github.ksoichiro.android.observablescrollview.ObservableListView>
 

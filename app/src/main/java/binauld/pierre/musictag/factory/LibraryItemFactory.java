@@ -9,6 +9,7 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 import binauld.pierre.musictag.decoder.AudioFileBitmapDecoder;
@@ -25,10 +26,12 @@ import binauld.pierre.musictag.item.NodeItem;
 public class LibraryItemFactory {
 
     private BitmapDecoder folderBitmapDecoder;
+    private FileFilter filter;
     private int thumbnailSize;
 
-    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, int thumbnailSize) {
+    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, FileFilter filter, int thumbnailSize) {
         this.folderBitmapDecoder = folderBitmapDecoder;
+        this.filter = filter;
         this.thumbnailSize = thumbnailSize;
     }
 
@@ -42,7 +45,7 @@ public class LibraryItemFactory {
      */
     public LibraryItem build(File file, NodeItem parent) throws IOException {
         if (file.isDirectory()) {
-            FolderItem folder = new FolderItem(file, parent);
+            FolderItem folder = new FolderItem(file, filter, parent);
             folder.switchDecoder(folderBitmapDecoder);
 
             return folder;

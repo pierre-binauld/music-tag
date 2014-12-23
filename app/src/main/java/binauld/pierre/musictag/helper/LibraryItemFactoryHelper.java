@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.util.TypedValue;
 
+import java.io.FileFilter;
+
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
@@ -17,10 +19,10 @@ public class LibraryItemFactoryHelper {
      * @param activity The activity context.
      * @return A library item factory.
      */
-    public static LibraryItemFactory buildFactory(Activity activity) {
+    public static LibraryItemFactory buildFactory(Activity activity, FileFilter filter) {
         Resources res = activity.getResources();
         BitmapDecoder folderBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.folder);
-        return new LibraryItemFactory(folderBitmapDecoder, getThumbnailSize(activity));
+        return new LibraryItemFactory(folderBitmapDecoder, filter, getThumbnailSize(activity));
     }
 
     /**

@@ -1,8 +1,11 @@
 package binauld.pierre.musictag.io;
 
 
+import android.os.AsyncTask;
+import android.os.Build;
 import android.widget.ProgressBar;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,6 +55,19 @@ public class LibraryItemLoaderManager {
             if(null != loader) {
                 loader.cancel(mayInterruptIfRunning);
             }
+        }
+    }
+
+    /**
+     * Execute a loader for specified files.
+     * @param loader The loader to execute.
+     * @param files Files to load.
+     */
+    public void execute(LibraryItemLoader loader, File[] files) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, files);
+        } else {
+            loader.execute(files);
         }
     }
 }

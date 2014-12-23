@@ -6,24 +6,22 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 
-import binauld.pierre.musictag.collection.MultipleBufferedList;
-import binauld.pierre.musictag.item.FolderItem;
-import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.collection.MultipleBufferedList;
+import binauld.pierre.musictag.factory.LibraryItemFactory;
+import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
 import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.factory.LibraryItemFactory;
 
 /**
  * Load all the audio files and directories from a folder to an adapter.
  * This task is executed asynchronously when execute is called.
  */
-public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
+public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
 
     private int updateStep;
 
@@ -32,17 +30,16 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
     private int invalidItemCount;
 
     private LibraryItemAdapter adapter;
-    private FileFilter filter;
+    private NodeItem node;
     private Comparator<LibraryItem> comparator;
 
     private ProgressBar progressBar;
 
-    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, FileFilter filter, Comparator<LibraryItem> comparator, int updateStep) {
+    public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, Comparator<LibraryItem> comparator, int updateStep) {
         this.updateStep = updateStep;
 
         this.adapter = adapter;
-        NodeItem node = adapter.getCurrentNode();
-        this.filter = filter;
+        this.node = adapter.getCurrentNode();
         this.factory = libraryItemFactory;
 
         this.items = node.getChildren();
@@ -50,39 +47,31 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
     }
 
     @Override
-    protected Integer doInBackground(FolderItem... values) {
-        this.initProgressBar(values);
+    protected Integer doInBackground(File... files) {
+        this.initProgressBar(files);
 
-        for (FolderItem folderItem : values) {
-            folderItem.setState(LoadingState.LOADING);
-            File folder = folderItem.getFile();
-            File[] files = folder.listFiles(filter);
+        node.setState(LoadingState.LOADING);
 
-            if (null == files) {
-                Log.w(this.getClass().toString(), "'" + folder.getAbsolutePath() + "' does not contains readable file.");
-            } else {
-                int j = 0;
-                for (int i = 0; i < files.length; i++) {
+        int j = 0;
+        for (int i = 0; i < files.length; i++) {
 
-                    try {
-                        LibraryItem item = factory.build(files[i], folderItem);
+            try {
+                LibraryItem item = factory.build(files[i], node);
 
-                        this.items.add(item);
+                this.items.add(item);
 
-                        j = ++j % updateStep;
-                        if (j == 0 || i == files.length - 1) {
-                            Collections.sort(items.getWorkingList(), comparator);
-                            items.push();
-                            publishProgress();
-                        }
-                    } catch (IOException e) {
-                        invalidItemCount++;
-                        updateProgressBarOnUiThread();
-                        Log.w(this.getClass().toString(), e.getMessage());
-                    }
+                j = ++j % updateStep;
+                if (j == 0 || i == files.length - 1) {
+                    Collections.sort(items.getWorkingList(), comparator);
+                    items.push();
+                    publishProgress();
                 }
+            } catch (IOException e) {
+                invalidItemCount++;
+                updateProgressBarOnUiThread();
+                Log.w(this.getClass().toString(), e.getMessage());
             }
-            folderItem.setState(LoadingState.LOADED);
+            node.setState(LoadingState.LOADED);
         }
 
         return items.size();
@@ -105,22 +94,17 @@ public class LibraryItemLoader extends AsyncTask<FolderItem, Void, Integer> {
 
     /**
      * Initialize the max of progress bar with the list of folder items.
-     *
-     * @param items The list of folder items.
+     * @param files The list of files.
      */
-    private void initProgressBar(FolderItem[] items) {
+    private void initProgressBar(File[] files) {
         if (null != progressBar) {
-            int max = 0;
-            for (FolderItem folder : items) {
-                max += folder.getLength();
-            }
+            final int max = files.length;
 
-            final int finalMax = max;
             progressBar.post(new Runnable() {
                 @Override
                 public void run() {
                     progressBar.setVisibility(View.VISIBLE);
-                    progressBar.setMax(finalMax);
+                    progressBar.setMax(max);
                 }
             });
         }

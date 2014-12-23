@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -23,12 +21,14 @@ import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCal
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
 import binauld.pierre.musictag.io.Cache;
@@ -57,6 +57,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     private SharedPreferences sharedPrefs;
 
     private LibraryItemFactory itemFactory;
+    private FileFilter filter;
     private AudioItem updating;
 
     @Override
@@ -83,8 +84,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Init service(s)
         ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song);
 
+        // Init filter
+        FileFilterFactory filterFactory = new FileFilterFactory();
+        filter = filterFactory.build();
+
         // Init factory
-        itemFactory = LibraryItemFactoryHelper.buildFactory(this);
+        itemFactory = LibraryItemFactoryHelper.buildFactory(this, filter);
 
         // Init adapter
         adapter = new LibraryItemAdapter(thumbnailService);
@@ -159,7 +164,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         } else {
             updating = (AudioItem) item;
             Intent intent = new Intent(this, TagFormActivity.class);
-            intent.putExtra("file", updating.getAudioFile().getFile());
+            intent.putExtra(TagFormActivity.AUDIO_FILE_KEY, updating.getAudioFile().getFile());
             startActivityForResult(intent, TAG_UPDATE_REQUEST);
         }
     }
@@ -235,7 +240,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 res.getString(R.string.source_folder_preference_key),
                 res.getString(R.string.source_folder_preference_default));
 
-        return new FolderItem(new File(sourceFolder));
+        return new FolderItem(new File(sourceFolder), filter);
     }
 
     /**
@@ -248,11 +253,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         adapter.setCurrentNode(node);
         if (node.getState() == LoadingState.NOT_LOADED) {
             LibraryItemLoader loader = manager.get();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, node);
-            } else {
-                loader.execute(node);
-            }
+            manager.execute(loader, node.getFileChildren());
         } else if (node.getState() == LoadingState.LOADING) {
             //Progress bar improvement: switch back the progress bar when node is loading.
         }

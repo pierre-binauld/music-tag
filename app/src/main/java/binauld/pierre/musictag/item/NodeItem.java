@@ -15,15 +15,11 @@ public abstract class NodeItem extends ChildItem {
     private LoadingState state;
 
     public NodeItem() {
-        this.init();
+        this(null);
     }
 
     public NodeItem(NodeItem parent) {
-        this.init();
         this.parent = parent;
-    }
-
-    private void init() {
         this.children = new MultipleBufferedList<>(new MultipleBufferedList.ListFactory<LibraryItem>() {
             public List<LibraryItem> buildEmptyList() {
                 return new ArrayList<>();

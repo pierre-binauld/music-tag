@@ -1,6 +1,7 @@
 package binauld.pierre.musictag.item;
 
 import java.io.File;
+import java.io.FileFilter;
 
 /**
  * Represent a folder in the library.
@@ -8,28 +9,26 @@ import java.io.File;
 public class FolderItem extends NodeItem {
 
     private File file;
+    private FileFilter filter;
     private String secondaryInformation;
 
-    public FolderItem(File file) {
-        super();
-        init(file);
+    public FolderItem(File file, FileFilter filter) {
+        this(file, filter, null);
     }
 
-    public FolderItem(File file, NodeItem parent) {
+    public FolderItem(File file, FileFilter filter, NodeItem parent) {
         super(parent);
-        init(file);
-    }
-
-    // TODO: Add local logic
-    private void init(File file) {
         this.file = file;
+        this.filter = filter;
 
         int fileNumber = getLength();
+        // TODO: Add local logic
         this.secondaryInformation = fileNumber + " file";
         if(fileNumber > 1) {
             this.secondaryInformation += "s";
         }
     }
+
 
     @Override
     public String getPrimaryInformation() {
@@ -55,5 +54,9 @@ public class FolderItem extends NodeItem {
      */
     public int getLength() {
         return file.isDirectory()?file.list().length:0;
+    }
+
+    public File[] getFileChildren() {
+        return file.listFiles(filter);
     }
 }

@@ -11,18 +11,38 @@
         android:layout_height="wrap_content">
 
         <android.support.v7.widget.CardView
+            android:id="@+id/card_filename"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
+            card_view:contentPadding="@dimen/activity_horizontal_margin"
+            card_view:cardElevation="@dimen/card_elevation">
+
+            <TextView
+                android:id="@+id/lbl_filename"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"/>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
             android:id="@+id/card_title_artist_album"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp"
-            card_view:cardCornerRadius="0dp"
-            card_view:contentPadding="16dp"
-            card_view:cardElevation="5dp">
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
+            card_view:contentPadding="@dimen/activity_horizontal_margin"
+            card_view:cardElevation="@dimen/card_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -34,21 +54,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/title"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
 
                 <com.iangclifton.android.floatlabel.FloatLabel
                     android:id="@+id/txt_artist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/artist"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
 
                 <com.iangclifton.android.floatlabel.FloatLabel
                     android:id="@+id/txt_album"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/album"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
@@ -57,14 +77,14 @@
             android:id="@+id/card_year_disk_track"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp"
-            card_view:cardCornerRadius="0dp"
-            card_view:contentPadding="16dp"
-            card_view:cardElevation="5dp">
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
+            card_view:contentPadding="@dimen/activity_horizontal_margin"
+            card_view:cardElevation="@dimen/card_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -103,14 +123,14 @@
             android:id="@+id/card_others"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp"
-            card_view:cardCornerRadius="0dp"
-            card_view:contentPadding="16dp"
-            card_view:cardElevation="5dp">
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
+            card_view:contentPadding="@dimen/activity_horizontal_margin"
+            card_view:cardElevation="@dimen/card_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -122,14 +142,14 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:hint="@string/album_artist"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
 
                 <com.iangclifton.android.floatlabel.FloatLabel
                     android:id="@+id/txt_composer"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:hint="@string/composer"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
 
                 <com.iangclifton.android.floatlabel.FloatLabel
                     android:id="@+id/txt_grouping"
@@ -143,7 +163,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:hint="@string/genre"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -151,13 +171,13 @@
             android:id="@+id/card_artwork"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp"
-            card_view:cardCornerRadius="0dp"
-            card_view:cardElevation="5dp">
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
+            card_view:cardElevation="@dimen/card_elevation">
 
             <ImageView
                 android:id="@+id/img_artwork"

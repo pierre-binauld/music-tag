@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.iangclifton.android.floatlabel.FloatLabel;
 
@@ -34,6 +35,7 @@ import binauld.pierre.musictag.R;
 public class TagFormActivity extends Activity {
     private AudioFile audio;
     private ImageView img_artwork;
+    private TextView lbl_filename;
     private EditText txt_title;
     private EditText txt_artist;
     private EditText txt_album;
@@ -74,6 +76,7 @@ public class TagFormActivity extends Activity {
             }
 
             img_artwork = (ImageView) findViewById(R.id.img_artwork);
+            lbl_filename = (TextView) findViewById(R.id.lbl_filename);
             txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
             txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
             txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
@@ -94,6 +97,7 @@ public class TagFormActivity extends Activity {
             } else {
                 findViewById(R.id.card_artwork).setVisibility(View.GONE);
             }
+            lbl_filename.setText(audio.getFile().getName());
             txt_title.setText(tags.getFirst(FieldKey.TITLE));
             txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
             txt_album.setText(tags.getFirst(FieldKey.ALBUM));

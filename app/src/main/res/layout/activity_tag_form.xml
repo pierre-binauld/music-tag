@@ -14,10 +14,15 @@
             android:id="@+id/card_title_artist_album"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             card_view:cardCornerRadius="0dp"
             card_view:contentPadding="16dp"
-            card_view:cardElevation="10dp">
+            card_view:cardElevation="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,10 +57,14 @@
             android:id="@+id/card_year_disk_track"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             card_view:cardCornerRadius="0dp"
             card_view:contentPadding="16dp"
-            card_view:cardElevation="10dp">
+            card_view:cardElevation="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -94,10 +103,14 @@
             android:id="@+id/card_others"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             card_view:cardCornerRadius="0dp"
             card_view:contentPadding="16dp"
-            card_view:cardElevation="10dp">
+            card_view:cardElevation="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -138,10 +151,13 @@
             android:id="@+id/card_artwork"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             card_view:cardCornerRadius="0dp"
-            card_view:contentPadding="16dp"
-            card_view:cardElevation="10dp">
+            card_view:cardElevation="5dp">
 
             <ImageView
                 android:id="@+id/img_artwork"

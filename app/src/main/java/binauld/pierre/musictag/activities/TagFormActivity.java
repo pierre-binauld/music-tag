@@ -54,7 +54,7 @@ public class TagFormActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_tag_form);
         ActionBar actionBar = getActionBar();
-        if(null != actionBar) {
+        if (null != actionBar) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         File file;
@@ -131,16 +131,17 @@ public class TagFormActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        switch(id) {
+        switch (id) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case R.id.action_settings :
-        
+            case R.id.action_settings:
                 return true;
             case R.id.action_valid:
                 saveChange();
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
     }

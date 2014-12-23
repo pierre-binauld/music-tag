@@ -20,10 +20,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.TagFormActivity"
-            android:label="@string/title_activity_tag_form" >
-        </activity>
-        <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/setting_preference_activity"
             android:theme="@style/SettingsTheme">

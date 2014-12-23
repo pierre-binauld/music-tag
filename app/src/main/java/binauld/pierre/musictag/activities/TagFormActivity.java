@@ -1,5 +1,6 @@
 package binauld.pierre.musictag.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -49,6 +50,10 @@ public class TagFormActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_tag_form);
+        ActionBar actionBar = getActionBar();
+        if(null != actionBar) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         File file;
         setContentView(R.layout.activity_tag_form);
         Bundle extras = getIntent().getExtras();
@@ -123,14 +128,18 @@ public class TagFormActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         switch(id) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.action_settings :
                 return true;
             case R.id.action_valid :
                 saveChange();
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
     public void saveChange() {

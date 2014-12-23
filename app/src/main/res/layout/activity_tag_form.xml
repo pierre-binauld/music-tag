@@ -8,16 +8,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_title_artist_album"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             card_view:cardCornerRadius="0dp"
-            android:layout_marginBottom="16dp"
-            card_view:contentPadding="16dp">
+            card_view:contentPadding="16dp"
+            card_view:cardElevation="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,9 +52,10 @@
             android:id="@+id/card_year_disk_track"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             card_view:cardCornerRadius="0dp"
-            android:layout_marginBottom="16dp"
-            card_view:contentPadding="16dp">
+            card_view:contentPadding="16dp"
+            card_view:cardElevation="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -93,9 +94,10 @@
             android:id="@+id/card_others"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             card_view:cardCornerRadius="0dp"
-            android:layout_marginBottom="16dp"
-            card_view:contentPadding="16dp">
+            card_view:contentPadding="16dp"
+            card_view:cardElevation="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -136,9 +138,10 @@
             android:id="@+id/card_artwork"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             card_view:cardCornerRadius="0dp"
-            android:layout_marginBottom="16dp"
-            card_view:contentPadding="16dp">
+            card_view:contentPadding="16dp"
+            card_view:cardElevation="10dp">
 
             <ImageView
                 android:id="@+id/img_artwork"

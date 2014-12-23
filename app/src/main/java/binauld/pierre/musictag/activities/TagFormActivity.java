@@ -1,5 +1,6 @@
 package binauld.pierre.musictag.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.iangclifton.android.floatlabel.FloatLabel;
 
@@ -34,6 +36,7 @@ import binauld.pierre.musictag.R;
 public class TagFormActivity extends Activity {
     private AudioFile audio;
     private ImageView img_artwork;
+    private TextView lbl_filename;
     private EditText txt_title;
     private EditText txt_artist;
     private EditText txt_album;
@@ -50,6 +53,10 @@ public class TagFormActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_tag_form);
+        ActionBar actionBar = getActionBar();
+        if(null != actionBar) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         File file;
         setContentView(R.layout.activity_tag_form);
         Bundle extras = getIntent().getExtras();
@@ -70,6 +77,7 @@ public class TagFormActivity extends Activity {
             }
 
             img_artwork = (ImageView) findViewById(R.id.img_artwork);
+            lbl_filename = (TextView) findViewById(R.id.lbl_filename);
             txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
             txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
             txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
@@ -90,6 +98,7 @@ public class TagFormActivity extends Activity {
             } else {
                 findViewById(R.id.card_artwork).setVisibility(View.GONE);
             }
+            lbl_filename.setText(audio.getFile().getName());
             txt_title.setText(tags.getFirst(FieldKey.TITLE));
             txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
             txt_album.setText(tags.getFirst(FieldKey.ALBUM));
@@ -122,15 +131,18 @@ public class TagFormActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        switch (id) {
-            case R.id.action_settings:
+        switch(id) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.action_settings :
+        
                 return true;
             case R.id.action_valid:
                 saveChange();
                 return true;
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
     public void saveChange() {

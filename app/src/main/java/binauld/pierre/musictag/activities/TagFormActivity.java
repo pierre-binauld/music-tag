@@ -27,10 +27,14 @@ import org.jaudiotagger.tag.datatype.Artwork;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import binauld.pierre.musictag.R;
 
 public class TagFormActivity extends Activity {
+    private List<AudioFile> audios;
     private AudioFile audio;
     private ImageView img_artwork;
     private EditText txt_title;
@@ -49,24 +53,10 @@ public class TagFormActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_tag_form);
-        File file;
         setContentView(R.layout.activity_tag_form);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            file = (File) extras.getSerializable("file");
-            try {
-                audio = AudioFileIO.read(file);
-            } catch (CannotReadException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (TagException e) {
-                e.printStackTrace();
-            } catch (ReadOnlyFileException e) {
-                e.printStackTrace();
-            } catch (InvalidAudioFrameException e) {
-                e.printStackTrace();
-            }
+            audios = new ArrayList<>();
 
             img_artwork = (ImageView) findViewById(R.id.img_artwork);
             txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
@@ -80,9 +70,30 @@ public class TagFormActivity extends Activity {
             txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
             txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
 
+            Object [] extrasObj = (Object[]) extras.getSerializable("file");
+            for(Object obj : extrasObj){
+                try {
+                    audios.add(AudioFileIO.read((File) obj));
+                } catch (CannotReadException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (TagException e) {
+                    e.printStackTrace();
+                } catch (ReadOnlyFileException e) {
+                    e.printStackTrace();
+                } catch (InvalidAudioFrameException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // get the first element of the selected song
+            audio = audios.get(0);
+
+            // fill in fieldtext
             Tag tags = audio.getTag();
             Artwork artwork = tags.getFirstArtwork();
-            if(null != artwork) {
+            if (null != artwork) {
                 byte[] artworkData = artwork.getBinaryData();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
                 img_artwork.setImageBitmap(bitmap);

@@ -10,11 +10,15 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
@@ -36,6 +40,7 @@ import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
+import binauld.pierre.musictag.item.MultipleChoiceModeListenerCustom;
 import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
@@ -96,6 +101,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         listView.setOnItemClickListener(this);
         listView.setScrollViewCallbacks(this);
         listView.setAdapter(adapter);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(new MultipleChoiceModeListenerCustom(adapter, listView, this){
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                Intent intent = adapter.sendSelection(activity);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -152,7 +166,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         } else {
             AudioItem audio = (AudioItem) item;
             Intent intent = new Intent(this, TagFormActivity.class);
-            intent.putExtra("file", audio.getAudioFile().getFile());
+            File files[] = new File[1];
+            files[0]= audio.getAudioFile().getFile();
+            intent.putExtra("file", files);
             startActivity(intent);
         }
     }

@@ -1,6 +1,8 @@
 package binauld.pierre.musictag.adapter;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +10,13 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.activities.TagFormActivity;
+import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
 import binauld.pierre.musictag.service.ThumbnailService;
@@ -17,6 +25,36 @@ import binauld.pierre.musictag.service.ThumbnailService;
  * Adapt a list of library item for a list view.
  */
 public class LibraryItemAdapter extends BaseAdapter {
+    private List<File> files;
+
+    public void toggleSelection(int position) {
+        LibraryItem item = (LibraryItem) getItem(position);
+        if (item.isAudioItem()) {
+            AudioItem audio = (AudioItem) item;
+            File f = audio.getAudioFile().getFile();
+            if(files.contains(f)){
+                files.remove(f);
+            }else{
+                files.add(f);
+            }
+        }
+    }
+
+    public Intent sendSelection(Activity activity) {
+        Intent intent = new Intent(activity, TagFormActivity.class);
+        File [] listFiles = new File[files.size()];
+        int i = 0;
+        for(File f : files){
+            listFiles[i] = f;
+            i++;
+        }
+        intent.putExtra("file",listFiles);
+        return intent;
+    }
+
+    public void resetSelection(){
+        files.clear();
+    }
 
     static class ViewHolder {
         TextView firstLine;
@@ -29,6 +67,7 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     public LibraryItemAdapter(ThumbnailService thumbnailService) {
         this.thumbnailService = thumbnailService;
+        files = new ArrayList<>();
     }
 
     @Override

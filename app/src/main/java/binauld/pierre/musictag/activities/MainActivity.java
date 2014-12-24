@@ -8,7 +8,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +21,6 @@ import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -164,7 +162,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         } else {
             updating = (AudioItem) item;
             Intent intent = new Intent(this, TagFormActivity.class);
-            intent.putExtra(TagFormActivity.AUDIO_FILE_KEY, updating.getAudioFile().getFile());
+            TagFormActivity.provideItem(updating);
+//            intent.putExtra(TagFormActivity.AUDIO_FILE_KEY, updating.getAudioFile().getFile());
             startActivityForResult(intent, TAG_UPDATE_REQUEST);
         }
     }
@@ -175,16 +174,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         if (requestCode == TAG_UPDATE_REQUEST) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                Bundle extras = data.getExtras();
-                if (extras != null) {
-                    File file = (File) extras.getSerializable("file");
-                    try {
-                        itemFactory.update(updating, file);
+//                Bundle extras = data.getExtras();
+//                if (extras != null) {
+//                    File file = (File) extras.getSerializable("file");
+//                    try {
+//                        itemFactory.update(updating, file);
                         adapter.notifyDataSetChanged();
-                    } catch (IOException e) {
-                        Log.e(this.getClass().toString(), e.getMessage(), e);
-                    }
-                }
+//                    } catch (IOException e) {
+//                        Log.e(this.getClass().toString(), e.getMessage(), e);
+//                    }
+//                }
             }
         }
     }

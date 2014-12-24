@@ -16,28 +16,30 @@ import android.widget.TextView;
 
 import com.iangclifton.android.floatlabel.FloatLabel;
 
+import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.datatype.Artwork;
 
-import java.io.File;
-import java.io.IOException;
-
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.item.AudioItem;
 
 public class TagFormActivity extends Activity {
 
-    public static final String AUDIO_FILE_KEY = "audio_file";
+//    public static final String AUDIO_FILE_KEY = "audio_file";
 
-    private AudioFile audio;
+    private static AudioItem providedItem;
+
+    public static void provideItem(AudioItem item) {
+        TagFormActivity.providedItem = item;
+    }
+
+    private AudioItem audioItem;
+
     private ImageView img_artwork;
     private TextView lbl_filename;
     private EditText txt_title;
@@ -67,18 +69,26 @@ public class TagFormActivity extends Activity {
 
         // Init views
         initContent();
+        initActivityTitle();
 
     }
 
     public void initContent() {
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            File file = (File) extras.getSerializable(AUDIO_FILE_KEY);
-            try {
-                audio = AudioFileIO.read(file);
-            } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-                e.printStackTrace();
-            }
+//        Bundle extras = getIntent().getExtras();
+//        if (extras != null) {
+        if (null == providedItem) {
+            Log.e(this.getClass().toString(), "No item has been provided.");
+            finish();
+        } else {
+//            File file = (File) extras.getSerializable(AUDIO_FILE_KEY);
+//            try {
+//                audio = AudioFileIO.read(file);
+//            } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+//                e.printStackTrace();
+//            }
+
+            audioItem = TagFormActivity.providedItem;
+            AudioFile audioFile = audioItem.getAudioFile();
 
             img_artwork = (ImageView) findViewById(R.id.img_artwork);
             lbl_filename = (TextView) findViewById(R.id.lbl_filename);
@@ -93,17 +103,19 @@ public class TagFormActivity extends Activity {
             txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
             txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
 
-            Tag tags = audio.getTag();
+            Tag tags = audioFile.getTag();
             Artwork artwork = tags.getFirstArtwork();
             if (null != artwork) {
                 byte[] artworkData = artwork.getBinaryData();
                 //TODO: Improvement needed.
+                // Use service Locator with weakreference for all factory needed ?
+
                 Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
                 img_artwork.setImageBitmap(bitmap);
             } else {
                 findViewById(R.id.card_artwork).setVisibility(View.GONE);
             }
-            lbl_filename.setText(audio.getFile().getName());
+            lbl_filename.setText(audioFile.getFile().getAbsolutePath());
             txt_title.setText(tags.getFirst(FieldKey.TITLE));
             txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
             txt_album.setText(tags.getFirst(FieldKey.ALBUM));
@@ -114,8 +126,6 @@ public class TagFormActivity extends Activity {
             txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
             txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
             txt_genre.setText(tags.getFirst(FieldKey.GENRE));
-        } else {
-            finish();
         }
     }
 
@@ -143,35 +153,25 @@ public class TagFormActivity extends Activity {
     }
 
     public void saveChangeAndFinish() {
-        String title = txt_title.getText().toString();
-        String artist = txt_artist.getText().toString();
-        String album = txt_album.getText().toString();
-        String year = txt_year.getText().toString();
-        String album_artist = txt_album_artist.getText().toString();
-        String composer = txt_composer.getText().toString();
-        String grouping = txt_grouping.getText().toString();
-        String genre = txt_genre.getText().toString();
-        String disk = txt_disk.getText().toString();
-        String track = txt_track.getText().toString();
-
         Intent intent = new Intent();
         try {
-            Tag tags = audio.getTag();
-            tags.setField(FieldKey.TITLE, title);
-            tags.setField(FieldKey.ARTIST, artist);
-            tags.setField(FieldKey.ALBUM, album);
-            tags.setField(FieldKey.YEAR, year);
-            tags.setField(FieldKey.ALBUM_ARTIST, album_artist);
-            tags.setField(FieldKey.COMPOSER, composer);
-            tags.setField(FieldKey.GROUPING, grouping);
-            tags.setField(FieldKey.GENRE, genre);
-            tags.setField(FieldKey.DISC_NO, disk);
-            tags.setField(FieldKey.TRACK, track);
-            audio.setTag(tags);
+            AudioFile audioFile = audioItem.getAudioFile();
+            Tag tags = audioFile.getTag();
+            setTagField(tags, FieldKey.TITLE, txt_title.getText().toString());
+            setTagField(tags, FieldKey.ARTIST, txt_artist.getText().toString());
+            setTagField(tags, FieldKey.ALBUM, txt_album.getText().toString());
+            setTagField(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString());
+            setTagField(tags, FieldKey.COMPOSER, txt_composer.getText().toString());
+            setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString());
+            setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString());
+            setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
+            setNumericTagField(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
+            setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
+            audioFile.setTag(tags);
 
-            AudioFileIO.write(audio);
+            AudioFileIO.write(audioFile);
 
-            intent.putExtra("file", audio.getFile());
+//            intent.putExtra("file", audioFile.getFile());
             setResult(RESULT_OK, intent);
         } catch (CannotWriteException | FieldDataInvalidException e) {
             Log.e(this.getClass().toString(), e.getMessage(), e);
@@ -179,5 +179,26 @@ public class TagFormActivity extends Activity {
         }
 
         finish();
+    }
+
+    private void initActivityTitle() {
+        String title = audioItem.getPrimaryInformation();
+        if (StringUtils.isNotBlank(audioItem.getSecondaryInformation())) {
+            title += " - " + audioItem.getSecondaryInformation();
+        }
+        setTitle(title);
+    }
+
+    private static void setNumericTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
+        if (!StringUtils.isBlank(value) && StringUtils.isNumeric(value)) {
+            tags.setField(key, value);
+        }
+    }
+
+    private static void setTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
+        if (StringUtils.isBlank(value)) {
+            value = "";
+        }
+        tags.setField(key, value);
     }
 }

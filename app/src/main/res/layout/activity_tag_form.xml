@@ -156,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:hint="@string/grouping"
-                    android:inputType="text" />
+                    android:inputType="textCapWords" />
 
                 <com.iangclifton.android.floatlabel.FloatLabel
                     android:id="@+id/txt_genre"

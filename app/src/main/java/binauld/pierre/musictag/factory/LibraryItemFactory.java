@@ -1,6 +1,8 @@
 package binauld.pierre.musictag.factory;
 
 
+import android.content.res.Resources;
+
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -27,10 +29,12 @@ public class LibraryItemFactory {
 
     private BitmapDecoder folderBitmapDecoder;
     private FileFilter filter;
+    private Resources res;
 
-    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, FileFilter filter) {
+    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, FileFilter filter, Resources res) {
         this.folderBitmapDecoder = folderBitmapDecoder;
         this.filter = filter;
+        this.res = res;
     }
 
     /**
@@ -43,10 +47,7 @@ public class LibraryItemFactory {
      */
     public LibraryItem build(File file, NodeItem parent) throws IOException {
         if (file.isDirectory()) {
-            FolderItem folder = new FolderItem(file, filter, parent);
-            folder.switchDecoder(folderBitmapDecoder);
-
-            return folder;
+            return buildFolderItem(file, parent);
         } else {
             AudioItem audioItem = new AudioItem();
             audioItem.setParent(parent);
@@ -56,6 +57,11 @@ public class LibraryItemFactory {
         }
     }
 
+    public FolderItem buildFolderItem(File file, NodeItem parent) {
+        FolderItem folder = new FolderItem(file, filter, parent, res);
+        folder.switchDecoder(folderBitmapDecoder);
+        return folder;
+    }
 
     //TODO: Set up here the default decoder and not in the artwork service
     // Maybe just do not set.

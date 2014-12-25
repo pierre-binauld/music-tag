@@ -30,15 +30,15 @@ import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
-import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
-import binauld.pierre.musictag.service.Locator;
 import binauld.pierre.musictag.service.ArtworkService;
+import binauld.pierre.musictag.service.CacheService;
+import binauld.pierre.musictag.service.Locator;
 
 /**
  * Main activity of the app.
@@ -239,7 +239,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 res.getString(R.string.source_folder_preference_key),
                 res.getString(R.string.source_folder_preference_default));
 
-        return new FolderItem(new File(sourceFolder), filter);
+        return itemFactory.buildFolderItem(new File(sourceFolder), null);
     }
 
     /**

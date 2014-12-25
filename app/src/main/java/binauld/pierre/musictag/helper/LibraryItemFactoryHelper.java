@@ -19,6 +19,6 @@ public class LibraryItemFactoryHelper {
      */
     public static LibraryItemFactory buildFactory(Resources res, FileFilter filter) {
         BitmapDecoder folderBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.folder);
-        return new LibraryItemFactory(folderBitmapDecoder, filter);
+        return new LibraryItemFactory(folderBitmapDecoder, filter, res);
     }
 }

@@ -1,7 +1,11 @@
 package binauld.pierre.musictag.item;
 
+import android.content.res.Resources;
+
 import java.io.File;
 import java.io.FileFilter;
+
+import binauld.pierre.musictag.R;
 
 /**
  * Represent a folder in the library.
@@ -12,11 +16,11 @@ public class FolderItem extends NodeItem {
     private File[] fileList;
     private String secondaryInformation;
 
-    public FolderItem(File file, FileFilter filter) {
-        this(file, filter, null);
+    public FolderItem(File file, FileFilter filter, Resources res) {
+        this(file, filter, null, res);
     }
 
-    public FolderItem(File file, FileFilter filter, NodeItem parent) {
+    public FolderItem(File file, FileFilter filter, NodeItem parent, Resources res) {
         super(parent);
         this.file = file;
         this.fileList = file.listFiles(filter);
@@ -24,9 +28,11 @@ public class FolderItem extends NodeItem {
 
         int fileNumber = getLength();
         // TODO: Add local logic
-        this.secondaryInformation = fileNumber + " file";
-        if(fileNumber > 1) {
-            this.secondaryInformation += "s";
+        this.secondaryInformation = fileNumber + " ";
+        if(fileNumber < 2) {
+            this.secondaryInformation  += res.getString(R.string.file);
+        } else {
+            this.secondaryInformation  += res.getString(R.string.files);
         }
     }
 

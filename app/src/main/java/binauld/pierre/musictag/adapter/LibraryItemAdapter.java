@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import binauld.pierre.musictag.R;
@@ -27,10 +28,18 @@ public class LibraryItemAdapter extends BaseAdapter {
     private NodeItem currentNode;
     private final ThumbnailService thumbnailService;
     private int thumbnailSize;
+    private int invalidItemCount;
+    private ProgressBar progressBar;
 
     public LibraryItemAdapter(ThumbnailService thumbnailService, int thumbnailSize) {
         this.thumbnailService = thumbnailService;
         this.thumbnailSize = thumbnailSize;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        updateProgressBar();
     }
 
     @Override
@@ -80,11 +89,43 @@ public class LibraryItemAdapter extends BaseAdapter {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
             thumbnailService.setThumbnail(item, viewHolder.thumbnail, thumbnailSize);
-//            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
             convertView.setTag(viewHolder);
         }
 
         return convertView;
+    }
+
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
+    }
+
+    private void setUpProgressBar() {
+        if (null != progressBar) {
+            if (null == currentNode) {
+                progressBar.setVisibility(View.GONE);
+            } else {
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setMax(currentNode.getMaxChildren());
+                updateProgressBar();
+            }
+        }
+    }
+
+    private void updateProgressBar() {
+        if (null != progressBar) {
+            switch (currentNode.getState()) {
+                case LOADING:
+                    progressBar.setProgress(currentNode.size() + invalidItemCount);
+                    break;
+                case LOADED:
+                    progressBar.setVisibility(View.GONE);
+                    break;
+                case NOT_LOADED:
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     /**
@@ -98,6 +139,7 @@ public class LibraryItemAdapter extends BaseAdapter {
             return false;
         } else {
             currentNode = parent;
+            setUpProgressBar();
             return true;
         }
     }
@@ -109,6 +151,7 @@ public class LibraryItemAdapter extends BaseAdapter {
      */
     public void setCurrentNode(NodeItem currentNode) {
         this.currentNode = currentNode;
+        setUpProgressBar();
     }
 
     /**
@@ -118,6 +161,10 @@ public class LibraryItemAdapter extends BaseAdapter {
      */
     public NodeItem getCurrentNode() {
         return currentNode;
+    }
+
+    public void setInvalidItemCount(int invalidItemCount) {
+        this.invalidItemCount = invalidItemCount;
     }
 
 }

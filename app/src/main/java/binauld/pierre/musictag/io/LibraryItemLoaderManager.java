@@ -3,7 +3,6 @@ package binauld.pierre.musictag.io;
 
 import android.os.AsyncTask;
 import android.os.Build;
-import android.widget.ProgressBar;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -25,13 +24,11 @@ public class LibraryItemLoaderManager {
     private LibraryItemAdapter adapter;
     private LibraryItemFactory itemFactory;
     //TODO: Progress bar is break.
-    private ProgressBar progressBar;
     private int updateStep;
 
-    public LibraryItemLoaderManager(LibraryItemAdapter adapter, LibraryItemFactory itemFactory, ProgressBar progressBar, int updateStep) {
+    public LibraryItemLoaderManager(LibraryItemAdapter adapter, LibraryItemFactory itemFactory, int updateStep) {
         this.adapter = adapter;
         this.itemFactory = itemFactory;
-        this.progressBar = progressBar;
         this.updateStep = updateStep;
     }
 
@@ -41,7 +38,6 @@ public class LibraryItemLoaderManager {
      */
     public LibraryItemLoader get() {
         LibraryItemLoader loader = LoaderHelper.buildLoader(adapter, itemFactory, this, updateStep);
-        loader.setProgressBar(progressBar);
         loaders.add(new WeakReference<>(loader));
         return loader;
     }

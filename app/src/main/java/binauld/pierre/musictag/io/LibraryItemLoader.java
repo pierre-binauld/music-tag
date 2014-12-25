@@ -2,8 +2,6 @@ package binauld.pierre.musictag.io;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +31,6 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
     private NodeItem node;
     private Comparator<LibraryItem> comparator;
 
-    private ProgressBar progressBar;
 
     public LibraryItemLoader(LibraryItemAdapter adapter, LibraryItemFactory libraryItemFactory, Comparator<LibraryItem> comparator, int updateStep) {
         this.updateStep = updateStep;
@@ -47,10 +44,14 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
     }
 
     @Override
-    protected Integer doInBackground(File... files) {
-        this.initProgressBar(files);
-
+    protected void onPreExecute() {
+        super.onPreExecute();
         node.setState(LoadingState.LOADING);
+    }
+
+    @Override
+    protected Integer doInBackground(File... files) {
+
 
         int j = 0;
         for (int i = 0; i < files.length; i++) {
@@ -68,10 +69,8 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
                 }
             } catch (IOException e) {
                 invalidItemCount++;
-                updateProgressBarOnUiThread();
                 Log.w(this.getClass().toString(), e.getMessage());
             }
-            node.setState(LoadingState.LOADED);
         }
 
         return items.size();
@@ -80,67 +79,14 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
     @Override
     protected void onProgressUpdate(Void... voids) {
         items.pull();
-        updateProgressBar();
+        adapter.setInvalidItemCount(invalidItemCount);
         adapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onPostExecute(Integer count) {
         super.onPostExecute(count);
-        if (null != progressBar) {
-            progressBar.setVisibility(View.GONE);
-        }
+        node.setState(LoadingState.LOADED);
+        adapter.notifyDataSetChanged();
     }
-
-    /**
-     * Initialize the max of progress bar with the list of folder items.
-     * @param files The list of files.
-     */
-    private void initProgressBar(File[] files) {
-        if (null != progressBar) {
-            final int max = files.length;
-
-            progressBar.post(new Runnable() {
-                @Override
-                public void run() {
-                    progressBar.setVisibility(View.VISIBLE);
-                    progressBar.setMax(max);
-                }
-            });
-        }
-    }
-
-    /**
-     * Update the progress bar from any thread.
-     * Used in case of unreadable file.
-     */
-    private void updateProgressBarOnUiThread() {
-        if (null != progressBar) {
-            progressBar.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateProgressBar();
-                }
-            });
-        }
-    }
-
-    /**
-     * Update the progress bar with the items count and the invalid item count.
-     */
-    public void updateProgressBar() {
-        if (null != progressBar) {
-            progressBar.setProgress(items.size() + invalidItemCount);
-        }
-    }
-
-    /**
-     * Set the progress bar used to display the loading progression.
-     *
-     * @param progressBar The progress bar.
-     */
-    public void setProgressBar(ProgressBar progressBar) {
-        this.progressBar = progressBar;
-    }
-
 }

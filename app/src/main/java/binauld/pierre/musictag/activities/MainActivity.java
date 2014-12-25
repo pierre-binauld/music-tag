@@ -90,14 +90,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Init factory
         itemFactory = LibraryItemFactoryHelper.buildFactory(res, filter);
 
-        // Init adapter
-        adapter = new LibraryItemAdapter(thumbnailService, getThumbnailSize());
-
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+//        progressBar.setProgress(50);
+
+        // Init adapter
+        adapter = new LibraryItemAdapter(thumbnailService, getThumbnailSize());
+        adapter.setProgressBar(progressBar);
 
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(adapter, itemFactory, progressBar, res.getInteger(R.integer.thumbnail_loader_update_step));
+        manager = new LibraryItemLoaderManager(adapter, itemFactory, res.getInteger(R.integer.thumbnail_loader_update_step));
 
         // Load items
         switchNode(getSourceNode());
@@ -180,7 +182,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 //                    File file = (File) extras.getSerializable("file");
 //                    try {
 //                        itemFactory.update(updating, file);
-                        adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
 //                    } catch (IOException e) {
 //                        Log.e(this.getClass().toString(), e.getMessage(), e);
 //                    }
@@ -219,13 +221,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
         ActionBar ab = getActionBar();
-        if (scrollState == ScrollState.UP) {
-            if (ab.isShowing()) {
-                ab.hide();
-            }
-        } else if (scrollState == ScrollState.DOWN) {
-            if (!ab.isShowing()) {
-                ab.show();
+        if (ab != null) {
+            if (scrollState == ScrollState.UP) {
+                if (ab.isShowing()) {
+                    ab.hide();
+                }
+            } else if (scrollState == ScrollState.DOWN) {
+                if (!ab.isShowing()) {
+                    ab.show();
+                }
             }
         }
     }
@@ -261,6 +265,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     /**
      * Retrieve the thumbnail size from listPreferredItemHeight theme attribute.
+     *
      * @return The thumbnail size.
      */
     private int getThumbnailSize() {

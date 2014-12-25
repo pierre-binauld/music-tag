@@ -16,12 +16,14 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
     private final BitmapDecoder defaultThumbnailDecoder;
     private LibraryItem item;
     private Cache<Bitmap> cache;
+    private int thumbnailSize;
 
-    public ThumbnailLoader(ImageView imageView, Cache<Bitmap> cache, BitmapDecoder defaultThumbnailDecoder) {
+    public ThumbnailLoader(ImageView imageView, Cache<Bitmap> cache, BitmapDecoder defaultThumbnailDecoder, int thumbnailSize) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
         this.imageViewReference = new WeakReference<>(imageView);
         this.cache = cache;
         this.defaultThumbnailDecoder = defaultThumbnailDecoder;
+        this.thumbnailSize = thumbnailSize;
     }
 
     // Decode image in background.
@@ -29,8 +31,9 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
     protected Bitmap doInBackground(LibraryItem... items) {
         item = items[0];
         BitmapDecoder decoder = item.getDecoder();
-        String key = decoder.getId();
-        Bitmap bitmap = decoder.decode();
+
+        String key = decoder.getKey(thumbnailSize, thumbnailSize);
+        Bitmap bitmap = decoder.decode(thumbnailSize, thumbnailSize);
         if (null != bitmap) {
             cache.put(key, bitmap);
         } else if (decoder != defaultThumbnailDecoder) {
@@ -64,4 +67,5 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
     public LibraryItem getWorkingItem() {
         return item;
     }
+
 }

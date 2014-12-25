@@ -11,13 +11,8 @@ public class AudioFileBitmapDecoder implements BitmapDecoder {
 
     private AudioFile audioFile;
 
-    private int targetedWidth;
-    private int targetedHeight;
-
-    public AudioFileBitmapDecoder(AudioFile audioFile, int targetedWidth, int targetedHeight) {
+    public AudioFileBitmapDecoder(AudioFile audioFile) {
         this.audioFile = audioFile;
-        this.targetedHeight = targetedHeight;
-        this.targetedWidth = targetedWidth;
     }
 
     @Override
@@ -25,7 +20,19 @@ public class AudioFileBitmapDecoder implements BitmapDecoder {
         Bitmap bitmap = null;
 
         Artwork artwork = audioFile.getTag().getFirstArtwork();
-        if(null != artwork) {
+        if (null != artwork) {
+            byte[] artworkData = artwork.getBinaryData();
+            bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
+        }
+        return bitmap;
+    }
+
+    @Override
+    public Bitmap decode(int targetedWidth, int targetedHeight) {
+        Bitmap bitmap = null;
+
+        Artwork artwork = audioFile.getTag().getFirstArtwork();
+        if (null != artwork) {
             byte[] artworkData = artwork.getBinaryData();
 
             // Get the dimensions of the bitmap
@@ -50,7 +57,7 @@ public class AudioFileBitmapDecoder implements BitmapDecoder {
     }
 
     @Override
-    public String getId() {
-        return audioFile.getFile().getAbsolutePath();
+    public String getKey(int targetedWidth, int targetedHeight) {
+        return targetedWidth + "." + targetedHeight + "." + audioFile.getFile().getAbsolutePath();
     }
 }

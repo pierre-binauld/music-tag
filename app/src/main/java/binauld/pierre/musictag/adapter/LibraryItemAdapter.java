@@ -26,9 +26,11 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     private NodeItem currentNode;
     private final ThumbnailService thumbnailService;
+    private int thumbnailSize;
 
-    public LibraryItemAdapter(ThumbnailService thumbnailService) {
+    public LibraryItemAdapter(ThumbnailService thumbnailService, int thumbnailSize) {
         this.thumbnailService = thumbnailService;
+        this.thumbnailSize = thumbnailSize;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-            thumbnailService.setThumbnail(item, viewHolder.thumbnail);
+            thumbnailService.setThumbnail(item, viewHolder.thumbnail, thumbnailSize);
 //            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
             convertView.setTag(viewHolder);
         }

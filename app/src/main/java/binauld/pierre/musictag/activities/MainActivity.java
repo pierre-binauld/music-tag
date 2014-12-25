@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -87,10 +88,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         filter = filterFactory.build();
 
         // Init factory
-        itemFactory = LibraryItemFactoryHelper.buildFactory(this, filter);
+        itemFactory = LibraryItemFactoryHelper.buildFactory(res, filter);
 
         // Init adapter
-        adapter = new LibraryItemAdapter(thumbnailService);
+        adapter = new LibraryItemAdapter(thumbnailService, getThumbnailSize());
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -256,5 +257,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         } else if (node.getState() == LoadingState.LOADING) {
             //Progress bar improvement: switch back the progress bar when node is loading.
         }
+    }
+
+    /**
+     * Retrieve the thumbnail size from listPreferredItemHeight theme attribute.
+     * @return The thumbnail size.
+     */
+    private int getThumbnailSize() {
+
+        TypedValue thumbnailSize = new android.util.TypedValue();
+        this.getTheme().resolveAttribute(android.R.attr.listPreferredItemHeight, thumbnailSize, true);
+        TypedValue.coerceToString(thumbnailSize.type, thumbnailSize.data);
+
+        android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        return (int) thumbnailSize.getDimension(metrics);
     }
 }

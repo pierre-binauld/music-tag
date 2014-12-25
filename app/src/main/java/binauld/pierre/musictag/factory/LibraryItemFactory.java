@@ -27,12 +27,10 @@ public class LibraryItemFactory {
 
     private BitmapDecoder folderBitmapDecoder;
     private FileFilter filter;
-    private int thumbnailSize;
 
-    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, FileFilter filter, int thumbnailSize) {
+    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, FileFilter filter) {
         this.folderBitmapDecoder = folderBitmapDecoder;
         this.filter = filter;
-        this.thumbnailSize = thumbnailSize;
     }
 
     /**
@@ -63,7 +61,7 @@ public class LibraryItemFactory {
             try {
                 AudioFile audio = AudioFileIO.read(file);
                 updating.setAudioFile(audio);
-                updating.switchDecoder(new AudioFileBitmapDecoder(audio, thumbnailSize, thumbnailSize));
+                updating.switchDecoder(new AudioFileBitmapDecoder(audio));
 
             } catch (CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
                 throw new IOException(e);

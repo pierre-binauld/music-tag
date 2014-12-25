@@ -32,7 +32,7 @@ public class ThumbnailService {
         this.cache = cache;
         this.defaultThumbnailDecoder = new ResourceBitmapDecoder(res, defaultThumbnailResId);
 
-        DefaultThumbnailLoader loader = new DefaultThumbnailLoader(this.cache);
+        DefaultThumbnailLoader loader = new DefaultThumbnailLoader(this.cache, 0);
         loader.execute(this.defaultThumbnailDecoder);
     }
 
@@ -42,9 +42,9 @@ public class ThumbnailService {
      * @param item Current item.
      * @param imageView Associated image view.
      */
-    public void setThumbnail(LibraryItem item, ImageView imageView) {
+    public void setThumbnail(LibraryItem item, ImageView imageView, int thumbnailSize) {
 
-        final String key = item.getDecoder().getId();
+        final String key = item.getDecoder().getKey(thumbnailSize, thumbnailSize);
 //
         final Bitmap bitmap = cache.get(key);
 
@@ -52,7 +52,7 @@ public class ThumbnailService {
             imageView.setImageBitmap(bitmap);
         } else if (cancelPotentialWork(item, imageView)) {
             Resources res = imageView.getResources();
-            final ThumbnailLoader task = new ThumbnailLoader(imageView, cache, defaultThumbnailDecoder);
+            final ThumbnailLoader task = new ThumbnailLoader(imageView, cache, defaultThumbnailDecoder, thumbnailSize);
             final AsyncDrawable asyncDrawable = new AsyncDrawable(res, cache.get(defaultThumbnailResId), task);
             imageView.setImageDrawable(asyncDrawable);
             task.execute(item);

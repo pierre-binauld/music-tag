@@ -20,7 +20,12 @@ public class ResourceBitmapDecoder implements BitmapDecoder {
     }
 
     @Override
-    public String getId() {
+    public Bitmap decode(int targetedWidth, int targetedHeight) {
+        return decode();
+    }
+
+    @Override
+    public String getKey(int targetedWidth, int targetedHeight) {
         return String.valueOf(id);
     }
 }

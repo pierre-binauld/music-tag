@@ -1,9 +1,7 @@
 package binauld.pierre.musictag.helper;
 
 
-import android.app.Activity;
 import android.content.res.Resources;
-import android.util.TypedValue;
 
 import java.io.FileFilter;
 
@@ -16,28 +14,11 @@ public class LibraryItemFactoryHelper {
 
     /**
      * Build the library item factory.
-     * @param activity The activity context.
+     * @param res The activity resources.
      * @return A library item factory.
      */
-    public static LibraryItemFactory buildFactory(Activity activity, FileFilter filter) {
-        Resources res = activity.getResources();
+    public static LibraryItemFactory buildFactory(Resources res, FileFilter filter) {
         BitmapDecoder folderBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.folder);
-        return new LibraryItemFactory(folderBitmapDecoder, filter, getThumbnailSize(activity));
-    }
-
-    /**
-     * Retrieve the thumbnail size from listPreferredItemHeight theme attribute.
-     * @return The thumbnail size.
-     */
-    private static int getThumbnailSize(Activity activity) {
-
-        TypedValue thumbnailSize = new android.util.TypedValue();
-        activity.getTheme().resolveAttribute(android.R.attr.listPreferredItemHeight, thumbnailSize, true);
-        TypedValue.coerceToString(thumbnailSize.type, thumbnailSize.data);
-
-        android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        return (int) thumbnailSize.getDimension(metrics);
+        return new LibraryItemFactory(folderBitmapDecoder, filter);
     }
 }

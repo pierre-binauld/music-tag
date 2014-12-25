@@ -79,7 +79,7 @@ public class LibraryItemLoader extends AsyncTask<File, Void, Integer> {
     @Override
     protected void onProgressUpdate(Void... voids) {
         items.pull();
-        adapter.setInvalidItemCount(invalidItemCount);
+        node.setInvalidItemCount(invalidItemCount);
         adapter.notifyDataSetChanged();
     }
 

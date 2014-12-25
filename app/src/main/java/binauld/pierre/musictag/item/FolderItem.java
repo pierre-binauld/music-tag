@@ -24,10 +24,8 @@ public class FolderItem extends NodeItem {
         super(parent);
         this.file = file;
         this.fileList = file.listFiles(filter);
-//        this.filter = filter;
 
         int fileNumber = getLength();
-        // TODO: Add local logic
         this.secondaryInformation = fileNumber + " ";
         if(fileNumber < 2) {
             this.secondaryInformation  += res.getString(R.string.file);

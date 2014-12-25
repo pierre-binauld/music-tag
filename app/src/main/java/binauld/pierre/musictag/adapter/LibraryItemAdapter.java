@@ -28,7 +28,6 @@ public class LibraryItemAdapter extends BaseAdapter {
     private NodeItem currentNode;
     private final ArtworkService artworkService;
     private int thumbnailSize;
-    private int invalidItemCount;
     private ProgressBar progressBar;
 
     public LibraryItemAdapter(ArtworkService artworkService, int thumbnailSize) {
@@ -125,7 +124,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (null != progressBar) {
             switch (currentNode.getState()) {
                 case LOADING:
-                    progressBar.setProgress(currentNode.size() + invalidItemCount);
+                    progressBar.setProgress(currentNode.size() + currentNode.getInvalidItemCount());
                     break;
                 case LOADED:
                     progressBar.setVisibility(View.GONE);
@@ -171,15 +170,6 @@ public class LibraryItemAdapter extends BaseAdapter {
      */
     public NodeItem getCurrentNode() {
         return currentNode;
-    }
-
-    /**
-     * Set the count of invalid item found by a loader.
-     * @param invalidItemCount The count of invalid item found.
-     */
-    public void setInvalidItemCount(int invalidItemCount) {
-        //TODO: Put this in node item.
-        this.invalidItemCount = invalidItemCount;
     }
 
 }

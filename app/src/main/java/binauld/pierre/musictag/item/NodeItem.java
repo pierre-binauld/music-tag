@@ -13,6 +13,7 @@ public abstract class NodeItem extends ChildItem {
 
     private MultipleBufferedList<LibraryItem> children;
     private LoadingState state;
+    private int invalidItemCount;
 
     public NodeItem() {
         this(null);
@@ -78,5 +79,21 @@ public abstract class NodeItem extends ChildItem {
      */
     public MultipleBufferedList<LibraryItem> getChildren() {
         return children;
+    }
+
+    /**
+     * Set the count of invalid item found by a loader.
+     * @param invalidItemCount The count of invalid item found.
+     */
+    public void setInvalidItemCount(int invalidItemCount) {
+        //TODO: Put this in node item.
+        this.invalidItemCount = invalidItemCount;
+    }
+    /**
+     * Get the count of invalid item found by a loader.
+     * @return The count of invalid item found.
+     */
+    public int getInvalidItemCount() {
+        return invalidItemCount;
     }
 }

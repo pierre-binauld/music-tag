@@ -77,18 +77,10 @@ public class TagFormActivity extends Activity {
     }
 
     public void initContent() {
-//        Bundle extras = getIntent().getExtras();
-//        if (extras != null) {
         if (null == providedItem) {
             Log.e(this.getClass().toString(), "No item has been provided.");
             finish();
         } else {
-//            File file = (File) extras.getSerializable(AUDIO_FILE_KEY);
-//            try {
-//                audio = AudioFileIO.read(file);
-//            } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-//                e.printStackTrace();
-//            }
 
             audioItem = TagFormActivity.providedItem;
             AudioFile audioFile = audioItem.getAudioFile();
@@ -110,14 +102,6 @@ public class TagFormActivity extends Activity {
             Artwork artwork = tags.getFirstArtwork();
             if (null != artwork) {
                 artworkService.setArtwork(audioItem, img_artwork, 200);
-//                byte[] artworkData = artwork.getBinaryData();
-//                //TODO: Improvement needed.
-//                // Use service Locator with weakreference for all factory needed ?
-//
-//                Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
-//                img_artwork.setImageBitmap(bitmap);
-//            } else {
-//                findViewById(R.id.card_artwork).setVisibility(View.GONE);
             }
             lbl_filename.setText(audioFile.getFile().getAbsolutePath());
             txt_title.setText(tags.getFirst(FieldKey.TITLE));
@@ -174,7 +158,6 @@ public class TagFormActivity extends Activity {
 
             AudioFileIO.write(audioFile);
 
-//            intent.putExtra("file", audioFile.getFile());
             setResult(RESULT_OK, intent);
         } catch (CannotWriteException | FieldDataInvalidException e) {
             Log.e(this.getClass().toString(), e.getMessage(), e);

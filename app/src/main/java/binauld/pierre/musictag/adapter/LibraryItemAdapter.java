@@ -95,10 +95,17 @@ public class LibraryItemAdapter extends BaseAdapter {
         return convertView;
     }
 
+    /**
+     * Set the progress bar.
+     * @param progressBar The progress bar.
+     */
     public void setProgressBar(ProgressBar progressBar) {
         this.progressBar = progressBar;
     }
 
+    /**
+     * Initialize the progress bar (progress, max, visibility).
+     */
     private void setUpProgressBar() {
         if (null != progressBar) {
             if (null == currentNode) {
@@ -111,6 +118,9 @@ public class LibraryItemAdapter extends BaseAdapter {
         }
     }
 
+    /**
+     * Update the progression of the progress bar.
+     */
     private void updateProgressBar() {
         if (null != progressBar) {
             switch (currentNode.getState()) {
@@ -163,7 +173,12 @@ public class LibraryItemAdapter extends BaseAdapter {
         return currentNode;
     }
 
+    /**
+     * Set the count of invalid item found by a loader.
+     * @param invalidItemCount The count of invalid item found.
+     */
     public void setInvalidItemCount(int invalidItemCount) {
+        //TODO: Put this in node item.
         this.invalidItemCount = invalidItemCount;
     }
 

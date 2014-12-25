@@ -9,7 +9,7 @@ import java.io.FileFilter;
 public class FolderItem extends NodeItem {
 
     private File file;
-    private File[] fileChildren;
+    private File[] fileList;
     private String secondaryInformation;
 
     public FolderItem(File file, FileFilter filter) {
@@ -19,7 +19,7 @@ public class FolderItem extends NodeItem {
     public FolderItem(File file, FileFilter filter, NodeItem parent) {
         super(parent);
         this.file = file;
-        this.fileChildren = file.listFiles(filter);
+        this.fileList = file.listFiles(filter);
 //        this.filter = filter;
 
         int fileNumber = getLength();
@@ -57,12 +57,16 @@ public class FolderItem extends NodeItem {
         return file.isDirectory()?file.list().length:0;
     }
 
-    public File[] getFileChildren() {
-        return fileChildren;
+    /**
+     * Get the files containing by the folder of this item.
+     * @return A list of File.
+     */
+    public File[] getFileList() {
+        return fileList;
     }
 
     @Override
     public int getMaxChildren() {
-        return fileChildren.length;
+        return fileList.length;
     }
 }

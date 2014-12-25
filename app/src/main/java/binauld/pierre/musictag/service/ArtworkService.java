@@ -38,13 +38,14 @@ public class ArtworkService {
     /**
      * Set the Artwork associated to item to the imageView.
      * If the Artwork has not been yet loaded, then it is loaded a placeholder is put in the image view while loading.
-     * @param item Current item.
+     *
+     * @param item      Current item.
      * @param imageView Associated image view.
      */
     public void setArtwork(LibraryItem item, ImageView imageView, int artworkSize) {
 
         final String key = item.getDecoder().getKey(artworkSize, artworkSize);
-//
+
         final Bitmap bitmap = cacheService.get(key);
 
         if (bitmap != null) {
@@ -56,14 +57,12 @@ public class ArtworkService {
             imageView.setImageDrawable(asyncDrawable);
             task.execute(item);
         }
-
-
-
     }
 
     /**
      * Cancel a potential AsyncTask from anAsyncDrawable of the ImageView if the AsyncTask is outdated.
-     * @param item The item that the artwork must be load.
+     *
+     * @param item      The item that the artwork must be load.
      * @param imageView The image view which has to display artwork thumbnail.
      * @return False if the same work is in progress.
      */

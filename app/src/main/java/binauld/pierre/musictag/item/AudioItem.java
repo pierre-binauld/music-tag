@@ -12,10 +12,6 @@ public class AudioItem extends ChildItem {
 
     private AudioFile audio;
 
-    public AudioItem() {
-
-    }
-
     @Override
     public boolean isAudioItem() {
         return true;

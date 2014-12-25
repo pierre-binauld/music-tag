@@ -55,21 +55,28 @@ public class AudioFileBitmapDecoder implements BitmapDecoder {
         return targetedWidth + "." + targetedHeight + "." + audioFile.getFile().getAbsolutePath();
     }
 
-    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    /**
+     * Calculate th in sample size for decode the bitmap at the right size.
+     * @param options Options of the bitmap.
+     * @param targetedWidth The targeted width.
+     * @param targetedHeight The targeted Height.
+     * @return The calculated in sample size.
+     */
+    private static int calculateInSampleSize(BitmapFactory.Options options, int targetedWidth, int targetedHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
 
-        if (height > reqHeight || width > reqWidth) {
+        if (height > targetedHeight || width > targetedWidth) {
 
             final int halfHeight = height / 2;
             final int halfWidth = width / 2;
 
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
+            while ((halfHeight / inSampleSize) > targetedHeight
+                    && (halfWidth / inSampleSize) > targetedWidth) {
                 inSampleSize *= 2;
             }
         }

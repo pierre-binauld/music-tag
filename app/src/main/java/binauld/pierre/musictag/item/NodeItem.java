@@ -33,6 +33,10 @@ public abstract class NodeItem extends ChildItem {
         return false;
     }
 
+    /**
+     * Get the maximum number of possible children.
+     * @return The maximum number of possible children.
+     */
     public abstract int getMaxChildren();
 
     /**

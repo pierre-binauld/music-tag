@@ -3,13 +3,10 @@ package binauld.pierre.musictag.activities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,6 +24,7 @@ import org.jaudiotagger.tag.datatype.Artwork;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.item.AudioItem;
+import binauld.pierre.musictag.service.ArtworkService;
 
 public class TagFormActivity extends Activity {
 
@@ -37,6 +35,8 @@ public class TagFormActivity extends Activity {
     public static void provideItem(AudioItem item) {
         TagFormActivity.providedItem = item;
     }
+
+    private ArtworkService artworkService;
 
     private AudioItem audioItem;
 
@@ -66,6 +66,9 @@ public class TagFormActivity extends Activity {
         if (null != actionBar) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        // Init service(s)
+        artworkService = new ArtworkService(this, R.drawable.song);
 
         // Init views
         initContent();
@@ -106,14 +109,15 @@ public class TagFormActivity extends Activity {
             Tag tags = audioFile.getTag();
             Artwork artwork = tags.getFirstArtwork();
             if (null != artwork) {
-                byte[] artworkData = artwork.getBinaryData();
-                //TODO: Improvement needed.
-                // Use service Locator with weakreference for all factory needed ?
-
-                Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
-                img_artwork.setImageBitmap(bitmap);
-            } else {
-                findViewById(R.id.card_artwork).setVisibility(View.GONE);
+                artworkService.setArtwork(audioItem, img_artwork, 200);
+//                byte[] artworkData = artwork.getBinaryData();
+//                //TODO: Improvement needed.
+//                // Use service Locator with weakreference for all factory needed ?
+//
+//                Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
+//                img_artwork.setImageBitmap(bitmap);
+//            } else {
+//                findViewById(R.id.card_artwork).setVisibility(View.GONE);
             }
             lbl_filename.setText(audioFile.getFile().getAbsolutePath());
             txt_title.setText(tags.getFirst(FieldKey.TITLE));
@@ -128,7 +132,6 @@ public class TagFormActivity extends Activity {
             txt_genre.setText(tags.getFirst(FieldKey.GENRE));
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

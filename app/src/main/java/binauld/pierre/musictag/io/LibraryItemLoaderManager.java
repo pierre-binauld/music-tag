@@ -23,7 +23,6 @@ public class LibraryItemLoaderManager {
 
     private LibraryItemAdapter adapter;
     private LibraryItemFactory itemFactory;
-    //TODO: Progress bar is break.
     private int updateStep;
 
     public LibraryItemLoaderManager(LibraryItemAdapter adapter, LibraryItemFactory itemFactory, int updateStep) {

@@ -35,29 +35,45 @@ public class AudioFileBitmapDecoder implements BitmapDecoder {
         if (null != artwork) {
             byte[] artworkData = artwork.getBinaryData();
 
-            // Get the dimensions of the bitmap
-            BitmapFactory.Options options = new BitmapFactory.Options();
+            // First decode with inJustDecodeBounds=true to check dimensions
+            final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length, options);
 
-            int sourceWidth = options.outWidth;
-            int sourceHeight = options.outHeight;
+            // Calculate inSampleSize
+            options.inSampleSize = calculateInSampleSize(options, targetedWidth, targetedHeight);
 
-            // Determine how much to scale down the image
-            int scaleFactor = Math.min(sourceWidth / targetedWidth, sourceHeight / targetedHeight);
-
-            // Decode the image file into a Bitmap sized to fill the View
+            // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
-            options.inSampleSize = scaleFactor;
-
             bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length, options);
         }
-
         return bitmap;
     }
 
     @Override
     public String getKey(int targetedWidth, int targetedHeight) {
         return targetedWidth + "." + targetedHeight + "." + audioFile.getFile().getAbsolutePath();
+    }
+
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 }

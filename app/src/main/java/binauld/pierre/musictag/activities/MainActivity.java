@@ -30,14 +30,15 @@ import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
-import binauld.pierre.musictag.io.Cache;
+import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
-import binauld.pierre.musictag.service.ThumbnailService;
+import binauld.pierre.musictag.service.Locator;
+import binauld.pierre.musictag.service.ArtworkService;
 
 /**
  * Main activity of the app.
@@ -78,10 +79,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
         // Init cache
-        Cache<Bitmap> cache = new Cache<>();
+        Locator.provide(new CacheService<Bitmap>());
 
         // Init service(s)
-        ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song);
+        ArtworkService artworkService = new ArtworkService(this, R.drawable.song);
 
         // Init filter
         FileFilterFactory filterFactory = new FileFilterFactory();
@@ -95,7 +96,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 //        progressBar.setProgress(50);
 
         // Init adapter
-        adapter = new LibraryItemAdapter(thumbnailService, getThumbnailSize());
+        adapter = new LibraryItemAdapter(artworkService, getThumbnailSize());
         adapter.setProgressBar(progressBar);
 
         // Init manager(s)

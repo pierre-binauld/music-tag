@@ -9,19 +9,20 @@ import java.lang.ref.WeakReference;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.service.CacheService;
 
-public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
+public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
 
     private final WeakReference<ImageView> imageViewReference;
     private final BitmapDecoder defaultThumbnailDecoder;
     private LibraryItem item;
-    private Cache<Bitmap> cache;
+    private CacheService<Bitmap> cacheService;
     private int thumbnailSize;
 
-    public ThumbnailLoader(ImageView imageView, Cache<Bitmap> cache, BitmapDecoder defaultThumbnailDecoder, int thumbnailSize) {
+    public ArtworkLoader(ImageView imageView, CacheService<Bitmap> cacheService, BitmapDecoder defaultThumbnailDecoder, int thumbnailSize) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
         this.imageViewReference = new WeakReference<>(imageView);
-        this.cache = cache;
+        this.cacheService = cacheService;
         this.defaultThumbnailDecoder = defaultThumbnailDecoder;
         this.thumbnailSize = thumbnailSize;
     }
@@ -35,7 +36,7 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
         String key = decoder.getKey(thumbnailSize, thumbnailSize);
         Bitmap bitmap = decoder.decode(thumbnailSize, thumbnailSize);
         if (null != bitmap) {
-            cache.put(key, bitmap);
+            cacheService.put(key, bitmap);
         } else if (decoder != defaultThumbnailDecoder) {
             item.switchDecoder(defaultThumbnailDecoder);
             bitmap = this.doInBackground(item);
@@ -53,8 +54,8 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
 
         final ImageView imageView = imageViewReference.get();
         if (imageView != null && bitmap != null) {
-            final ThumbnailLoader thumbnailLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
-            if (this == thumbnailLoader) {
+            final ArtworkLoader artworkLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
+            if (this == artworkLoader) {
                 imageView.setImageBitmap(bitmap);
             }
         }

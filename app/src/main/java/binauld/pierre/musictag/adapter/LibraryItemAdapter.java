@@ -12,7 +12,7 @@ import android.widget.TextView;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.service.ThumbnailService;
+import binauld.pierre.musictag.service.ArtworkService;
 
 /**
  * Adapt a list of library item for a list view.
@@ -26,13 +26,13 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     private NodeItem currentNode;
-    private final ThumbnailService thumbnailService;
+    private final ArtworkService artworkService;
     private int thumbnailSize;
     private int invalidItemCount;
     private ProgressBar progressBar;
 
-    public LibraryItemAdapter(ThumbnailService thumbnailService, int thumbnailSize) {
-        this.thumbnailService = thumbnailService;
+    public LibraryItemAdapter(ArtworkService artworkService, int thumbnailSize) {
+        this.artworkService = artworkService;
         this.thumbnailSize = thumbnailSize;
     }
 
@@ -88,7 +88,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-            thumbnailService.setThumbnail(item, viewHolder.thumbnail, thumbnailSize);
+            artworkService.setArtwork(item, viewHolder.thumbnail, thumbnailSize);
             convertView.setTag(viewHolder);
         }
 

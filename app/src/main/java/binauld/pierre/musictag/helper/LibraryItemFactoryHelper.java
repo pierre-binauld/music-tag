@@ -15,7 +15,7 @@ public class LibraryItemFactoryHelper {
     /**
      * Build the library item factory.
      * @param res The activity resources.
-     * @param defaultArtworkBitmapDecoder
+     * @param defaultArtworkBitmapDecoder The default artwork bitmap decoder.
      * @return A library item factory.
      */
     public static LibraryItemFactory buildFactory(Resources res, FileFilter filter, BitmapDecoder defaultArtworkBitmapDecoder) {

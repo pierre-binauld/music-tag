@@ -18,7 +18,9 @@ public class LoaderHelper {
      * Help to build the AsyncTask loading library items list.
      *
      * @param adapter The adapter used to adapt library items for the list view.
+     * @param factory The library item factory used to build item list.
      * @param manager The manager to the loader.
+     * @param updateStep The number of item loaded for each publish progress.
      * @return The loader built.
      */
     public static LibraryItemLoader buildLoader(LibraryItemAdapter adapter, LibraryItemFactory factory, LibraryItemLoaderManager manager, int updateStep) {

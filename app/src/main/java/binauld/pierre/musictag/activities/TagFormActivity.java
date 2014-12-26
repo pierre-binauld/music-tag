@@ -31,8 +31,6 @@ import binauld.pierre.musictag.service.ArtworkService;
 
 public class TagFormActivity extends Activity {
 
-//    public static final String AUDIO_FILE_KEY = "audio_file";
-
     private static AudioItem providedItem;
 
     public static void provideItem(AudioItem item) {

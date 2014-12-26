@@ -47,10 +47,6 @@ import binauld.pierre.musictag.service.Locator;
  */
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, ObservableScrollViewCallbacks {
 
-    //TODO: Improve with
-    // https://android-arsenal.com/
-    // https://www.infinum.co/the-capsized-eight/articles/top-5-android-libraries-every-android-developer-should-know-about
-    // http://blog.teamtreehouse.com/android-libraries-use-every-project
     private static final int TAG_UPDATE_REQUEST = 1;
 
     private LibraryItemLoaderManager manager;

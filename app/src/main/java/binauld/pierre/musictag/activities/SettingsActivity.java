@@ -26,7 +26,6 @@ public class SettingsActivity extends PreferenceActivity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
-
     }
 
     @Override

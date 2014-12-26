@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
@@ -84,8 +86,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Init cache
         Locator.provide(new CacheService<Bitmap>());
 
+        // Init default decoder
+        BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
+
         // Init service(s)
-        ArtworkService artworkService = new ArtworkService(this, R.drawable.list_item_placeholder);
+        ArtworkService artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
         artworkService.initDefaultArtwork(artworkSize);
 
         // Init filter
@@ -93,7 +98,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         filter = filterFactory.build();
 
         // Init factory
-        itemFactory = LibraryItemFactoryHelper.buildFactory(res, filter);
+        itemFactory = LibraryItemFactoryHelper.buildFactory(res, filter, defaultArtworkBitmapDecoder);
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);

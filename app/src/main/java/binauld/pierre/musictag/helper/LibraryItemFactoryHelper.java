@@ -15,10 +15,11 @@ public class LibraryItemFactoryHelper {
     /**
      * Build the library item factory.
      * @param res The activity resources.
+     * @param defaultArtworkBitmapDecoder
      * @return A library item factory.
      */
-    public static LibraryItemFactory buildFactory(Resources res, FileFilter filter) {
+    public static LibraryItemFactory buildFactory(Resources res, FileFilter filter, BitmapDecoder defaultArtworkBitmapDecoder) {
         BitmapDecoder folderBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.folder);
-        return new LibraryItemFactory(folderBitmapDecoder, filter, res);
+        return new LibraryItemFactory(defaultArtworkBitmapDecoder, folderBitmapDecoder, filter, res);
     }
 }

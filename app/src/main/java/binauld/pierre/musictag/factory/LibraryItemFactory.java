@@ -28,11 +28,13 @@ import binauld.pierre.musictag.item.NodeItem;
 public class LibraryItemFactory {
 
     private BitmapDecoder folderBitmapDecoder;
+    private BitmapDecoder defaultArtworkDecoder;
     private FileFilter filter;
     private Resources res;
 
-    public LibraryItemFactory(BitmapDecoder folderBitmapDecoder, FileFilter filter, Resources res) {
+    public LibraryItemFactory(BitmapDecoder defaultArtworkDecoder, BitmapDecoder folderBitmapDecoder, FileFilter filter, Resources res) {
         this.folderBitmapDecoder = folderBitmapDecoder;
+        this.defaultArtworkDecoder = defaultArtworkDecoder;
         this.filter = filter;
         this.res = res;
     }
@@ -71,7 +73,11 @@ public class LibraryItemFactory {
             try {
                 AudioFile audio = AudioFileIO.read(file);
                 updating.setAudioFile(audio);
-                updating.switchDecoder(new AudioFileBitmapDecoder(audio));
+                if(null != audio.getTag().getFirstArtwork()) {
+                    updating.switchDecoder(new AudioFileBitmapDecoder(audio));
+                } else {
+                    updating.switchDecoder(defaultArtworkDecoder);
+                }
 
             } catch (CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
                 throw new IOException(e);

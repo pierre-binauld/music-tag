@@ -24,6 +24,8 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.datatype.Artwork;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.service.ArtworkService;
 
@@ -74,7 +76,8 @@ public class TagFormActivity extends Activity {
         res = getResources();
 
         // Init service(s)
-        artworkService = new ArtworkService(this, R.drawable.list_item_placeholder);
+        BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
+        artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
 
         // Init views
         initContent();

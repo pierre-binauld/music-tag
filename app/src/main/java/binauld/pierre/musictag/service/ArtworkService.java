@@ -1,15 +1,13 @@
 package binauld.pierre.musictag.service;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
+import binauld.pierre.musictag.io.ArtworkLoader;
 import binauld.pierre.musictag.io.AsyncDrawable;
 import binauld.pierre.musictag.io.DefaultArtworkLoader;
-import binauld.pierre.musictag.io.ArtworkLoader;
 import binauld.pierre.musictag.item.LibraryItem;
 
 /**
@@ -17,19 +15,13 @@ import binauld.pierre.musictag.item.LibraryItem;
  */
 public class ArtworkService {
 
-    private int defaultArtworkResId;
-
     private BitmapDecoder defaultArtworkDecoder;
 
     private CacheService<Bitmap> cacheService;
 
-    public ArtworkService(Context context, int defaultArtworkResId) {
-        Resources res = context.getResources();
-
-        this.defaultArtworkResId = defaultArtworkResId;
-
+    public ArtworkService(BitmapDecoder defaultArtworkDecoder) {
         this.cacheService = Locator.getCacheService();
-        this.defaultArtworkDecoder = new ResourceBitmapDecoder(res, defaultArtworkResId);
+        this.defaultArtworkDecoder = defaultArtworkDecoder;
     }
 
     public void initDefaultArtwork(int artworkSize) {
@@ -55,7 +47,8 @@ public class ArtworkService {
         } else if (cancelPotentialWork(item, imageView)) {
             Resources res = imageView.getResources();
             final ArtworkLoader task = new ArtworkLoader(imageView, cacheService, defaultArtworkDecoder, artworkSize);
-            final AsyncDrawable asyncDrawable = new AsyncDrawable(res, cacheService.get(defaultArtworkResId), task);
+            Bitmap placeholder = cacheService.get(defaultArtworkDecoder.getKey(artworkSize, artworkSize));
+            final AsyncDrawable asyncDrawable = new AsyncDrawable(res, placeholder, task);
             imageView.setImageDrawable(asyncDrawable);
             task.execute(item);
         }

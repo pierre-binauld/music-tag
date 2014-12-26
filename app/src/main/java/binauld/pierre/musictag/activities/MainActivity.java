@@ -36,6 +36,7 @@ import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
+import binauld.pierre.musictag.item.NodeItem;
 import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.service.Locator;
@@ -193,8 +194,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (adapter.backToParent()) {
-            adapter.notifyDataSetChanged();
+        if (backToParent()) {
             return true;
         }
 
@@ -255,11 +255,31 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      */
     private void switchNode(FolderItem node) {
         adapter.setCurrentNode(node);
+        adapter.notifyDataSetChanged();
+        if(null == node.getParent()) {
+            setTitle(res.getString(R.string.app_name));
+        } else {
+            setTitle(node.getPrimaryInformation());
+        }
+
         if (node.getState() == LoadingState.NOT_LOADED) {
             LibraryItemLoader loader = manager.get();
             manager.execute(loader, node.getFileList());
-        } else if (node.getState() == LoadingState.LOADING) {
-            //Progress bar improvement: switch back the progress bar when node is loading.
+        }
+    }
+
+    /**
+     * Switch the current node to the parent node.
+     *
+     * @return True if the adapter has switch to the parent node.
+     */
+    public boolean backToParent() {
+        NodeItem parent = adapter.getCurrentNode().getParent();
+        if (parent == null) {
+            return false;
+        } else {
+            switchNode((FolderItem) parent);
+            return true;
         }
     }
 }

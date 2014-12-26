@@ -138,22 +138,6 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     /**
-     * Switch the current node to the parent node.
-     *
-     * @return True if the adapter has switch to the parent node.
-     */
-    public boolean backToParent() {
-        NodeItem parent = currentNode.getParent();
-        if (parent == null) {
-            return false;
-        } else {
-            currentNode = parent;
-            setUpProgressBar();
-            return true;
-        }
-    }
-
-    /**
      * Set the current node of the library tree list.
      *
      * @param currentNode The current node to set.

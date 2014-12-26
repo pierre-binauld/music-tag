@@ -65,8 +65,6 @@ public class LibraryItemFactory {
         return folder;
     }
 
-    //TODO: Set up here the default decoder and not in the artwork service
-    // Maybe just do not set.
     @Deprecated
     public void update(AudioItem updating, File file) throws IOException {
         if (!file.isDirectory()) {

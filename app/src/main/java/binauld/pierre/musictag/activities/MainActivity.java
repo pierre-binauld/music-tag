@@ -1,6 +1,5 @@
 package binauld.pierre.musictag.activities;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,7 +7,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,13 +68,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         // Get resources
         res = getResources();
+        int artworkSize = (int) res.getDimension(R.dimen.list_artwork_size);
 
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
-        // Init theme
+        // Init layout
         setContentView(R.layout.activity_main);
 
         // Switch off JAudioTagger log
@@ -86,7 +85,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         Locator.provide(new CacheService<Bitmap>());
 
         // Init service(s)
-        ArtworkService artworkService = new ArtworkService(this, R.drawable.song);
+        ArtworkService artworkService = new ArtworkService(this, R.drawable.list_item_placeholder);
+        artworkService.initDefaultArtwork(artworkSize);
 
         // Init filter
         FileFilterFactory filterFactory = new FileFilterFactory();
@@ -99,11 +99,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         // Init adapter
-        adapter = new LibraryItemAdapter(artworkService, getThumbnailSize());
+        adapter = new LibraryItemAdapter(artworkService, artworkSize);
         adapter.setProgressBar(progressBar);
 
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(adapter, itemFactory, res.getInteger(R.integer.thumbnail_loader_update_step));
+        manager = new LibraryItemLoaderManager(adapter, itemFactory, res.getInteger(R.integer.artwork_loader_update_step));
 
         // Load items
         switchNode(getSourceNode());
@@ -215,18 +215,18 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-        ActionBar ab = getActionBar();
-        if (ab != null) {
-            if (scrollState == ScrollState.UP) {
-                if (ab.isShowing()) {
-                    ab.hide();
-                }
-            } else if (scrollState == ScrollState.DOWN) {
-                if (!ab.isShowing()) {
-                    ab.show();
-                }
-            }
-        }
+//        ActionBar ab = getActionBar();
+//        if (ab != null) {
+//            if (scrollState == ScrollState.UP) {
+//                if (ab.isShowing()) {
+//                    ab.hide();
+//                }
+//            } else if (scrollState == ScrollState.DOWN) {
+//                if (!ab.isShowing()) {
+//                    ab.show();
+//                }
+//            }
+//        }
     }
 
     /**
@@ -256,22 +256,5 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         } else if (node.getState() == LoadingState.LOADING) {
             //Progress bar improvement: switch back the progress bar when node is loading.
         }
-    }
-
-    /**
-     * Retrieve the thumbnail size from listPreferredItemHeight theme attribute.
-     *
-     * @return The thumbnail size.
-     */
-    private int getThumbnailSize() {
-
-        TypedValue thumbnailSize = new android.util.TypedValue();
-        this.getTheme().resolveAttribute(android.R.attr.listPreferredItemHeight, thumbnailSize, true);
-        TypedValue.coerceToString(thumbnailSize.type, thumbnailSize.data);
-
-        android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
-        this.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        return (int) thumbnailSize.getDimension(metrics);
     }
 }

@@ -27,12 +27,12 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     private NodeItem currentNode;
     private final ArtworkService artworkService;
-    private int thumbnailSize;
+    private int artworkSize;
     private ProgressBar progressBar;
 
-    public LibraryItemAdapter(ArtworkService artworkService, int thumbnailSize) {
+    public LibraryItemAdapter(ArtworkService artworkService, int artworkSize) {
         this.artworkService = artworkService;
-        this.thumbnailSize = thumbnailSize;
+        this.artworkSize = artworkSize;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-            artworkService.setArtwork(item, viewHolder.thumbnail, thumbnailSize);
+            artworkService.setArtwork(item, viewHolder.thumbnail, artworkSize);
             convertView.setTag(viewHolder);
         }
 

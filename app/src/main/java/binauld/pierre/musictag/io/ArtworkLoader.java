@@ -14,17 +14,17 @@ import binauld.pierre.musictag.service.CacheService;
 public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
 
     private final WeakReference<ImageView> imageViewReference;
-    private final BitmapDecoder defaultThumbnailDecoder;
+    private final BitmapDecoder defaultArtworkDecoder;
     private LibraryItem item;
     private CacheService<Bitmap> cacheService;
-    private int thumbnailSize;
+    private int artworkSize;
 
-    public ArtworkLoader(ImageView imageView, CacheService<Bitmap> cacheService, BitmapDecoder defaultThumbnailDecoder, int thumbnailSize) {
+    public ArtworkLoader(ImageView imageView, CacheService<Bitmap> cacheService, BitmapDecoder defaultArtworkDecoder, int artworkSize) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
         this.imageViewReference = new WeakReference<>(imageView);
         this.cacheService = cacheService;
-        this.defaultThumbnailDecoder = defaultThumbnailDecoder;
-        this.thumbnailSize = thumbnailSize;
+        this.defaultArtworkDecoder = defaultArtworkDecoder;
+        this.artworkSize = artworkSize;
     }
 
     // Decode image in background.
@@ -33,12 +33,12 @@ public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
         item = items[0];
         BitmapDecoder decoder = item.getDecoder();
 
-        String key = decoder.getKey(thumbnailSize, thumbnailSize);
-        Bitmap bitmap = decoder.decode(thumbnailSize, thumbnailSize);
+        String key = decoder.getKey(artworkSize, artworkSize);
+        Bitmap bitmap = decoder.decode(artworkSize, artworkSize);
         if (null != bitmap) {
             cacheService.put(key, bitmap);
-        } else if (decoder != defaultThumbnailDecoder) {
-            item.switchDecoder(defaultThumbnailDecoder);
+        } else if (decoder != defaultArtworkDecoder) {
+            item.switchDecoder(defaultArtworkDecoder);
             bitmap = this.doInBackground(item);
         }
 

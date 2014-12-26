@@ -3,6 +3,7 @@ package binauld.pierre.musictag.activities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -36,6 +37,8 @@ public class TagFormActivity extends Activity {
         TagFormActivity.providedItem = item;
     }
 
+    private Resources res;
+
     private ArtworkService artworkService;
 
     private AudioItem audioItem;
@@ -67,8 +70,11 @@ public class TagFormActivity extends Activity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        // Init resources
+        res = getResources();
+
         // Init service(s)
-        artworkService = new ArtworkService(this, R.drawable.song);
+        artworkService = new ArtworkService(this, R.drawable.list_item_placeholder);
 
         // Init views
         initContent();

@@ -30,8 +30,10 @@ public class ArtworkService {
 
         this.cacheService = Locator.getCacheService();
         this.defaultArtworkDecoder = new ResourceBitmapDecoder(res, defaultArtworkResId);
+    }
 
-        DefaultArtworkLoader loader = new DefaultArtworkLoader(this.cacheService, 0);
+    public void initDefaultArtwork(int artworkSize) {
+        DefaultArtworkLoader loader = new DefaultArtworkLoader(this.cacheService, artworkSize);
         loader.execute(this.defaultArtworkDecoder);
     }
 

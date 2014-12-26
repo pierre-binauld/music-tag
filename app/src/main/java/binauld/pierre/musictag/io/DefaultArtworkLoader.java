@@ -7,7 +7,9 @@ import android.os.AsyncTask;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.service.CacheService;
 
-//TODO: Maybe is not the best way to use this class
+/**
+ * Allow to load artwork and put it in the cache. Perfect to load default artwork.
+ */
 public class DefaultArtworkLoader extends AsyncTask<BitmapDecoder, Void, Integer> {
 
     private CacheService<Bitmap> cacheService;

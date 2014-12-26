@@ -86,7 +86,6 @@ public abstract class NodeItem extends ChildItem {
      * @param invalidItemCount The count of invalid item found.
      */
     public void setInvalidItemCount(int invalidItemCount) {
-        //TODO: Put this in node item.
         this.invalidItemCount = invalidItemCount;
     }
     /**

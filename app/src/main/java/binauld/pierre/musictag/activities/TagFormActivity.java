@@ -31,6 +31,8 @@ import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.service.ArtworkService;
+import binauld.pierre.musictag.tag.Id3Tag;
+import binauld.pierre.musictag.tag.Id3TagParcelable;
 
 public class TagFormActivity extends Activity implements View.OnClickListener {
 
@@ -39,6 +41,8 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     public static void provideItem(AudioItem item) {
         TagFormActivity.providedItem = item;
     }
+
+    public static final int SUGGESTION_REQUEST_CODE = 1;
 
     private Resources res;
 
@@ -56,13 +60,16 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private EditText txt_composer;
     private EditText txt_grouping;
     private EditText txt_genre;
-    private EditText txt_disk;
+    private EditText txt_disc;
     private EditText txt_track;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Init content
+        initContent();
 
         //Init layout
         this.setContentView(R.layout.activity_tag_form);
@@ -87,8 +94,11 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
 
         // Init views
-        initContent();
+        initViews();
         initActivityTitle();
+
+        // Fill views
+        fillViews();
 
     }
 
@@ -125,54 +135,90 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    public void callSuggestionActivity() {
-        TagSuggestionActivity.provideItem(audioItem);
-        Intent intent = new Intent(this, TagSuggestionActivity.class);
-        startActivity(intent);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == SUGGESTION_REQUEST_CODE) {
+            switch (resultCode) {
+                case RESULT_OK:
+                    Id3Tag id3Tags = (Id3Tag) data.getParcelableExtra(TagSuggestionActivity.TAG_KEY);
+                    id3Tags.saveInto(audioItem.getAudioFile());
+                    fillViews();
+                    break;
+                case RESULT_CANCELED:
+                default:
+                    break;
+            }
+        }
     }
 
-    public void initContent() {
+    /**
+     * Start the suggestion activity.
+     */
+    private void callSuggestionActivity() {
+        Intent intent = new Intent(this, TagSuggestionActivity.class);
+        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(audioItem.getAudioFile()));
+        startActivityForResult(intent, SUGGESTION_REQUEST_CODE);
+    }
+
+    /**
+     * Initialize the audio item and finish if it is not possible.
+     */
+    private void initContent() {
+        //TODO: maybe crash on suggestion return
         if (null == providedItem) {
             Log.e(this.getClass().toString(), "No item has been provided.");
             finish();
         } else {
-
             audioItem = TagFormActivity.providedItem;
-            AudioFile audioFile = audioItem.getAudioFile();
-
-            img_artwork = (ImageView) findViewById(R.id.img_artwork);
-            lbl_filename = (TextView) findViewById(R.id.lbl_filename);
-            txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
-            txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
-            txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
-            txt_year = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
-            txt_disk = ((FloatLabel) findViewById(R.id.txt_disk)).getEditText();
-            txt_track = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
-            txt_album_artist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
-            txt_composer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
-            txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
-            txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
-
-            Tag tags = audioFile.getTag();
-            Artwork artwork = tags.getFirstArtwork();
-            if (null != artwork) {
-                artworkService.setArtwork(audioItem, img_artwork, 200);
-            }
-            lbl_filename.setText(audioFile.getFile().getAbsolutePath());
-            txt_title.setText(tags.getFirst(FieldKey.TITLE));
-            txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
-            txt_album.setText(tags.getFirst(FieldKey.ALBUM));
-            txt_year.setText(tags.getFirst(FieldKey.YEAR));
-            txt_disk.setText(tags.getFirst(FieldKey.DISC_NO));
-            txt_track.setText(tags.getFirst(FieldKey.TRACK));
-            txt_album_artist.setText(tags.getFirst(FieldKey.ALBUM_ARTIST));
-            txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
-            txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
-            txt_genre.setText(tags.getFirst(FieldKey.GENRE));
         }
     }
 
-    public void saveChangeAndFinish() {
+    /**
+     * Initialize views.
+     */
+    private void initViews() {
+        img_artwork = (ImageView) findViewById(R.id.img_artwork);
+        lbl_filename = (TextView) findViewById(R.id.lbl_filename);
+        txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
+        txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
+        txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
+        txt_year = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
+        txt_disc = ((FloatLabel) findViewById(R.id.txt_disc)).getEditText();
+        txt_track = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
+        txt_album_artist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
+        txt_composer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
+        txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
+        txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
+    }
+
+    /**
+     * Fill views.
+     */
+    private void fillViews() {
+        AudioFile audioFile = audioItem.getAudioFile();
+        Tag tags = audioFile.getTag();
+        Artwork artwork = tags.getFirstArtwork();
+        if (null != artwork) {
+            artworkService.setArtwork(audioItem, img_artwork, 200);
+        }
+        lbl_filename.setText(audioFile.getFile().getAbsolutePath());
+        txt_title.setText(tags.getFirst(FieldKey.TITLE));
+        txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
+        txt_album.setText(tags.getFirst(FieldKey.ALBUM));
+        txt_year.setText(tags.getFirst(FieldKey.YEAR));
+        txt_disc.setText(tags.getFirst(FieldKey.DISC_NO));
+        txt_track.setText(tags.getFirst(FieldKey.TRACK));
+        txt_album_artist.setText(tags.getFirst(FieldKey.ALBUM_ARTIST));
+        txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
+        txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
+        txt_genre.setText(tags.getFirst(FieldKey.GENRE));
+    }
+
+    /**
+     * Save the modification into the audio file and finish the activity.
+     */
+    private void saveChangeAndFinish() {
         Intent intent = new Intent();
         try {
             AudioFile audioFile = audioItem.getAudioFile();
@@ -185,7 +231,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString());
             setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString());
             setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
-            setNumericTagField(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
+            setNumericTagField(tags, FieldKey.DISC_NO, txt_disc.getText().toString());
             setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
             audioFile.setTag(tags);
 
@@ -200,6 +246,9 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         finish();
     }
 
+    /**
+     * Initialize the activity title.
+     */
     private void initActivityTitle() {
         String title = audioItem.getPrimaryInformation();
         if (StringUtils.isNotBlank(audioItem.getSecondaryInformation())) {
@@ -208,6 +257,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         setTitle(title);
     }
 
+    //TODO: Use this kind of logic in Id3Tag for saving.
     private static void setNumericTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
         if (!StringUtils.isBlank(value) && StringUtils.isNumeric(value)) {
             tags.setField(key, value);

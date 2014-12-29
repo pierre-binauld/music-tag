@@ -6,7 +6,7 @@
     <string name="album_artist">Artiste de l\'Album</string>
     <string name="artist">Artiste</string>
     <string name="composer">Compositeur</string>
-    <string name="disk">N° Disque</string>
+    <string name="disc">N° Disque</string>
     <string name="file">fichier</string>
     <string name="files">fichiers</string>
     <string name="genre">Genre</string>

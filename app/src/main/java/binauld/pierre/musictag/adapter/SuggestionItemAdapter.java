@@ -9,35 +9,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.item.LocalSuggestion;
-import binauld.pierre.musictag.item.Suggestion;
+import binauld.pierre.musictag.item.SuggestionItem;
 
 
 public class SuggestionItemAdapter extends BaseAdapter {
 
-    private List<Suggestion> suggestions;
+    private List<SuggestionItem> suggestionItems;
     private int selectedPosition;
 
-    public SuggestionItemAdapter(LocalSuggestion suggestion) {
+    public SuggestionItemAdapter(SuggestionItem suggestion) {
         this.selectedPosition = 0;
-        this.suggestions = new ArrayList<>();
-        this.suggestions.add(suggestion);
-        this.suggestions.add(suggestion);
-        this.suggestions.add(suggestion);
-        this.suggestions.add(suggestion);
-        this.suggestions.add(suggestion);
-        this.suggestions.add(suggestion);
-        this.suggestions.add(suggestion);
+        this.suggestionItems = new ArrayList<>();
+        this.suggestionItems.add(suggestion);
+        this.suggestionItems.add(suggestion);
+        this.suggestionItems.add(suggestion);
+        this.suggestionItems.add(suggestion);
+        this.suggestionItems.add(suggestion);
+        this.suggestionItems.add(suggestion);
+        this.suggestionItems.add(suggestion);
     }
 
     @Override
     public int getCount() {
-        return suggestions.size();
+        return suggestionItems.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return suggestions.get(position);
+        return suggestionItems.get(position);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class SuggestionItemAdapter extends BaseAdapter {
         }
 
         // object item based on the position
-        Suggestion item = suggestions.get(position);
+        SuggestionItem item = suggestionItems.get(position);
 
         // assign values if the object is not null
         if (item != null) {
@@ -99,7 +98,11 @@ public class SuggestionItemAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public boolean isLocalSuggestion() {
+    /**
+     * Check if the first item is selected.
+     * @return True if it is, else false.
+     */
+    public boolean isLocalSuggestionSelected() {
         if(0 == selectedPosition) {
             return true;
         } else {
@@ -107,7 +110,11 @@ public class SuggestionItemAdapter extends BaseAdapter {
         }
     }
 
-    public Suggestion getSelectedSuggestion() {
-        return suggestions.get(selectedPosition);
+    /**
+     * Return the current selected suggestion item.
+     * @return the current selected suggestion item.
+     */
+    public SuggestionItem getSelectedSuggestion() {
+        return suggestionItems.get(selectedPosition);
     }
 }

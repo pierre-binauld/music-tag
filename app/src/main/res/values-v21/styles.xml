@@ -15,7 +15,7 @@
     <style name="SettingsTheme" parent="android:Theme.Material"/>
 
     <!--Progress bar style.-->
-    <style name="horizontalProgressBar" parent="android:Widget.Material.ProgressBar.Horizontal">
+    <style name="HorizontalProgressBar" parent="android:Widget.Material.ProgressBar.Horizontal">
 
     </style>
 </resources>

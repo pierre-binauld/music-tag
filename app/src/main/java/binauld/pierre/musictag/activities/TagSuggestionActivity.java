@@ -10,13 +10,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.melnykov.fab.FloatingActionButton;
+
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.LocalSuggestion;
 import binauld.pierre.musictag.item.Suggestion;
 
-public class TagSuggestionActivity extends Activity implements AdapterView.OnItemClickListener {
+public class TagSuggestionActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private static AudioItem providedItem;
 
@@ -45,6 +47,11 @@ public class TagSuggestionActivity extends Activity implements AdapterView.OnIte
         ListView listView = (ListView) findViewById(R.id.list_suggestion);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
+
+        // Init Floating Action Button
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_valid);
+        fab.attachToListView(listView);
+        fab.setOnClickListener(this);
     }
 
 
@@ -65,6 +72,15 @@ public class TagSuggestionActivity extends Activity implements AdapterView.OnIte
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab_valid:
+                finish();
+                break;
         }
     }
 

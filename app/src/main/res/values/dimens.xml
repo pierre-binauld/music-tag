@@ -11,4 +11,9 @@
     <dimen name="list_artwork_size">52dp</dimen>
     <dimen name="list_text_margin_start">72dp</dimen>
     <dimen name="list_text_margin_end">16dp</dimen>
+
+    <dimen name="text_size">16sp</dimen>
+    <dimen name="label_text_size">12sp</dimen>
+
+    <dimen name="text_margin_half">10dp</dimen>
 </resources>

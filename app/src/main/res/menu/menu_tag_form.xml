@@ -2,9 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="binauld.pierre.musictag.activities.TagFormActivity">
     <item
-        android:id="@+id/action_valid"
-        android:title="@string/action_valid"
-        android:icon="@drawable/ic_done_white_48dp"
+        android:id="@+id/action_suggestion"
+        android:title="@string/action_download_suggestion"
+        android:icon="@drawable/ic_action_suggestion_32dp"
         android:showAsAction="always"
         />
 </menu>

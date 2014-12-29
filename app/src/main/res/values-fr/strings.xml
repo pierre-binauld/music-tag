@@ -19,4 +19,5 @@
     <string name="track">Piste</string>
     <string name="year">Année</string>
     <string name="action_valid">Enregistrer</string>
+    <string name="action_download_suggestion" >Suggestions</string>
 </resources>

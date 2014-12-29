@@ -8,11 +8,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.iangclifton.android.floatlabel.FloatLabel;
+import com.melnykov.fab.FloatingActionButton;
+import com.melnykov.fab.ObservableScrollView;
 
 import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
@@ -29,7 +32,7 @@ import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.service.ArtworkService;
 
-public class TagFormActivity extends Activity {
+public class TagFormActivity extends Activity implements View.OnClickListener {
 
     private static AudioItem providedItem;
 
@@ -70,6 +73,12 @@ public class TagFormActivity extends Activity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        // Init Floating Action Button
+        ObservableScrollView scrollView = (ObservableScrollView) findViewById(R.id.scroll_tag_form);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_valid);
+        fab.attachToScrollView(scrollView);
+        fab.setOnClickListener(this);
+
         // Init resources
         res = getResources();
 
@@ -81,6 +90,45 @@ public class TagFormActivity extends Activity {
         initContent();
         initActivityTitle();
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_tag_form, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.action_settings:
+                return true;
+            case R.id.action_suggestion:
+                callSuggestionActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab_valid:
+                saveChangeAndFinish();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void callSuggestionActivity() {
+        TagSuggestionActivity.provideItem(audioItem);
+        Intent intent = new Intent(this, TagSuggestionActivity.class);
+        startActivity(intent);
     }
 
     public void initContent() {
@@ -121,28 +169,6 @@ public class TagFormActivity extends Activity {
             txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
             txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
             txt_genre.setText(tags.getFirst(FieldKey.GENRE));
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_tag_form, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            case R.id.action_settings:
-                return true;
-            case R.id.action_valid:
-                saveChangeAndFinish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 

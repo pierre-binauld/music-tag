@@ -111,7 +111,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         switchNode(getSourceNode());
 
         // Init view
-        listView = (ObservableListView) findViewById(R.id.library_item_list);
+        listView = (ObservableListView) findViewById(R.id.list_library_item);
         listView.setOnItemClickListener(this);
         listView.setScrollViewCallbacks(this);
         listView.setAdapter(adapter);

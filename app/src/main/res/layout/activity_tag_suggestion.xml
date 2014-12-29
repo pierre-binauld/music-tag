@@ -1,0 +1,18 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="binauld.pierre.musictag.activities.TagSuggestionActivity">
+
+        <ListView
+            android:id="@+id/list_suggestion"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/activity_margin_half"
+            android:scrollbarStyle="outsideOverlay"
+            android:divider="@android:color/background_light"
+            android:dividerHeight="0px"
+            android:footerDividersEnabled="false"
+            android:headerDividersEnabled="false"/>
+
+</RelativeLayout>

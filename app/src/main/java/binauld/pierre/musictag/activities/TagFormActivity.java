@@ -233,22 +233,10 @@ public class TagFormActivity extends Activity {
     public void saveChangeAndFinish() {
         Intent intent = new Intent();
         try {
-            AudioFile audioFile = audioItem.getAudioFile();
-            Tag tags = audioFile.getTag();
-            setTagField(tags, FieldKey.TITLE, txt_title.getText().toString());
-            setTagField(tags, FieldKey.ARTIST, txt_artist.getText().toString());
-            setTagField(tags, FieldKey.ALBUM, txt_album.getText().toString());
-            setTagField(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString());
-            setTagField(tags, FieldKey.COMPOSER, txt_composer.getText().toString());
-            setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString());
-            setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString());
-            setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
-            setNumericTagField(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
-            setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
-            audioFile.setTag(tags);
-
-            AudioFileIO.write(audioFile);
-
+            if(providedItem.size() == 1)
+                saveOneFile();
+            else
+                saveSomeFiles();
             setResult(RESULT_OK, intent);
         } catch (CannotWriteException | FieldDataInvalidException e) {
             Log.e(this.getClass().toString(), e.getMessage(), e);
@@ -256,6 +244,45 @@ public class TagFormActivity extends Activity {
         }
 
         finish();
+    }
+
+    public void saveOneFile() throws FieldDataInvalidException, CannotWriteException {
+        AudioFile audioFile = audioItem.getAudioFile();
+        Tag tags = audioFile.getTag();
+        setTagField(tags, FieldKey.TITLE, txt_title.getText().toString());
+        setTagField(tags, FieldKey.ARTIST, txt_artist.getText().toString());
+        setTagField(tags, FieldKey.ALBUM, txt_album.getText().toString());
+        setTagField(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString());
+        setTagField(tags, FieldKey.COMPOSER, txt_composer.getText().toString());
+        setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString());
+        setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString());
+        setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
+        setNumericTagField(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
+        setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
+        audioFile.setTag(tags);
+
+        AudioFileIO.write(audioFile);
+    }
+
+    public void saveSomeFiles() throws FieldDataInvalidException, CannotWriteException {
+
+        for(AudioItem audioIt : providedItem) {
+            AudioFile audioFile = audioIt.getAudioFile();
+            Tag tags = audioFile.getTag();
+            setTagFieldForMultipleSelection(tags, FieldKey.TITLE, txt_title.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.ARTIST, txt_artist.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.ALBUM, txt_album.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.COMPOSER, txt_composer.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.GROUPING, txt_grouping.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.GENRE, txt_genre.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.YEAR, txt_year.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
+            setTagFieldForMultipleSelection(tags, FieldKey.TRACK, txt_track.getText().toString());
+            audioFile.setTag(tags);
+
+            AudioFileIO.write(audioFile);
+        }
     }
 
     private void initActivityTitle() {
@@ -284,5 +311,11 @@ public class TagFormActivity extends Activity {
             value = "";
         }
         tags.setField(key, value);
+    }
+
+    private static void setTagFieldForMultipleSelection(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
+        if (!StringUtils.isBlank(value)) {
+            tags.setField(key, value);
+        }
     }
 }

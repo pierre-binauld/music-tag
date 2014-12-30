@@ -23,11 +23,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.datatype.Artwork;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
@@ -76,6 +72,9 @@ public class TagFormActivity extends Activity {
         ActionBar actionBar = getActionBar();
         if (null != actionBar) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            if(providedItem.size() > 1) {
+                actionBar.setTitle("Multiple Selection");
+            }
         }
 
         // Init resources
@@ -205,7 +204,7 @@ public class TagFormActivity extends Activity {
     }
 
     public void attributeText(boolean boolTest, EditText txt_field, String currentText){
-        if(boolTest) {
+        if(boolTest && !currentText.equals("")) {
             txt_field.setText(currentText);
         }else{
             txt_field.setHint(txt_field.getHint() + alertMessage);

@@ -26,35 +26,28 @@ import binauld.pierre.musictag.service.ArtworkService;
  * Adapt a list of library item for a list view.
  */
 public class LibraryItemAdapter extends BaseAdapter {
-    private List<File> files;
+    private List<AudioItem> audios;
 
     public void toggleSelection(int position) {
         LibraryItem item = (LibraryItem) getItem(position);
         if (item.isAudioItem()) {
             AudioItem audio = (AudioItem) item;
-            File f = audio.getAudioFile().getFile();
-            if(files.contains(f)){
-                files.remove(f);
+            if(audios.contains(audio)){
+                audios.remove(audio);
             }else{
-                files.add(f);
+                audios.add(audio);
             }
         }
     }
 
     public Intent sendSelection(Activity activity) {
         Intent intent = new Intent(activity, TagFormActivity.class);
-        File [] listFiles = new File[files.size()];
-        int i = 0;
-        for(File f : files){
-            listFiles[i] = f;
-            i++;
-        }
-        intent.putExtra("file",listFiles);
+        TagFormActivity.provideItem(audios);
         return intent;
     }
 
     public void resetSelection(){
-        files.clear();
+        audios.clear();
     }
 
     static class ViewHolder {
@@ -71,7 +64,7 @@ public class LibraryItemAdapter extends BaseAdapter {
     public LibraryItemAdapter(ArtworkService artworkService, int artworkSize) {
         this.artworkService = artworkService;
         this.artworkSize = artworkSize;
-        files = new ArrayList<>();
+        audios = new ArrayList<>();
     }
 
     @Override

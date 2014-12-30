@@ -37,10 +37,10 @@ import binauld.pierre.musictag.service.ArtworkService;
 
 public class TagFormActivity extends Activity {
 
-    private static AudioItem providedItem;
+    private static List<AudioItem> providedItem;
 
-    public static void provideItem(AudioItem item) {
-        TagFormActivity.providedItem = item;
+    public static void provideItem(List<AudioItem> items) {
+        TagFormActivity.providedItem = items;
     }
 
     private Resources res;
@@ -49,8 +49,6 @@ public class TagFormActivity extends Activity {
 
     private AudioItem audioItem;
 
-    //private List<AudioFile> audios;
-    //private AudioFile audio;
     private ImageView img_artwork;
     private TextView lbl_filename;
     private EditText txt_title;
@@ -64,6 +62,8 @@ public class TagFormActivity extends Activity {
     private EditText txt_disk;
     private EditText txt_track;
 
+    private final String alertMessage = " : Please note this will change all selected song";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +71,6 @@ public class TagFormActivity extends Activity {
 
         //Init layout
         this.setContentView(R.layout.activity_tag_form);
-        //setContentView(R.layout.activity_tag_form);
-        //Bundle extras = getIntent().getExtras();
-        //if (extras != null) {
-        //    audios = new ArrayList<>();
 
         // Init action bar
         ActionBar actionBar = getActionBar();
@@ -100,55 +96,119 @@ public class TagFormActivity extends Activity {
             Log.e(this.getClass().toString(), "No item has been provided.");
             finish();
         } else {
-
-            audioItem = TagFormActivity.providedItem;
-            AudioFile audioFile = audioItem.getAudioFile();
-
-            img_artwork = (ImageView) findViewById(R.id.img_artwork);
-            lbl_filename = (TextView) findViewById(R.id.lbl_filename);
-            txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
-            txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
-            txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
-            txt_year = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
-            txt_disk = ((FloatLabel) findViewById(R.id.txt_disk)).getEditText();
-            txt_track = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
-            txt_album_artist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
-            txt_composer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
-            txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
-            txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
-
-            Tag tags = audioFile.getTag();
-            //Object [] extrasObj = (Object[]) extras.getSerializable("file");
-            //for(Object obj : extrasObj){
-            //    audios.add(AudioFileIO.read((File) obj));
-            //}
-
-            // get the first element of the selected song
-            //audio = audios.get(0);
-
-            // fill in fieldtext
-            //Tag tags = audio.getTag();
-            Artwork artwork = tags.getFirstArtwork();
-            /*if (null != artwork) {
-                byte[] artworkData = artwork.getBinaryData();
-                Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
-                img_artwork.setImageBitmap(bitmap);
-            } else {
-                findViewById(R.id.card_artwork).setVisibility(View.GONE);*/
-            if (null != artwork) {
-                artworkService.setArtwork(audioItem, img_artwork, 200);
+            initFields();
+            if(TagFormActivity.providedItem.size() == 1) {
+                fillTextForOneAudio();
             }
-            lbl_filename.setText(audioFile.getFile().getAbsolutePath());
-            txt_title.setText(tags.getFirst(FieldKey.TITLE));
-            txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
-            txt_album.setText(tags.getFirst(FieldKey.ALBUM));
-            txt_year.setText(tags.getFirst(FieldKey.YEAR));
-            txt_disk.setText(tags.getFirst(FieldKey.DISC_NO));
-            txt_track.setText(tags.getFirst(FieldKey.TRACK));
-            txt_album_artist.setText(tags.getFirst(FieldKey.ALBUM_ARTIST));
-            txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
-            txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
-            txt_genre.setText(tags.getFirst(FieldKey.GENRE));
+            else{
+                fillTextForSomeAudios();
+            }
+        }
+    }
+
+    public void initFields(){
+        img_artwork = (ImageView) findViewById(R.id.img_artwork);
+        lbl_filename = (TextView) findViewById(R.id.lbl_filename);
+        txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
+        txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
+        txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
+        txt_year = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
+        txt_disk = ((FloatLabel) findViewById(R.id.txt_disk)).getEditText();
+        txt_track = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
+        txt_album_artist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
+        txt_composer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
+        txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
+        txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
+    }
+
+    public void fillTextForOneAudio(){
+        audioItem = TagFormActivity.providedItem.get(0);
+        AudioFile audioFile = audioItem.getAudioFile();
+        Tag tags = audioFile.getTag();
+
+        // fill in fieldtext
+        Artwork artwork = tags.getFirstArtwork();
+
+        if (null != artwork) {
+            artworkService.setArtwork(audioItem, img_artwork, 200);
+        }
+        lbl_filename.setText(audioFile.getFile().getAbsolutePath());
+        txt_title.setText(tags.getFirst(FieldKey.TITLE));
+        txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
+        txt_album.setText(tags.getFirst(FieldKey.ALBUM));
+        txt_year.setText(tags.getFirst(FieldKey.YEAR));
+        txt_disk.setText(tags.getFirst(FieldKey.DISC_NO));
+        txt_track.setText(tags.getFirst(FieldKey.TRACK));
+        txt_album_artist.setText(tags.getFirst(FieldKey.ALBUM_ARTIST));
+        txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
+        txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
+        txt_genre.setText(tags.getFirst(FieldKey.GENRE));
+    }
+
+    public void fillTextForSomeAudios(){
+        audioItem = TagFormActivity.providedItem.get(0);
+        AudioFile audioFile = audioItem.getAudioFile();
+        Tag tags = audioFile.getTag();
+
+        boolean sameTitle = true, sameArtist = true, sameAlbum = true, sameYear = true,
+                sameDisk = true, sameTrack = true, sameAlbum_Artist = true,
+                sameComposer = true, sameGrouping = true, sameGenre = true;
+
+        String currentTitle = tags.getFirst(FieldKey.TITLE);
+        String currentArtist = tags.getFirst(FieldKey.ARTIST);
+        String currentAlbum = tags.getFirst(FieldKey.ALBUM);
+        String currentYear = tags.getFirst(FieldKey.YEAR);
+        String currentDisk = tags.getFirst(FieldKey.DISC_NO);
+        String currentTrack = tags.getFirst(FieldKey.TRACK);
+        String currentAlbum_Artist = tags.getFirst(FieldKey.ALBUM_ARTIST);
+        String currentComposer = tags.getFirst(FieldKey.COMPOSER);
+        String currentGrouping = tags.getFirst(FieldKey.GROUPING);
+        String currentGenre = tags.getFirst(FieldKey.GENRE);
+
+        String pathOfAllFiles = "";
+
+        for(AudioItem audio : providedItem){
+            pathOfAllFiles += audio.getAudioFile().getFile().getAbsolutePath() + " \n";
+            if(sameTitle || sameArtist || sameAlbum || sameYear ||
+                    sameDisk || sameTrack || sameAlbum_Artist ||
+                    sameComposer || sameGrouping || sameGenre){
+                audioFile = audio.getAudioFile();
+                tags = audioFile.getTag();
+
+                if(sameTitle && !currentTitle.equals(tags.getFirst(FieldKey.TITLE))){sameTitle = false;}
+                if(sameArtist && !currentArtist.equals(tags.getFirst(FieldKey.ARTIST))){sameArtist = false;}
+                if(sameAlbum && !currentAlbum.equals(tags.getFirst(FieldKey.ALBUM))){sameAlbum = false;}
+                if(sameYear && !currentYear.equals(tags.getFirst(FieldKey.YEAR))){sameYear = false;}
+                if(sameDisk && !currentDisk.equals(tags.getFirst(FieldKey.DISC_NO))){sameDisk = false;}
+                if(sameTrack && !currentTrack.equals(tags.getFirst(FieldKey.TRACK))){sameTrack = false;}
+                if(sameAlbum_Artist && !currentAlbum_Artist.equals(tags.getFirst(FieldKey.ALBUM_ARTIST))){sameAlbum_Artist = false;}
+                if(sameComposer && !currentComposer.equals(tags.getFirst(FieldKey.COMPOSER))){sameComposer = false;}
+                if(sameGrouping && !currentGrouping.equals(tags.getFirst(FieldKey.GROUPING))){sameGrouping = false;}
+                if(sameGenre && !currentGenre.equals(tags.getFirst(FieldKey.GENRE))){sameGenre = false;}
+
+            }
+        }
+
+        lbl_filename.setText(pathOfAllFiles.substring(0, pathOfAllFiles.length() - 2));
+
+        attributeText(sameTitle, txt_title, currentTitle);
+        attributeText(sameArtist, txt_artist, currentArtist);
+        attributeText(sameAlbum, txt_album, currentAlbum);
+        attributeText(sameYear, txt_year, currentYear);
+        attributeText(sameDisk, txt_disk, currentDisk);
+        attributeText(sameTrack, txt_track, currentTrack);
+        attributeText(sameAlbum_Artist, txt_album_artist, currentAlbum_Artist);
+        attributeText(sameComposer, txt_composer, currentComposer);
+        attributeText(sameGrouping, txt_grouping, currentGrouping);
+        attributeText(sameGenre, txt_genre, currentGenre);
+
+    }
+
+    public void attributeText(boolean boolTest, EditText txt_field, String currentText){
+        if(boolTest) {
+            txt_field.setText(currentText);
+        }else{
+            txt_field.setHint(txt_field.getHint() + alertMessage);
         }
     }
 

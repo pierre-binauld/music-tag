@@ -24,6 +24,8 @@ import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,7 +66,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     private LibraryItemFactory itemFactory;
     private FileFilter filter;
-    private AudioItem updating;
+    private List<AudioItem> updating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +128,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 Intent intent = adapter.sendSelection(activity);
-                startActivity(intent);
+                //startActivity(intent);
+                startActivityForResult(intent, TAG_UPDATE_REQUEST);
             }
         });
     }
@@ -183,15 +186,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             switchNode(node);
             adapter.notifyDataSetChanged();
         } else {
-            updating = (AudioItem) item;
+            updating = new ArrayList<>();
+            updating.add((AudioItem) item);
             Intent intent = new Intent(this, TagFormActivity.class);
             TagFormActivity.provideItem(updating);
-//            intent.putExtra(TagFormActivity.AUDIO_FILE_KEY, updating.getAudioFile().getFile());
             startActivityForResult(intent, TAG_UPDATE_REQUEST);
-//            File files[] = new File[1];
-//            files[0]= audio.getAudioFile().getFile();
-//            intent.putExtra("file", files);
-//            startActivity(intent);
         }
     }
 

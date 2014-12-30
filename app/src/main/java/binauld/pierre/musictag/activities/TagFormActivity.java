@@ -72,9 +72,6 @@ public class TagFormActivity extends Activity {
         ActionBar actionBar = getActionBar();
         if (null != actionBar) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            if(providedItem.size() > 1) {
-                actionBar.setTitle("Multiple Selection");
-            }
         }
 
         // Init resources
@@ -262,10 +259,17 @@ public class TagFormActivity extends Activity {
     }
 
     private void initActivityTitle() {
-        String title = audioItem.getPrimaryInformation();
-        if (StringUtils.isNotBlank(audioItem.getSecondaryInformation())) {
-            title += " - " + audioItem.getSecondaryInformation();
+        String title;
+        if(providedItem.size() > 1) {
+            title = "Multiple Selection";
         }
+        else {
+            title = audioItem.getPrimaryInformation();
+            if (StringUtils.isNotBlank(audioItem.getSecondaryInformation())) {
+                title += " - " + audioItem.getSecondaryInformation();
+            }
+        }
+
         setTitle(title);
     }
 

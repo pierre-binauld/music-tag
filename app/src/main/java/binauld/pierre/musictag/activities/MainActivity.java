@@ -1,13 +1,10 @@
 package binauld.pierre.musictag.activities;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -26,28 +23,36 @@ import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCal
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
+import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
-import binauld.pierre.musictag.io.Cache;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
+import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.service.ArtworkService;
+import binauld.pierre.musictag.service.CacheService;
+import binauld.pierre.musictag.service.Locator;
 import binauld.pierre.musictag.item.MultipleChoiceModeListenerCustom;
-import binauld.pierre.musictag.service.ThumbnailService;
 
 /**
  * Main activity of the app.
  * Display a list of directories and audio files the user can modify.
  */
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, ObservableScrollViewCallbacks {
+
+    private static final int TAG_UPDATE_REQUEST = 1;
 
     private LibraryItemLoaderManager manager;
     private LibraryItemAdapter adapter;
@@ -57,41 +62,55 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     private Resources res;
     private SharedPreferences sharedPrefs;
 
+    private LibraryItemFactory itemFactory;
+    private FileFilter filter;
+    private AudioItem updating;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Get resources
         res = getResources();
+        int artworkSize = (int) res.getDimension(R.dimen.list_artwork_size);
 
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
-        // Init theme
+        // Init layout
         setContentView(R.layout.activity_main);
 
         // Switch off JAudioTagger log
         Logger.getLogger(res.getString(R.string.jaudiotagger_logger)).setLevel(Level.OFF);
 
         // Init cache
-        Cache<Bitmap> cache = new Cache<>();
+        Locator.provide(new CacheService<Bitmap>());
+
+        // Init default decoder
+        BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
 
         // Init service(s)
-        ThumbnailService thumbnailService = new ThumbnailService(cache, this, R.drawable.song);
+        ArtworkService artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
+        artworkService.initDefaultArtwork(artworkSize);
+
+        // Init filter
+        FileFilterFactory filterFactory = new FileFilterFactory();
+        filter = filterFactory.build();
 
         // Init factory
-        LibraryItemFactory itemFactory = LibraryItemFactoryHelper.buildFactory(this);
-
-        // Init adapter
-        adapter = new LibraryItemAdapter(thumbnailService);
+        itemFactory = LibraryItemFactoryHelper.buildFactory(res, filter, defaultArtworkBitmapDecoder);
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
+        // Init adapter
+        adapter = new LibraryItemAdapter(artworkService, artworkSize);
+        adapter.setProgressBar(progressBar);
+
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(adapter, itemFactory, progressBar, res.getInteger(R.integer.thumbnail_loader_update_step));
+        manager = new LibraryItemLoaderManager(adapter, itemFactory, res.getInteger(R.integer.artwork_loader_update_step));
 
         // Load items
         switchNode(getSourceNode());
@@ -164,19 +183,32 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             switchNode(node);
             adapter.notifyDataSetChanged();
         } else {
-            AudioItem audio = (AudioItem) item;
+            updating = (AudioItem) item;
             Intent intent = new Intent(this, TagFormActivity.class);
-            File files[] = new File[1];
-            files[0]= audio.getAudioFile().getFile();
-            intent.putExtra("file", files);
-            startActivity(intent);
+            TagFormActivity.provideItem(updating);
+//            intent.putExtra(TagFormActivity.AUDIO_FILE_KEY, updating.getAudioFile().getFile());
+            startActivityForResult(intent, TAG_UPDATE_REQUEST);
+//            File files[] = new File[1];
+//            files[0]= audio.getAudioFile().getFile();
+//            intent.putExtra("file", files);
+//            startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == TAG_UPDATE_REQUEST) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                adapter.notifyDataSetChanged();
+            }
         }
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (adapter.backToParent()) {
-            adapter.notifyDataSetChanged();
+        if (backToParent()) {
             return true;
         }
 
@@ -202,16 +234,18 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-        ActionBar ab = getActionBar();
-        if (scrollState == ScrollState.UP) {
-            if (ab.isShowing()) {
-                ab.hide();
-            }
-        } else if (scrollState == ScrollState.DOWN) {
-            if (!ab.isShowing()) {
-                ab.show();
-            }
-        }
+//        ActionBar ab = getActionBar();
+//        if (ab != null) {
+//            if (scrollState == ScrollState.UP) {
+//                if (ab.isShowing()) {
+//                    ab.hide();
+//                }
+//            } else if (scrollState == ScrollState.DOWN) {
+//                if (!ab.isShowing()) {
+//                    ab.show();
+//                }
+//            }
+//        }
     }
 
     /**
@@ -224,7 +258,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 res.getString(R.string.source_folder_preference_key),
                 res.getString(R.string.source_folder_preference_default));
 
-        return new FolderItem(new File(sourceFolder));
+        return itemFactory.buildFolderItem(new File(sourceFolder), null);
     }
 
     /**
@@ -235,15 +269,31 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      */
     private void switchNode(FolderItem node) {
         adapter.setCurrentNode(node);
+        adapter.notifyDataSetChanged();
+        if(null == node.getParent()) {
+            setTitle(res.getString(R.string.app_name));
+        } else {
+            setTitle(node.getPrimaryInformation());
+        }
+
         if (node.getState() == LoadingState.NOT_LOADED) {
             LibraryItemLoader loader = manager.get();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, node);
-            } else {
-                loader.execute(node);
-            }
-        } else if (node.getState() == LoadingState.LOADING) {
-            //Progress bar improvement: switch back the progress bar when node is loading.
+            manager.execute(loader, node.getFileList());
+        }
+    }
+
+    /**
+     * Switch the current node to the parent node.
+     *
+     * @return True if the adapter has switch to the parent node.
+     */
+    public boolean backToParent() {
+        NodeItem parent = adapter.getCurrentNode().getParent();
+        if (parent == null) {
+            return false;
+        } else {
+            switchNode((FolderItem) parent);
+            return true;
         }
     }
 }

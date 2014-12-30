@@ -15,7 +15,7 @@ public interface LibraryItem {
     public boolean isAudioItem();
 
     /**
-     * Get the primary information of the item (Like song title or folder name).
+     * Get the primary information of the item (Like list_item_placeholder title or folder name).
      * This information should be used for sorting and main display in the list.
      * @return A String of the primary information.
      */

@@ -1,28 +1,26 @@
 package binauld.pierre.musictag.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.iangclifton.android.floatlabel.FloatLabel;
 
+import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.datatype.Artwork;
 
 import java.io.File;
@@ -32,11 +30,29 @@ import java.util.List;
 import java.util.Objects;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
+import binauld.pierre.musictag.item.AudioItem;
+import binauld.pierre.musictag.service.ArtworkService;
 
 public class TagFormActivity extends Activity {
-    private List<AudioFile> audios;
-    private AudioFile audio;
+
+    private static AudioItem providedItem;
+
+    public static void provideItem(AudioItem item) {
+        TagFormActivity.providedItem = item;
+    }
+
+    private Resources res;
+
+    private ArtworkService artworkService;
+
+    private AudioItem audioItem;
+
+    //private List<AudioFile> audios;
+    //private AudioFile audio;
     private ImageView img_artwork;
+    private TextView lbl_filename;
     private EditText txt_title;
     private EditText txt_artist;
     private EditText txt_album;
@@ -52,13 +68,44 @@ public class TagFormActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Init layout
         this.setContentView(R.layout.activity_tag_form);
-        setContentView(R.layout.activity_tag_form);
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            audios = new ArrayList<>();
+        //setContentView(R.layout.activity_tag_form);
+        //Bundle extras = getIntent().getExtras();
+        //if (extras != null) {
+        //    audios = new ArrayList<>();
+
+        // Init action bar
+        ActionBar actionBar = getActionBar();
+        if (null != actionBar) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        // Init resources
+        res = getResources();
+
+        // Init service(s)
+        BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
+        artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
+
+        // Init views
+        initContent();
+        initActivityTitle();
+
+    }
+
+    public void initContent() {
+        if (null == providedItem) {
+            Log.e(this.getClass().toString(), "No item has been provided.");
+            finish();
+        } else {
+
+            audioItem = TagFormActivity.providedItem;
+            AudioFile audioFile = audioItem.getAudioFile();
 
             img_artwork = (ImageView) findViewById(R.id.img_artwork);
+            lbl_filename = (TextView) findViewById(R.id.lbl_filename);
             txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
             txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
             txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
@@ -70,36 +117,28 @@ public class TagFormActivity extends Activity {
             txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
             txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
 
-            Object [] extrasObj = (Object[]) extras.getSerializable("file");
-            for(Object obj : extrasObj){
-                try {
-                    audios.add(AudioFileIO.read((File) obj));
-                } catch (CannotReadException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (TagException e) {
-                    e.printStackTrace();
-                } catch (ReadOnlyFileException e) {
-                    e.printStackTrace();
-                } catch (InvalidAudioFrameException e) {
-                    e.printStackTrace();
-                }
-            }
+            Tag tags = audioFile.getTag();
+            //Object [] extrasObj = (Object[]) extras.getSerializable("file");
+            //for(Object obj : extrasObj){
+            //    audios.add(AudioFileIO.read((File) obj));
+            //}
 
             // get the first element of the selected song
-            audio = audios.get(0);
+            //audio = audios.get(0);
 
             // fill in fieldtext
-            Tag tags = audio.getTag();
+            //Tag tags = audio.getTag();
             Artwork artwork = tags.getFirstArtwork();
-            if (null != artwork) {
+            /*if (null != artwork) {
                 byte[] artworkData = artwork.getBinaryData();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(artworkData, 0, artworkData.length);
                 img_artwork.setImageBitmap(bitmap);
             } else {
-                findViewById(R.id.card_artwork).setVisibility(View.GONE);
+                findViewById(R.id.card_artwork).setVisibility(View.GONE);*/
+            if (null != artwork) {
+                artworkService.setArtwork(audioItem, img_artwork, 200);
             }
+            lbl_filename.setText(audioFile.getFile().getAbsolutePath());
             txt_title.setText(tags.getFirst(FieldKey.TITLE));
             txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
             txt_album.setText(tags.getFirst(FieldKey.ALBUM));
@@ -111,84 +150,76 @@ public class TagFormActivity extends Activity {
             txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
             txt_genre.setText(tags.getFirst(FieldKey.GENRE));
         }
-        else{
-            finish();
-        }
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_tag_form, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        switch(id) {
-            case R.id.action_settings :
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
                 return true;
-            case R.id.action_valid :
-                saveChange();
+            case R.id.action_settings:
                 return true;
+            case R.id.action_valid:
+                saveChangeAndFinish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
-    public void saveChange() {
-        String title = txt_title.getText().toString();
-        String artist = txt_artist.getText().toString();
-        String album = txt_album.getText().toString();
-        String year = txt_year.getText().toString();
-        String album_artist = txt_album_artist.getText().toString();
-        String composer = txt_composer.getText().toString();
-        String grouping = txt_grouping.getText().toString();
-        String genre = txt_genre.getText().toString();
-        String disk = txt_disk.getText().toString();
-        String track = txt_track.getText().toString();
-
-        Tag tags = audio.getTag();
+    public void saveChangeAndFinish() {
+        Intent intent = new Intent();
         try {
-            tags.setField(FieldKey.TITLE,title);
-            tags.setField(FieldKey.ARTIST,artist);
-            tags.setField(FieldKey.ALBUM,album);
-            if(isInteger(year)){tags.setField(FieldKey.YEAR,year);}
-            tags.setField(FieldKey.ALBUM_ARTIST,album_artist);
-            tags.setField(FieldKey.COMPOSER,composer);
-            tags.setField(FieldKey.GROUPING,grouping);
-            tags.setField(FieldKey.GENRE,genre);
-            if(isInteger(disk)){tags.setField(FieldKey.DISC_NO,disk);}
-            if(isInteger(track)){tags.setField(FieldKey.TRACK,track);}
-        } catch (FieldDataInvalidException e) {
+            AudioFile audioFile = audioItem.getAudioFile();
+            Tag tags = audioFile.getTag();
+            setTagField(tags, FieldKey.TITLE, txt_title.getText().toString());
+            setTagField(tags, FieldKey.ARTIST, txt_artist.getText().toString());
+            setTagField(tags, FieldKey.ALBUM, txt_album.getText().toString());
+            setTagField(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString());
+            setTagField(tags, FieldKey.COMPOSER, txt_composer.getText().toString());
+            setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString());
+            setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString());
+            setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
+            setNumericTagField(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
+            setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
+            audioFile.setTag(tags);
+
+            AudioFileIO.write(audioFile);
+
+            setResult(RESULT_OK, intent);
+        } catch (CannotWriteException | FieldDataInvalidException e) {
             Log.e(this.getClass().toString(), e.getMessage(), e);
+            setResult(RESULT_CANCELED, intent);
         }
-        audio.setTag(tags);
 
-        try {
-            AudioFileIO.write(audio);
-        } catch (CannotWriteException e) {
-            e.printStackTrace();
-        }
         finish();
     }
 
-
-    public boolean isInteger(String string) {
-        try {
-            Integer.parseInt(string);
-        } catch (NumberFormatException e){
-            return false;
+    private void initActivityTitle() {
+        String title = audioItem.getPrimaryInformation();
+        if (StringUtils.isNotBlank(audioItem.getSecondaryInformation())) {
+            title += " - " + audioItem.getSecondaryInformation();
         }
+        setTitle(title);
+    }
 
-        return true;
+    private static void setNumericTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
+        if (!StringUtils.isBlank(value) && StringUtils.isNumeric(value)) {
+            tags.setField(key, value);
+        }
+    }
+
+    private static void setTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
+        if (StringUtils.isBlank(value)) {
+            value = "";
+        }
+        tags.setField(key, value);
     }
 }

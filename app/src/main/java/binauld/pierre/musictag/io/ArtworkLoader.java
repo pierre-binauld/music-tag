@@ -9,19 +9,22 @@ import java.lang.ref.WeakReference;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.service.CacheService;
 
-public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
+public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
 
     private final WeakReference<ImageView> imageViewReference;
-    private final BitmapDecoder defaultThumbnailDecoder;
+    private final BitmapDecoder defaultArtworkDecoder;
     private LibraryItem item;
-    private Cache<Bitmap> cache;
+    private CacheService<Bitmap> cacheService;
+    private int artworkSize;
 
-    public ThumbnailLoader(ImageView imageView, Cache<Bitmap> cache, BitmapDecoder defaultThumbnailDecoder) {
+    public ArtworkLoader(ImageView imageView, CacheService<Bitmap> cacheService, BitmapDecoder defaultArtworkDecoder, int artworkSize) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
         this.imageViewReference = new WeakReference<>(imageView);
-        this.cache = cache;
-        this.defaultThumbnailDecoder = defaultThumbnailDecoder;
+        this.cacheService = cacheService;
+        this.defaultArtworkDecoder = defaultArtworkDecoder;
+        this.artworkSize = artworkSize;
     }
 
     // Decode image in background.
@@ -29,12 +32,13 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
     protected Bitmap doInBackground(LibraryItem... items) {
         item = items[0];
         BitmapDecoder decoder = item.getDecoder();
-        String key = decoder.getId();
-        Bitmap bitmap = decoder.decode();
+
+        String key = decoder.getKey(artworkSize, artworkSize);
+        Bitmap bitmap = decoder.decode(artworkSize, artworkSize);
         if (null != bitmap) {
-            cache.put(key, bitmap);
-        } else if (decoder != defaultThumbnailDecoder) {
-            item.switchDecoder(defaultThumbnailDecoder);
+            cacheService.put(key, bitmap);
+        } else if (decoder != defaultArtworkDecoder) {
+            item.switchDecoder(defaultArtworkDecoder);
             bitmap = this.doInBackground(item);
         }
 
@@ -50,8 +54,8 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
 
         final ImageView imageView = imageViewReference.get();
         if (imageView != null && bitmap != null) {
-            final ThumbnailLoader thumbnailLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
-            if (this == thumbnailLoader) {
+            final ArtworkLoader artworkLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
+            if (this == artworkLoader) {
                 imageView.setImageBitmap(bitmap);
             }
         }
@@ -64,4 +68,5 @@ public class ThumbnailLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
     public LibraryItem getWorkingItem() {
         return item;
     }
+
 }

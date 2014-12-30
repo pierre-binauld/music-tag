@@ -1,9 +1,9 @@
 package binauld.pierre.musictag.helper;
 
 
-import android.app.Activity;
 import android.content.res.Resources;
-import android.util.TypedValue;
+
+import java.io.FileFilter;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
@@ -14,28 +14,12 @@ public class LibraryItemFactoryHelper {
 
     /**
      * Build the library item factory.
-     * @param activity The activity context.
+     * @param res The activity resources.
+     * @param defaultArtworkBitmapDecoder The default artwork bitmap decoder.
      * @return A library item factory.
      */
-    public static LibraryItemFactory buildFactory(Activity activity) {
-        Resources res = activity.getResources();
+    public static LibraryItemFactory buildFactory(Resources res, FileFilter filter, BitmapDecoder defaultArtworkBitmapDecoder) {
         BitmapDecoder folderBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.folder);
-        return new LibraryItemFactory(folderBitmapDecoder, getThumbnailSize(activity));
-    }
-
-    /**
-     * Retrieve the thumbnail size from listPreferredItemHeight theme attribute.
-     * @return The thumbnail size.
-     */
-    private static int getThumbnailSize(Activity activity) {
-
-        TypedValue thumbnailSize = new android.util.TypedValue();
-        activity.getTheme().resolveAttribute(android.R.attr.listPreferredItemHeight, thumbnailSize, true);
-        TypedValue.coerceToString(thumbnailSize.type, thumbnailSize.data);
-
-        android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        return (int) thumbnailSize.getDimension(metrics);
+        return new LibraryItemFactory(defaultArtworkBitmapDecoder, folderBitmapDecoder, filter, res);
     }
 }

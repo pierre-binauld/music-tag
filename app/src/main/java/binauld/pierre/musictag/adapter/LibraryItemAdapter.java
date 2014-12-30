@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.File;
@@ -19,7 +20,7 @@ import binauld.pierre.musictag.activities.TagFormActivity;
 import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.service.ThumbnailService;
+import binauld.pierre.musictag.service.ArtworkService;
 
 /**
  * Adapt a list of library item for a list view.
@@ -63,11 +64,20 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     private NodeItem currentNode;
-    private final ThumbnailService thumbnailService;
+    private final ArtworkService artworkService;
+    private int artworkSize;
+    private ProgressBar progressBar;
 
-    public LibraryItemAdapter(ThumbnailService thumbnailService) {
-        this.thumbnailService = thumbnailService;
+    public LibraryItemAdapter(ArtworkService artworkService, int artworkSize) {
+        this.artworkService = artworkService;
+        this.artworkSize = artworkSize;
         files = new ArrayList<>();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        updateProgressBar();
     }
 
     @Override
@@ -116,8 +126,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-            thumbnailService.setThumbnail(item, viewHolder.thumbnail);
-//            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
+            artworkService.setArtwork(item, viewHolder.thumbnail, artworkSize);
             convertView.setTag(viewHolder);
         }
 
@@ -125,17 +134,45 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     /**
-     * Switch the current node to the parent node.
-     *
-     * @return True if the adapter has switch to the parent node.
+     * Set the progress bar.
+     * @param progressBar The progress bar.
      */
-    public boolean backToParent() {
-        NodeItem parent = currentNode.getParent();
-        if (parent == null) {
-            return false;
-        } else {
-            currentNode = parent;
-            return true;
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
+    }
+
+    /**
+     * Initialize the progress bar (progress, max, visibility).
+     */
+    private void setUpProgressBar() {
+        if (null != progressBar) {
+            if (null == currentNode) {
+                progressBar.setVisibility(View.GONE);
+            } else {
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setMax(currentNode.getMaxChildren());
+                updateProgressBar();
+            }
+        }
+    }
+
+    /**
+     * Update the progression of the progress bar.
+     */
+    private void updateProgressBar() {
+        if (null != progressBar) {
+            switch (currentNode.getState()) {
+                case LOADING:
+                    progressBar.setProgress(currentNode.size() + currentNode.getInvalidItemCount());
+                    break;
+                case LOADED:
+                    progressBar.setVisibility(View.GONE);
+                    break;
+                case NOT_LOADED:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -146,6 +183,7 @@ public class LibraryItemAdapter extends BaseAdapter {
      */
     public void setCurrentNode(NodeItem currentNode) {
         this.currentNode = currentNode;
+        setUpProgressBar();
     }
 
     /**

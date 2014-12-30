@@ -1,13 +1,13 @@
-package binauld.pierre.musictag.io;
+package binauld.pierre.musictag.service;
 
 
 import android.util.LruCache;
 
-public class Cache<Resource> {
+public class CacheService<Resource> {
 
     private LruCache<String, Resource> cache;
 
-    public Cache() {
+    public CacheService() {
         // Use 1/8th of the available memory for this memory cache.
         this.cache = new LruCache<>((int) (Runtime.getRuntime().maxMemory() / 1024 / 8));
     }

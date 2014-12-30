@@ -13,17 +13,14 @@ public abstract class NodeItem extends ChildItem {
 
     private MultipleBufferedList<LibraryItem> children;
     private LoadingState state;
+    private int invalidItemCount;
 
     public NodeItem() {
-        this.init();
+        this(null);
     }
 
     public NodeItem(NodeItem parent) {
-        this.init();
         this.parent = parent;
-    }
-
-    private void init() {
         this.children = new MultipleBufferedList<>(new MultipleBufferedList.ListFactory<LibraryItem>() {
             public List<LibraryItem> buildEmptyList() {
                 return new ArrayList<>();
@@ -36,6 +33,12 @@ public abstract class NodeItem extends ChildItem {
     public boolean isAudioItem() {
         return false;
     }
+
+    /**
+     * Get the maximum number of possible children.
+     * @return The maximum number of possible children.
+     */
+    public abstract int getMaxChildren();
 
     /**
      * Get the number of children node.
@@ -76,5 +79,20 @@ public abstract class NodeItem extends ChildItem {
      */
     public MultipleBufferedList<LibraryItem> getChildren() {
         return children;
+    }
+
+    /**
+     * Set the count of invalid item found by a loader.
+     * @param invalidItemCount The count of invalid item found.
+     */
+    public void setInvalidItemCount(int invalidItemCount) {
+        this.invalidItemCount = invalidItemCount;
+    }
+    /**
+     * Get the count of invalid item found by a loader.
+     * @return The count of invalid item found.
+     */
+    public int getInvalidItemCount() {
+        return invalidItemCount;
     }
 }

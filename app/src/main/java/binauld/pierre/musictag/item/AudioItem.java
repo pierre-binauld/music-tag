@@ -10,11 +10,7 @@ import org.jaudiotagger.tag.FieldKey;
  */
 public class AudioItem extends ChildItem {
 
-    private final AudioFile audio;
-
-    public AudioItem(AudioFile audio) {
-        this.audio = audio;
-    }
+    private AudioFile audio;
 
     @Override
     public boolean isAudioItem() {
@@ -41,6 +37,14 @@ public class AudioItem extends ChildItem {
      */
     public AudioFile getAudioFile() {
         return audio;
+    }
+
+    /**
+     * Set the AudioFile.
+     * @param audio The audio file.
+     */
+    public void setAudioFile(AudioFile audio) {
+        this.audio = audio;
     }
 
 }

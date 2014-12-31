@@ -127,9 +127,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                Intent intent = adapter.sendSelection(activity);
-                //startActivity(intent);
-                startActivityForResult(intent, TAG_UPDATE_REQUEST);
+                if(listView.getCheckedItemCount() > 1) {
+                    Intent intent = adapter.sendSelection(activity);
+                    //startActivity(intent);
+                    startActivityForResult(intent, TAG_UPDATE_REQUEST);
+                }
             }
         });
     }

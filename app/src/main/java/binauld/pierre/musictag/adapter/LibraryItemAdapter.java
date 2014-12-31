@@ -44,19 +44,21 @@ public class LibraryItemAdapter extends BaseAdapter {
         }
         else{
             FolderItem folder = (FolderItem) item;
-            List<File> files = recursiveDirectoryContent(folder);
-            LibraryItemFactory factory = LibraryItemFactoryHelper.buildFactory(folder.getResources(), folder.getFilter(), new ResourceBitmapDecoder(folder.getResources(), R.drawable.list_item_placeholder));
+            if(!alreadySelected(folder)) {
+                List<File> files = recursiveDirectoryContent(folder);
+                LibraryItemFactory factory = LibraryItemFactoryHelper.buildFactory(folder.getResources(), folder.getFilter(), new ResourceBitmapDecoder(folder.getResources(), R.drawable.list_item_placeholder));
 
 
-            for(File f : files) {
-                AudioItem audioItem = new AudioItem();
-                audioItem.setParent(folder);
-                try {
-                    factory.update(audioItem, f);
-                } catch (IOException e) {
-                    Log.e(this.getClass().toString(), e.getMessage(), e);
+                for (File f : files) {
+                    AudioItem audioItem = new AudioItem();
+                    audioItem.setParent(folder);
+                    try {
+                        factory.update(audioItem, f);
+                    } catch (IOException e) {
+                        Log.e(this.getClass().toString(), e.getMessage(), e);
+                    }
+                    audios.add(audioItem);
                 }
-                audios.add(audioItem);
             }
         }
     }
@@ -69,21 +71,41 @@ public class LibraryItemAdapter extends BaseAdapter {
         }
     }
 
+    /**
+     * Check if the folder is already selected and then delete audioitem in the list.
+     * @param folder the checked folder item
+     * @return a boolean to know if the folder was selected before the check.
+     */
+    public boolean alreadySelected(FolderItem folder){
+        boolean alreadySelected = false;
+        List<AudioItem> audiosToDelete = new ArrayList<>();
+        for(AudioItem audio : audios){
+            if(audio.getParent() == folder){
+                alreadySelected = true;
+                audiosToDelete.add(audio);
+            }
+        }
+        for(AudioItem audio : audiosToDelete){
+            audios.remove(audio);
+        }
+        return alreadySelected;
+    }
+
     public List<File> recursiveDirectoryContent(FolderItem folder){
-        File[] files = folder.getFileList();
-        List<File> returnfiles = new ArrayList<>();
-        for(File f : files){
+        File[] filesInFolder = folder.getFileList();
+        List<File> files = new ArrayList<>();
+        for(File f : filesInFolder){
             if (f.isDirectory()){
-                List<File> filesList = recursiveDirectoryContent(new FolderItem(f, folder.getFilter(), folder.getResources()));
-                for(File fileRecurse : filesList) {
-                    returnfiles.add(fileRecurse);
+                List<File> filesInSubFolder = recursiveDirectoryContent(new FolderItem(f, folder.getFilter(), folder.getResources()));
+                for(File file : filesInSubFolder) {
+                    files.add(file);
                 }
             }
             else{
-                returnfiles.add(f);
+                files.add(f);
             }
         }
-        return returnfiles;
+        return files;
     }
 
     public Intent sendSelection(Activity activity) {

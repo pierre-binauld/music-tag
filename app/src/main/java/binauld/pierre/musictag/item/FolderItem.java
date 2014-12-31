@@ -15,6 +15,8 @@ public class FolderItem extends NodeItem {
     private File file;
     private File[] fileList;
     private String secondaryInformation;
+    private FileFilter filter;
+    private Resources res;
 
     public FolderItem(File file, FileFilter filter, Resources res) {
         this(file, filter, null, res);
@@ -23,6 +25,8 @@ public class FolderItem extends NodeItem {
     public FolderItem(File file, FileFilter filter, NodeItem parent, Resources res) {
         super(parent);
         this.file = file;
+        this.filter = filter;
+        this.res = res;
         this.fileList = file.listFiles(filter);
 
         int fileNumber = getLength();
@@ -51,6 +55,22 @@ public class FolderItem extends NodeItem {
      */
     public File getFile() {
         return file;
+    }
+
+    /**
+     * Get the filter.
+     * @return The filter.
+     */
+    public FileFilter getFilter() {
+        return filter;
+    }
+
+    /**
+     * Get the resources.
+     * @return The resources.
+     */
+    public Resources getResources() {
+        return res;
     }
 
     /**

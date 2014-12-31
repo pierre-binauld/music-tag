@@ -3,6 +3,7 @@ package binauld.pierre.musictag.adapter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,13 +12,20 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.jaudiotagger.audio.AudioFile;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.activities.TagFormActivity;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
+import binauld.pierre.musictag.factory.LibraryItemFactory;
+import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
 import binauld.pierre.musictag.item.AudioItem;
+import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
 import binauld.pierre.musictag.service.ArtworkService;
@@ -32,12 +40,50 @@ public class LibraryItemAdapter extends BaseAdapter {
         LibraryItem item = (LibraryItem) getItem(position);
         if (item.isAudioItem()) {
             AudioItem audio = (AudioItem) item;
-            if(audios.contains(audio)){
-                audios.remove(audio);
-            }else{
-                audios.add(audio);
+            toggleAudio(audio);
+        }
+        else{
+            FolderItem folder = (FolderItem) item;
+            List<File> files = recursiveDirectoryContent(folder);
+            LibraryItemFactory factory = LibraryItemFactoryHelper.buildFactory(folder.getResources(), folder.getFilter(), new ResourceBitmapDecoder(folder.getResources(), R.drawable.list_item_placeholder));
+
+
+            for(File f : files) {
+                AudioItem audioItem = new AudioItem();
+                audioItem.setParent(folder);
+                try {
+                    factory.update(audioItem, f);
+                } catch (IOException e) {
+                    Log.e(this.getClass().toString(), e.getMessage(), e);
+                }
+                audios.add(audioItem);
             }
         }
+    }
+
+    public void toggleAudio(AudioItem audio){
+        if(audios.contains(audio)){
+            audios.remove(audio);
+        }else{
+            audios.add(audio);
+        }
+    }
+
+    public List<File> recursiveDirectoryContent(FolderItem folder){
+        File[] files = folder.getFileList();
+        List<File> returnfiles = new ArrayList<>();
+        for(File f : files){
+            if (f.isDirectory()){
+                List<File> filesList = recursiveDirectoryContent(new FolderItem(f, folder.getFilter(), folder.getResources()));
+                for(File fileRecurse : filesList) {
+                    returnfiles.add(fileRecurse);
+                }
+            }
+            else{
+                returnfiles.add(f);
+            }
+        }
+        return returnfiles;
     }
 
     public Intent sendSelection(Activity activity) {

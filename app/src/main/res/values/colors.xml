@@ -4,11 +4,10 @@
     <color name="color_primary_dark">#d32f2f</color>
     <color name="color_primary_fallback">#e57373</color>
 
-    <color name="color_accent">#03a9f4</color>
-    <color name="color_accent_hover">#039be5</color>
-    <color name="color_accent_pressed">#0288d1</color>
-    <color name="color_accent_fallback">#0288d1</color>
-
+    <color name="color_accent">#ff9800</color>
+    <color name="color_accent_hover">#fb8C00</color>
+    <color name="color_accent_pressed">#f57c00</color>
+    <color name="color_accent_fallback">#f57c00</color>
 
 
 </resources>

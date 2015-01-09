@@ -5,22 +5,15 @@ import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.FieldKey;
 
-import binauld.pierre.musictag.decoder.AudioFileBitmapDecoder;
-
 /**
  * Represent an audio file in a library.
  */
 public class AudioItem extends ChildItem {
 
-    private final AudioFile audio;
-
-    public AudioItem(AudioFile audio) {
-        this.audio = audio;
-        this.decoder = new AudioFileBitmapDecoder(this.audio);
-    }
+    private AudioFile audio;
 
     @Override
-    public boolean getAudio() {
+    public boolean isAudioItem() {
         return true;
     }
 
@@ -38,9 +31,20 @@ public class AudioItem extends ChildItem {
         return audio.getTag().getFirst(FieldKey.ARTIST);
     }
 
+    /**
+     * Get the AudioFile.
+     * @return The audio file.
+     */
+    public AudioFile getAudioFile() {
+        return audio;
+    }
 
-//    @Override
-//    public Bitmap getThumbnail() {
-//        return thumbnail;
-//    }
+    /**
+     * Set the AudioFile.
+     * @param audio The audio file.
+     */
+    public void setAudioFile(AudioFile audio) {
+        this.audio = audio;
+    }
+
 }

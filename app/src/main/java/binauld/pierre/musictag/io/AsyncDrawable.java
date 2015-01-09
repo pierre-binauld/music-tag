@@ -10,24 +10,32 @@ import android.widget.ImageView;
 import java.lang.ref.WeakReference;
 
 public class AsyncDrawable extends BitmapDrawable {
-    private final WeakReference<ThumbnailLoader> bitmapWorkerTaskReference;
+    private final WeakReference<ArtworkLoader> bitmapWorkerTaskReference;
 
-    public AsyncDrawable(Resources res, Bitmap bitmap,
-                         ThumbnailLoader thumbnailLoader) {
+    public AsyncDrawable(Resources res, Bitmap bitmap, ArtworkLoader artworkLoader) {
         super(res, bitmap);
-        bitmapWorkerTaskReference = new WeakReference<ThumbnailLoader>(thumbnailLoader);
+        bitmapWorkerTaskReference = new WeakReference<>(artworkLoader);
     }
 
-    public ThumbnailLoader getBitmapWorkerTask() {
+    /**
+     * Get the bitmap loader.
+     * @return The bitmap loader.
+     */
+    ArtworkLoader getBitmapLoader() {
         return bitmapWorkerTaskReference.get();
     }
 
-    public static ThumbnailLoader getBitmapWorkerTask(ImageView imageView) {
+    /**
+     * Retrieve bitmap loader from an ImageView.
+     * @param imageView The image view containing the bitmap loader.
+     * @return The bitmap loader or null if it does not exist.
+     */
+    public static ArtworkLoader retrieveBitmapLoader(ImageView imageView) {
         if (imageView != null) {
             final Drawable drawable = imageView.getDrawable();
             if (drawable instanceof AsyncDrawable) {
                 final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
-                return asyncDrawable.getBitmapWorkerTask();
+                return asyncDrawable.getBitmapLoader();
             }
         }
         return null;

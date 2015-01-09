@@ -1,38 +1,39 @@
 package binauld.pierre.musictag.item;
 
-import android.graphics.Bitmap;
+import android.content.res.Resources;
 
 import java.io.File;
-import java.util.Comparator;
+import java.io.FileFilter;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 
+/**
+ * Represent a folder in the library.
+ */
 public class FolderItem extends NodeItem {
 
     private File file;
+    private File[] fileList;
     private String secondaryInformation;
 
-    public FolderItem(File file, Comparator<LibraryItem> comparator) {
-        super(comparator);
-        init(file);
+    public FolderItem(File file, FileFilter filter, Resources res) {
+        this(file, filter, null, res);
     }
 
-    public FolderItem(File file, NodeItem parent) {
+    public FolderItem(File file, FileFilter filter, NodeItem parent, Resources res) {
         super(parent);
-        init(file);
-    }
-
-    private void init(File file) {
         this.file = file;
+        this.fileList = file.listFiles(filter);
 
-        // TODO: Add local logic
-        int fileNumber = file.list().length;
-        this.secondaryInformation = fileNumber + " file";
-        if(fileNumber > 1) {
-            this.secondaryInformation += "s";
+        int fileNumber = getLength();
+        this.secondaryInformation = fileNumber + " ";
+        if(fileNumber < 2) {
+            this.secondaryInformation  += res.getString(R.string.file);
+        } else {
+            this.secondaryInformation  += res.getString(R.string.files);
         }
     }
+
 
     @Override
     public String getPrimaryInformation() {
@@ -52,4 +53,24 @@ public class FolderItem extends NodeItem {
         return file;
     }
 
+    /**
+     * Get the number of sub file.
+     * @return The number of sub file.
+     */
+    public int getLength() {
+        return file.isDirectory()?file.list().length:0;
+    }
+
+    /**
+     * Get the files containing by the folder of this item.
+     * @return A list of File.
+     */
+    public File[] getFileList() {
+        return fileList;
+    }
+
+    @Override
+    public int getMaxChildren() {
+        return fileList.length;
+    }
 }

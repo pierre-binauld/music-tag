@@ -1,55 +1,44 @@
 package binauld.pierre.musictag.item;
 
 
-import android.graphics.Bitmap;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+
+import binauld.pierre.musictag.collection.MultipleBufferedList;
 
 /**
  * Represent a folder in a library.
  */
 public abstract class NodeItem extends ChildItem {
 
-    private Comparator<LibraryItem> comparator;
-    private List<LibraryItem> children = new ArrayList<LibraryItem>();
+    private MultipleBufferedList<LibraryItem> children;
     private LoadingState state;
+    private int invalidItemCount;
 
-    public NodeItem(Comparator<LibraryItem> comparator) {
-        this.init();
-        this.comparator = comparator;
+    public NodeItem() {
+        this(null);
     }
 
     public NodeItem(NodeItem parent) {
-        this.init();
         this.parent = parent;
-        this.comparator = parent.getComparator();
-    }
-
-    private void init() {
+        this.children = new MultipleBufferedList<>(new MultipleBufferedList.ListFactory<LibraryItem>() {
+            public List<LibraryItem> buildEmptyList() {
+                return new ArrayList<>();
+            }
+        });
         this.state = LoadingState.NOT_LOADED;
     }
 
     @Override
-    public boolean getAudio() {
+    public boolean isAudioItem() {
         return false;
     }
 
-//    @Override
-//    public Bitmap getThumbnail() {
-//        return thumbnail;
-//    }
-
-    public void add(LibraryItem item) {
-        children.add(item);
-    }
-
-    public void add(LibraryItem[] elements) {
-        Collections.addAll(children, elements);
-        Collections.sort(children, comparator);
-    }
+    /**
+     * Get the maximum number of possible children.
+     * @return The maximum number of possible children.
+     */
+    public abstract int getMaxChildren();
 
     /**
      * Get the number of children node.
@@ -69,28 +58,6 @@ public abstract class NodeItem extends ChildItem {
     }
 
     /**
-     * Get the comparator used to sort children.
-     * @return The comparator.
-     */
-    public Comparator<LibraryItem> getComparator() {
-        if(null != comparator) {
-            return comparator;
-        } else if (null != parent) {
-            return parent.getComparator();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Set the comparator used to sort children.
-     * @param comparator The comparator.
-     */
-    public void setComparator(Comparator<LibraryItem> comparator) {
-        this.comparator = comparator;
-    }
-
-    /**
      * Get the loading state from the item.
      * @return The loading state.
      */
@@ -104,5 +71,28 @@ public abstract class NodeItem extends ChildItem {
      */
     public void setState(LoadingState state) {
         this.state = state;
+    }
+
+    /**
+     * Get the list of children for modification.
+     * @return The list of children
+     */
+    public MultipleBufferedList<LibraryItem> getChildren() {
+        return children;
+    }
+
+    /**
+     * Set the count of invalid item found by a loader.
+     * @param invalidItemCount The count of invalid item found.
+     */
+    public void setInvalidItemCount(int invalidItemCount) {
+        this.invalidItemCount = invalidItemCount;
+    }
+    /**
+     * Get the count of invalid item found by a loader.
+     * @return The count of invalid item found.
+     */
+    public int getInvalidItemCount() {
+        return invalidItemCount;
     }
 }

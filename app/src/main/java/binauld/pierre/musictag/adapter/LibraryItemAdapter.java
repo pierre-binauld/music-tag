@@ -1,21 +1,18 @@
 package binauld.pierre.musictag.adapter;
 
 
-import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import java.util.Comparator;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.service.ThumbnailService;
+import binauld.pierre.musictag.service.ArtworkService;
 
 /**
  * Adapt a list of library item for a list view.
@@ -29,12 +26,19 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     private NodeItem currentNode;
-    private LayoutInflater inflater;
-    private final ThumbnailService thumbnailService;
+    private final ArtworkService artworkService;
+    private int artworkSize;
+    private ProgressBar progressBar;
 
-    public LibraryItemAdapter(Context baseContext, ThumbnailService thumbnailService, Comparator<LibraryItem> comparator) {
-        this.thumbnailService = thumbnailService;
-        this.inflater = LayoutInflater.from(baseContext);
+    public LibraryItemAdapter(ArtworkService artworkService, int artworkSize) {
+        this.artworkService = artworkService;
+        this.artworkSize = artworkSize;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        updateProgressBar();
     }
 
     @Override
@@ -59,7 +63,8 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (convertView == null) {
 
             // inflate the layout
-            convertView = inflater.inflate(R.layout.library_item_view, parent, false);
+            convertView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.library_item_view, parent, false);
 
             // well set up the ViewHolder
             viewHolder = new ViewHolder();
@@ -82,9 +87,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-            Log.wtf(this.getClass().toString(), item.getPrimaryInformation());
-            thumbnailService.loadThumbnail(item, viewHolder.thumbnail);
-//            viewHolder.thumbnail.setImageDrawable(thumbnailService.getThumbnail(item.getThumbnailKey(), viewHolder.thumbnail));
+            artworkService.setArtwork(item, viewHolder.thumbnail, artworkSize);
             convertView.setTag(viewHolder);
         }
 
@@ -92,29 +95,61 @@ public class LibraryItemAdapter extends BaseAdapter {
     }
 
     /**
-     * Switch the current node to the parent node.
-     * @return True if the adapter has switch to the parent node.
+     * Set the progress bar.
+     * @param progressBar The progress bar.
      */
-    public boolean backToParent() {
-        NodeItem parent = currentNode.getParent();
-        if(parent == null) {
-            return false;
-        } else {
-            currentNode = parent;
-            return true;
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
+    }
+
+    /**
+     * Initialize the progress bar (progress, max, visibility).
+     */
+    private void setUpProgressBar() {
+        if (null != progressBar) {
+            if (null == currentNode) {
+                progressBar.setVisibility(View.GONE);
+            } else {
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setMax(currentNode.getMaxChildren());
+                updateProgressBar();
+            }
+        }
+    }
+
+    /**
+     * Update the progression of the progress bar.
+     */
+    private void updateProgressBar() {
+        if (null != progressBar) {
+            switch (currentNode.getState()) {
+                case LOADING:
+                    progressBar.setProgress(currentNode.size() + currentNode.getInvalidItemCount());
+                    break;
+                case LOADED:
+                    progressBar.setVisibility(View.GONE);
+                    break;
+                case NOT_LOADED:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
     /**
      * Set the current node of the library tree list.
+     *
      * @param currentNode The current node to set.
      */
     public void setCurrentNode(NodeItem currentNode) {
         this.currentNode = currentNode;
+        setUpProgressBar();
     }
 
     /**
      * Get the current node display by the list.
+     *
      * @return The current node to get.
      */
     public NodeItem getCurrentNode() {

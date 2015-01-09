@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="binauld.pierre.musictag.activities.TagFormActivity">
+    <item
+        android:id="@+id/action_suggestion"
+        android:title="@string/action_download_suggestion"
+        android:icon="@drawable/ic_action_suggestion_32dp"
+        android:showAsAction="always"
+        />
+</menu>

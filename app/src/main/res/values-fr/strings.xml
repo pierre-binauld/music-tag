@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Music Tag</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="album">Album</string>
+    <string name="album_artist">Artiste de l\'Album</string>
+    <string name="artist">Artiste</string>
+    <string name="composer">Compositeur</string>
+    <string name="disc">N° Disque</string>
+    <string name="file">fichier</string>
+    <string name="files">fichiers</string>
+    <string name="genre">Genre</string>
+    <string name="grouping">Label</string>
+    <string name="setting_preference_activity">Paramètres</string>
+    <string name="source_folder_summary">Choisissez le dossier source de votre librairie.</string>
+    <string name="source_folder_title">Dossier Source</string>
+    <string name="thumbnail">Miniature de la pochette de l\'album.</string>
+    <string name="title">Titre</string>
+    <string name="track">Piste</string>
+    <string name="year">Année</string>
+    <string name="action_valid">Enregistrer</string>
+    <string name="action_download_suggestion" >Suggestions</string>
+</resources>

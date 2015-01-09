@@ -12,10 +12,10 @@ public interface LibraryItem {
      * Check if the item contain an audio file.
      * @return Return true if it is an audio file.
      */
-    public boolean getAudio();
+    public boolean isAudioItem();
 
     /**
-     * Get the primary information of the item (Like song title or folder name).
+     * Get the primary information of the item (Like list_item_placeholder title or folder name).
      * This information should be used for sorting and main display in the list.
      * @return A String of the primary information.
      */
@@ -34,7 +34,15 @@ public interface LibraryItem {
      */
     NodeItem getParent();
 
+    /**
+     * Get the bitmap decoder.
+     * @return The bitmap decoder.
+     */
     BitmapDecoder getDecoder();
 
+    /**
+     * Allow to change the bitmap decoder.
+     * @param bitmapDecoder The bitmap decoder.
+     */
     void switchDecoder(BitmapDecoder bitmapDecoder);
 }

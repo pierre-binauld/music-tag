@@ -79,7 +79,7 @@
                     android:layout_margin="@dimen/text_margin_half"
                     android:layout_weight="3"
                     android:layout_gravity="center_vertical"
-                    android:text="Artist" />
+                    android:text="@string/artist" />
 
                 <TextView
                     android:id="@+id/txt_artist"
@@ -105,7 +105,7 @@
                     android:layout_margin="@dimen/text_margin_half"
                     android:layout_weight="3"
                     android:layout_gravity="center_vertical"
-                    android:text="Album" />
+                    android:text="@string/album" />
 
                 <TextView
                     android:id="@+id/txt_album"
@@ -131,7 +131,7 @@
                     android:layout_margin="@dimen/text_margin_half"
                     android:layout_weight="3"
                     android:layout_gravity="center_vertical"
-                    android:text="Genre" />
+                    android:text="@string/genre" />
 
                 <TextView
                     android:id="@+id/txt_genre"

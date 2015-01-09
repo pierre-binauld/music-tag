@@ -31,6 +31,10 @@ public class Id3TagParcelable extends Id3Tag implements Parcelable {
         }
     }
 
+    public Id3TagParcelable() {
+
+    }
+
     public Id3TagParcelable(AudioFile audioFile) {
         super(audioFile);
     }

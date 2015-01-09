@@ -99,7 +99,6 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
         // Fill views
         fillViews();
-
     }
 
     @Override

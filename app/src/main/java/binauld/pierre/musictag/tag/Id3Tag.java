@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Represent a bundle of id3 tag supported by the app.
  */
-public class Id3Tag {
+public abstract class Id3Tag {
 
     protected HashMap<SupportedTag, String> tags = new HashMap<>();
 

@@ -1,6 +1,8 @@
 package binauld.pierre.musictag.item;
 
 
+import java.util.Comparator;
+
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
 
@@ -9,11 +11,20 @@ import binauld.pierre.musictag.tag.SupportedTag;
  */
 public class SuggestionItem {
 
+    public static Comparator<SuggestionItem> comparator = new Comparator<SuggestionItem>() {
+        @Override
+        public int compare(SuggestionItem item1, SuggestionItem item2) {
+            return item2.getScore() - item1.getScore();
+        }
+    };
+
     private Id3Tag id3Tags;
+    private int score;
     private boolean isSelected;
 
-    public SuggestionItem(Id3Tag id3Tags) {
+    public SuggestionItem(Id3Tag id3Tags, int score) {
         this.id3Tags = id3Tags;
+        this.score = score;
     }
 
     public String getTrack() {
@@ -34,6 +45,18 @@ public class SuggestionItem {
 
     public String getGenre() {
         return id3Tags.get(SupportedTag.GENRE);
+    }
+
+    public String getYear() {
+        return id3Tags.get(SupportedTag.YEAR);
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     public boolean isSelected() {

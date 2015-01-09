@@ -16,7 +16,7 @@ public class SuggestionViewHolder {
     protected TextView txtTitle;
     protected TextView txtArtist;
     protected TextView txtAlbum;
-    protected TextView txtGenre;
+    protected TextView txtYear;
 
     public SuggestionViewHolder(View v) {
 
@@ -26,6 +26,6 @@ public class SuggestionViewHolder {
         this.txtTitle = (TextView) v.findViewById(R.id.txt_title);
         this.txtArtist = (TextView) v.findViewById(R.id.txt_artist);
         this.txtAlbum = (TextView) v.findViewById(R.id.txt_album);
-        this.txtGenre = (TextView) v.findViewById(R.id.txt_genre);
+        this.txtYear = (TextView) v.findViewById(R.id.txt_year);
     }
 }

@@ -21,12 +21,6 @@ public class SuggestionItemAdapter extends BaseAdapter {
         this.selectedPosition = 0;
         this.suggestionItems = new ArrayList<>();
         this.suggestionItems.add(suggestion);
-        this.suggestionItems.add(suggestion);
-        this.suggestionItems.add(suggestion);
-        this.suggestionItems.add(suggestion);
-        this.suggestionItems.add(suggestion);
-        this.suggestionItems.add(suggestion);
-        this.suggestionItems.add(suggestion);
     }
 
     @Override
@@ -74,7 +68,7 @@ public class SuggestionItemAdapter extends BaseAdapter {
             viewHolder.txtTitle.setText(item.getTitle());
             viewHolder.txtAlbum.setText(item.getTAlbum());
             viewHolder.txtArtist.setText(item.getArtist());
-            viewHolder.txtGenre.setText(item.getGenre());
+            viewHolder.txtYear.setText(item.getYear());
 
             viewHolder.rbItem.setChecked(position == selectedPosition);
             if(viewHolder.rbItem.isChecked()) {
@@ -116,5 +110,9 @@ public class SuggestionItemAdapter extends BaseAdapter {
      */
     public SuggestionItem getSelectedSuggestion() {
         return suggestionItems.get(selectedPosition);
+    }
+
+    public void putSuggestions(List<List<SuggestionItem>> lists) {
+        this.suggestionItems.addAll(lists.get(0));
     }
 }

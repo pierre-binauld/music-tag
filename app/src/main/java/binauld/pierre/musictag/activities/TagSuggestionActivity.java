@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.melnykov.fab.FloatingActionButton;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
 import binauld.pierre.musictag.item.SuggestionItem;
+import binauld.pierre.musictag.io.SuggestionLoader;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.Id3TagParcelable;
 
@@ -22,7 +24,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
 
     public static final String TAG_KEY = "id3_tag";
 
-    private Id3Tag id3Tags;
+    private Id3Tag id3Tag;
     private SuggestionItem localSuggestion;
     private SuggestionItemAdapter adapter;
 
@@ -37,22 +39,32 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // Init adapter
+        // Init content
         this.initContent();
 
         // Init adapter
         adapter = new SuggestionItemAdapter(localSuggestion);
 
         // Init List View
-        ListView listView = (ListView) findViewById(R.id.list_suggestion);
+        final ListView listView = (ListView) findViewById(R.id.list_suggestion);
+        final View footer = LayoutInflater.from(this).inflate(R.layout.suggestion_list_footer_view, listView, false);
+        listView.addFooterView(footer);
         listView.setAdapter(adapter);
+
+        // Load content
+        this.loadContent(new Runnable() {
+            @Override
+            public void run() {
+                footer.setVisibility(View.GONE);
+            }
+        });
 
         // Init Floating Action Button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_valid);
         fab.attachToListView(listView);
         fab.setOnClickListener(this);
-    }
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -88,7 +100,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
      * The first one is the one sent with the starting intent.
      */
     private void returnSelectedTag() {
-        if(adapter.isLocalSuggestionSelected()) {
+        if (adapter.isLocalSuggestionSelected()) {
             finishWithCanceledResult();
         } else {
             Intent intent = new Intent();
@@ -112,12 +124,17 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
      * If it is null, then finish.
      */
     private void initContent() {
-        this.id3Tags = (Id3Tag) getIntent().getParcelableExtra(TAG_KEY);
-        if (null == id3Tags) {
+        this.id3Tag = (Id3Tag) getIntent().getParcelableExtra(TAG_KEY);
+        if (null == id3Tag) {
             Log.e(this.getClass().toString(), "No tags has been provided.");
             finishWithCanceledResult();
         } else {
-            localSuggestion = new SuggestionItem(id3Tags);
+            localSuggestion = new SuggestionItem(id3Tag, 101);
         }
+    }
+
+    private void loadContent(Runnable callback) {
+        SuggestionLoader loader = new SuggestionLoader(adapter, callback);
+        loader.execute(id3Tag);
     }
 }

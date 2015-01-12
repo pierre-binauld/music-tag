@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.wrapper;
+package binauld.pierre.musictag.wrapper.musicbrainz;
 
 
 import org.musicbrainz.Controller.Recording;
@@ -8,12 +8,15 @@ import org.musicbrainz.modelWs2.SearchResult.RecordingResultWs2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.ScoredId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
 
 public class MusicBrainzWrapper {
+
+    private QueryBuilder queryBuilder = new QueryBuilder();
 
     public List<ScoredId3Tag> search(Id3Tag tag) {
         List<RecordingResultWs2> results = searchRecordings(tag);
@@ -32,29 +35,35 @@ public class MusicBrainzWrapper {
         RecordingSearchFilterWs2 filter = recording.getSearchFilter();
 
         filter.setLimit(20L);
-        filter.setQuery(tag.get(SupportedTag.TITLE)
-                + " AND artist:" + tag.get(SupportedTag.ARTIST)
-                + " tnum:" + tag.get(SupportedTag.TRACK)
-                + " release:" + tag.get(SupportedTag.ALBUM));
+        filter.setQuery(buildQuery(tag));
 
         recording.search(recording.getSearchFilter().getQuery());
 
         //TODO: Crash if internet not work
-        return recording.getFullSearchResultList();
+        return recording.getFirstSearchResultPage();
+    }
+
+    private String buildQuery(Id3Tag id3Tag) {
+
+        for(Map.Entry<SupportedTag, String> tag : id3Tag.entrySet()) {
+            queryBuilder.append(tag.getKey(), tag.getValue());
+        }
+
+        return queryBuilder.toString();
     }
 
     private Id3Tag build(RecordingResultWs2 recordingResultWs2) {
         RecordingWs2 recordingWs2 = recordingResultWs2.getRecording();
-
+        // Create a new Id3Tag assure to wipe out all tag.
         Id3Tag resultTag = new Id3Tag();
-        resultTag.put(SupportedTag.TITLE, recordingWs2.getTitle());
-        resultTag.put(SupportedTag.ARTIST, recordingWs2.getArtistCreditString());
-        resultTag.put(SupportedTag.YEAR, recordingWs2.getReleases().get(0).getYear());
-        resultTag.put(SupportedTag.ALBUM, recordingWs2.getReleases().get(0).getTitle());
-        resultTag.put(SupportedTag.TRACK, ""+ recordingWs2.getReleases().get(0).getMediumList().getMedia().get(0).getPosition());
+
+        for(Map.Entry<SupportedTag, TagGetter> entry : TagGetter.getters.entrySet()) {
+            resultTag.put(entry.getKey(), entry.getValue().get(recordingWs2));
+        }
 
         return resultTag;
     }
+
 
 
 }

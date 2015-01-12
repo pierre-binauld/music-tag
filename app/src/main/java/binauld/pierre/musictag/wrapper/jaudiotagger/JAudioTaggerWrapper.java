@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.wrapper;
+package binauld.pierre.musictag.wrapper.jaudiotagger;
 
 import android.util.Log;
 

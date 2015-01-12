@@ -1,16 +1,17 @@
-package binauld.pierre.musictag.wrapper;
+package binauld.pierre.musictag.wrapper.jaudiotagger;
 
 import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
-public class NumericTagSetter implements TagSetter {
+public class StringTagSetter implements TagSetter {
+
     @Override
     public void setTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
-        //TODO: if it is blank then remove
-        if (!StringUtils.isBlank(value) && StringUtils.isNumeric(value)) {
-            tags.setField(key, value);
+        if (StringUtils.isBlank(value)) {
+            value = "";
         }
+        tags.setField(key, value);
     }
 }

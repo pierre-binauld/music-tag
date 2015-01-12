@@ -32,7 +32,7 @@ import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.Id3TagParcelable;
 import binauld.pierre.musictag.tag.SupportedTag;
-import binauld.pierre.musictag.wrapper.JAudioTaggerWrapper;
+import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 
 public class TagFormActivity extends Activity implements View.OnClickListener {
 
@@ -160,8 +160,9 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private void callSuggestionActivity() {
         Intent intent = new Intent(this, TagSuggestionActivity.class);
         //TODO: Improve Supported tag logic.
-        Id3Tag tag = jAudioTaggerWrapper.build(audioItem.getAudioFile());
-        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(tag));
+//        Id3Tag tag = jAudioTaggerWrapper.build(audioItem.getAudioFile());
+        updateId3TagFromViews();
+        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(id3Tag));
         startActivityForResult(intent, SUGGESTION_REQUEST_CODE);
     }
 

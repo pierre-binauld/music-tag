@@ -8,7 +8,7 @@ import java.util.List;
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
 import binauld.pierre.musictag.item.SuggestionItem;
 import binauld.pierre.musictag.tag.Id3Tag;
-import binauld.pierre.musictag.wrapper.MusicBrainzWrapper;
+import binauld.pierre.musictag.wrapper.musicbrainz.MusicBrainzWrapper;
 import binauld.pierre.musictag.tag.ScoredId3Tag;
 
 public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<List<SuggestionItem>>> {

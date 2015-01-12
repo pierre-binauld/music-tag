@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.wrapper;
+package binauld.pierre.musictag.wrapper.jaudiotagger;
 
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;

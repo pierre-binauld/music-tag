@@ -5,6 +5,9 @@ import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
+/**
+ * Allow to set a numeric value of a FieldKey in a Tag.
+ */
 public class NumericTagSetter implements TagSetter {
     @Override
     public void setTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {

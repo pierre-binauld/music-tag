@@ -16,6 +16,9 @@ import java.util.Map;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
 
+/**
+ * Wrap the JAudioTagger API for a better implementation in the app.
+ */
 public class JAudioTaggerWrapper {
 
     protected static final HashMap<SupportedTag, FieldKey> fieldKeys;

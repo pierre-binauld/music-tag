@@ -14,10 +14,18 @@ import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.ScoredId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
 
+/**
+ * Wrap the MusicBrainz API for a better implementation in the app.
+ */
 public class MusicBrainzWrapper {
 
     private QueryBuilder queryBuilder = new QueryBuilder();
 
+    /**
+     * Search Id3Tag with its score from an Id3Tag.
+     * @param tag The Id3Tag to search from.
+     * @return Id3Tags found.
+     */
     public List<ScoredId3Tag> search(Id3Tag tag) {
         List<RecordingResultWs2> results = searchRecordings(tag);
 
@@ -30,12 +38,17 @@ public class MusicBrainzWrapper {
         return tags;
     }
 
+    /**
+     * Search recordings from an Id3Tag.
+     * @param tag The Id3Tag to search from.
+     * @return Recordings found.
+     */
     private List<RecordingResultWs2> searchRecordings(Id3Tag tag) {
         Recording recording = new Recording();
         RecordingSearchFilterWs2 filter = recording.getSearchFilter();
 
         filter.setLimit(20L);
-        filter.setQuery(buildQuery(tag));
+        filter.setQuery(queryBuilder.build(tag));
 
         recording.search(recording.getSearchFilter().getQuery());
 
@@ -43,15 +56,11 @@ public class MusicBrainzWrapper {
         return recording.getFirstSearchResultPage();
     }
 
-    private String buildQuery(Id3Tag id3Tag) {
-
-        for(Map.Entry<SupportedTag, String> tag : id3Tag.entrySet()) {
-            queryBuilder.append(tag.getKey(), tag.getValue());
-        }
-
-        return queryBuilder.toString();
-    }
-
+    /**
+     * Build an Id3Tag from a RecordingResultWs2.
+     * @param recordingResultWs2 The RecordingResultWs2 to build from.
+     * @return The Id3Tag built.
+     */
     private Id3Tag build(RecordingResultWs2 recordingResultWs2) {
         RecordingWs2 recordingWs2 = recordingResultWs2.getRecording();
         // Create a new Id3Tag assure to wipe out all tag.

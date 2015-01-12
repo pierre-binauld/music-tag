@@ -10,11 +10,23 @@ import java.util.List;
 
 import binauld.pierre.musictag.tag.SupportedTag;
 
+/**
+ * Allow to get a specific tag from a RecordingWs2 provide by MusicBrainz java API.
+ */
 public abstract class TagGetter {
 
+    /**
+     * Get a specific tag from a RecordingWs2.
+     * @param recordingWs2 A RecordingWs2 provide by MusicBrainz java API.
+     * @return The value of the tag looked up.
+     */
     public abstract String get(RecordingWs2 recordingWs2);
 
-
+    /**
+     * Help children class to get the release of a RecordingWs2.
+     * @param recordingWs2 A RecordingWs2 provide by MusicBrainz java API.
+     * @return The release.
+     */
     protected ReleaseWs2 getRelease(RecordingWs2 recordingWs2) {
         List<ReleaseWs2> releases = recordingWs2.getReleases();
         if (releases.isEmpty()) {
@@ -38,6 +50,9 @@ public abstract class TagGetter {
 //        getters.put(SupportedTag.COMPOSER, new ComposerGetter());
     }
 
+    /**
+     * Getter class to get the title tag.
+     */
     static class TitleGetter extends TagGetter {
         @Override
         public String get(RecordingWs2 recordingWs2) {
@@ -45,6 +60,9 @@ public abstract class TagGetter {
         }
     }
 
+    /**
+     * Getter class to get the artist tag.
+     */
     static class ArtistGetter extends TagGetter {
         @Override
         public String get(RecordingWs2 recordingWs2) {
@@ -52,6 +70,9 @@ public abstract class TagGetter {
         }
     }
 
+    /**
+     * Getter class to get the year tag.
+     */
     static class YearGetter extends TagGetter {
         @Override
         public String get(RecordingWs2 recordingWs2) {
@@ -64,6 +85,9 @@ public abstract class TagGetter {
         }
     }
 
+    /**
+     * Getter class to get the album tag.
+     */
     static class AlbumGetter extends TagGetter {
         @Override
         public String get(RecordingWs2 recordingWs2) {
@@ -76,6 +100,9 @@ public abstract class TagGetter {
         }
     }
 
+    /**
+     * Getter class to get the track tag.
+     */
     static class TrackGetter extends TagGetter {
         @Override
         public String get(RecordingWs2 recordingWs2) {

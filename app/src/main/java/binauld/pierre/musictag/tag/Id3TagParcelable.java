@@ -6,6 +6,9 @@ import android.os.Parcelable;
 
 import java.util.Map;
 
+/**
+ * A wrapper of Id3Tag to make him parcelable.
+ */
 public class Id3TagParcelable implements Parcelable {
 
     public static final Parcelable.Creator<Id3TagParcelable> CREATOR = new Parcelable.Creator<Id3TagParcelable>() {
@@ -36,6 +39,10 @@ public class Id3TagParcelable implements Parcelable {
         this.id3Tag = id3Tag;
     }
 
+    /**
+     * Get the Id3Tag.
+     * @return The Id3Tag.
+     */
     public Id3Tag getId3Tag() {
         return id3Tag;
     }

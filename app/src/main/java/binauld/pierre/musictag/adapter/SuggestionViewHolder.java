@@ -8,6 +8,9 @@ import android.widget.TextView;
 
 import binauld.pierre.musictag.R;
 
+/**
+ * View holder for suggestion item.
+ */
 public class SuggestionViewHolder {
 
     protected CardView card;

@@ -11,7 +11,9 @@ import java.util.List;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.item.SuggestionItem;
 
-
+/**
+ * Adapter for suggestion item.
+ */
 public class SuggestionItemAdapter extends BaseAdapter {
 
     private List<SuggestionItem> suggestionItems;

@@ -34,6 +34,9 @@ import binauld.pierre.musictag.tag.Id3TagParcelable;
 import binauld.pierre.musictag.tag.SupportedTag;
 import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 
+/**
+ * Activity for editing audio tag of one or several track.
+ */
 public class TagFormActivity extends Activity implements View.OnClickListener {
 
     private static AudioItem providedItem;

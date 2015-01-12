@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -104,7 +105,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
             finishWithCanceledResult();
         } else {
             Intent intent = new Intent();
-            intent.putExtra(TAG_KEY, (Id3TagParcelable) adapter.getSelectedSuggestion().getTags());
+            intent.putExtra(TAG_KEY, new Id3TagParcelable(adapter.getSelectedSuggestion().getTags()));
             setResult(RESULT_OK, intent);
         }
         finish();
@@ -124,17 +125,18 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
      * If it is null, then finish.
      */
     private void initContent() {
-        this.id3Tag = (Id3Tag) getIntent().getParcelableExtra(TAG_KEY);
+        this.id3Tag = ((Id3TagParcelable) getIntent().getParcelableExtra(TAG_KEY)).getId3Tag();
+        localSuggestion = new SuggestionItem(id3Tag, 101);
+    }
+
+    //TODO: Stop loader when back pressed
+    private void loadContent(Runnable callback) {
         if (null == id3Tag) {
             Log.e(this.getClass().toString(), "No tags has been provided.");
             finishWithCanceledResult();
         } else {
-            localSuggestion = new SuggestionItem(id3Tag, 101);
+            SuggestionLoader loader = new SuggestionLoader(adapter, callback);
+            loader.execute(id3Tag);
         }
-    }
-
-    private void loadContent(Runnable callback) {
-        SuggestionLoader loader = new SuggestionLoader(adapter, callback);
-        loader.execute(id3Tag);
     }
 }

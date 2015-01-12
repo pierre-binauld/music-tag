@@ -19,12 +19,10 @@ import com.melnykov.fab.ObservableScrollView;
 
 import org.apache.commons.lang.StringUtils;
 import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
-import org.jaudiotagger.tag.FieldDataInvalidException;
-import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.datatype.Artwork;
+
+import java.io.IOException;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
@@ -33,6 +31,8 @@ import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.Id3TagParcelable;
+import binauld.pierre.musictag.tag.SupportedTag;
+import binauld.pierre.musictag.wrapper.JAudioTaggerWrapper;
 
 public class TagFormActivity extends Activity implements View.OnClickListener {
 
@@ -49,6 +49,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private ArtworkService artworkService;
 
     private AudioItem audioItem;
+    private Id3Tag id3Tag;
 
     private ImageView img_artwork;
     private TextView lbl_filename;
@@ -62,6 +63,8 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private EditText txt_genre;
     private EditText txt_disc;
     private EditText txt_track;
+
+    JAudioTaggerWrapper jAudioTaggerWrapper = new JAudioTaggerWrapper();
 
 
     @Override
@@ -98,7 +101,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         initActivityTitle();
 
         // Fill views
-        fillViews();
+        fillViews(id3Tag);
     }
 
     @Override
@@ -140,9 +143,9 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         if (requestCode == SUGGESTION_REQUEST_CODE) {
             switch (resultCode) {
                 case RESULT_OK:
-                    Id3Tag id3Tags = (Id3Tag) data.getParcelableExtra(TagSuggestionActivity.TAG_KEY);
-                    id3Tags.saveInto(audioItem.getAudioFile());
-                    fillViews();
+                    Id3TagParcelable id3TagParcelable = data.getParcelableExtra(TagSuggestionActivity.TAG_KEY);
+                    id3Tag = id3TagParcelable.getId3Tag();
+                    fillViews(id3Tag);
                     break;
                 case RESULT_CANCELED:
                 default:
@@ -156,7 +159,9 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
      */
     private void callSuggestionActivity() {
         Intent intent = new Intent(this, TagSuggestionActivity.class);
-        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(audioItem.getAudioFile()));
+        //TODO: Improve Supported tag logic.
+        Id3Tag tag = jAudioTaggerWrapper.build(audioItem.getAudioFile());
+        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(tag));
         startActivityForResult(intent, SUGGESTION_REQUEST_CODE);
     }
 
@@ -170,6 +175,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             finish();
         } else {
             audioItem = TagFormActivity.providedItem;
+            id3Tag = jAudioTaggerWrapper.build(audioItem.getAudioFile());
         }
     }
 
@@ -194,24 +200,39 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     /**
      * Fill views.
      */
-    private void fillViews() {
+    private void fillViews(Id3Tag id3Tag) {
         AudioFile audioFile = audioItem.getAudioFile();
         Tag tags = audioFile.getTag();
+
         Artwork artwork = tags.getFirstArtwork();
         if (null != artwork) {
             artworkService.setArtwork(audioItem, img_artwork, 200);
         }
+
         lbl_filename.setText(audioFile.getFile().getAbsolutePath());
-        txt_title.setText(tags.getFirst(FieldKey.TITLE));
-        txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
-        txt_album.setText(tags.getFirst(FieldKey.ALBUM));
-        txt_year.setText(tags.getFirst(FieldKey.YEAR));
-        txt_disc.setText(tags.getFirst(FieldKey.DISC_NO));
-        txt_track.setText(tags.getFirst(FieldKey.TRACK));
-        txt_album_artist.setText(tags.getFirst(FieldKey.ALBUM_ARTIST));
-        txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
-        txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
-        txt_genre.setText(tags.getFirst(FieldKey.GENRE));
+        txt_title.setText(id3Tag.get(SupportedTag.TITLE));
+        txt_artist.setText(id3Tag.get(SupportedTag.ARTIST));
+        txt_album.setText(id3Tag.get(SupportedTag.ALBUM));
+        txt_year.setText(id3Tag.get(SupportedTag.YEAR));
+        txt_disc.setText(id3Tag.get(SupportedTag.DISC_NO));
+        txt_track.setText(id3Tag.get(SupportedTag.TRACK));
+        txt_album_artist.setText(id3Tag.get(SupportedTag.ALBUM_ARTIST));
+        txt_composer.setText(id3Tag.get(SupportedTag.COMPOSER));
+        txt_grouping.setText(id3Tag.get(SupportedTag.GROUPING));
+        txt_genre.setText(id3Tag.get(SupportedTag.GENRE));
+    }
+
+    private void updateId3TagFromViews() {
+        id3Tag.put(SupportedTag.TITLE, txt_title.getText().toString());
+        id3Tag.put(SupportedTag.ARTIST, txt_artist.getText().toString());
+        id3Tag.put(SupportedTag.ALBUM, txt_album.getText().toString());
+        id3Tag.put(SupportedTag.ALBUM_ARTIST, txt_album_artist.getText().toString());
+        id3Tag.put(SupportedTag.COMPOSER, txt_composer.getText().toString());
+        id3Tag.put(SupportedTag.GROUPING, txt_grouping.getText().toString());
+        id3Tag.put(SupportedTag.GENRE, txt_genre.getText().toString());
+        id3Tag.put(SupportedTag.YEAR, txt_year.getText().toString());
+        id3Tag.put(SupportedTag.DISC_NO, txt_disc.getText().toString());
+        id3Tag.put(SupportedTag.TRACK, txt_track.getText().toString());
     }
 
     /**
@@ -221,23 +242,11 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         Intent intent = new Intent();
         try {
             AudioFile audioFile = audioItem.getAudioFile();
-            Tag tags = audioFile.getTag();
-            setTagField(tags, FieldKey.TITLE, txt_title.getText().toString());
-            setTagField(tags, FieldKey.ARTIST, txt_artist.getText().toString());
-            setTagField(tags, FieldKey.ALBUM, txt_album.getText().toString());
-            setTagField(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString());
-            setTagField(tags, FieldKey.COMPOSER, txt_composer.getText().toString());
-            setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString());
-            setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString());
-            setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
-            setNumericTagField(tags, FieldKey.DISC_NO, txt_disc.getText().toString());
-            setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
-            audioFile.setTag(tags);
-
-            AudioFileIO.write(audioFile);
+            updateId3TagFromViews();
+            jAudioTaggerWrapper.save(id3Tag, audioFile);
 
             setResult(RESULT_OK, intent);
-        } catch (CannotWriteException | FieldDataInvalidException e) {
+        } catch (IOException e) {
             Log.e(this.getClass().toString(), e.getMessage(), e);
             setResult(RESULT_CANCELED, intent);
         }
@@ -254,19 +263,5 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             title += " - " + audioItem.getSecondaryInformation();
         }
         setTitle(title);
-    }
-
-    //TODO: Use this kind of logic in Id3Tag for saving.
-    private static void setNumericTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
-        if (!StringUtils.isBlank(value) && StringUtils.isNumeric(value)) {
-            tags.setField(key, value);
-        }
-    }
-
-    private static void setTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
-        if (StringUtils.isBlank(value)) {
-            value = "";
-        }
-        tags.setField(key, value);
     }
 }

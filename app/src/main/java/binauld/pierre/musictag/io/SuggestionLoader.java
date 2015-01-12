@@ -13,6 +13,11 @@ import org.jaudiotagger.tag.KeyNotFoundException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.musicbrainz.Controller.Artist;
+import org.musicbrainz.Controller.Recording;
+import org.musicbrainz.modelWs2.Entity.RecordingWs2;
+import org.musicbrainz.modelWs2.SearchResult.ArtistResultWs2;
+import org.musicbrainz.modelWs2.SearchResult.RecordingResultWs2;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -48,13 +53,61 @@ public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<List<Sugge
         int i = 0;
         publishProgress(0);
         for (Id3Tag tag : tags) {
-            infoList.add(search(client, tag));
+//            infoList.add(search(client, tag));
+            infoList.add(search(tag));
             publishProgress(++i);
         }
 
         return infoList;
     }
 
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+    }
+
+    @Override
+    protected void onPostExecute(List<List<SuggestionItem>> lists) {
+        adapter.putSuggestions(lists);
+        adapter.notifyDataSetChanged();
+        callback.run();
+    }
+
+    public List<SuggestionItem> search(Id3Tag tag) {
+
+        Recording recording = new Recording();
+        recording.getSearchFilter().setLimit(20L);
+
+//        recording.getSearchFilter().setTitle(tag.get(SupportedTag.TITLE));
+        recording.getSearchFilter().setQuery(tag.get(SupportedTag.TITLE)
+                + " AND artist:" + tag.get(SupportedTag.ARTIST)
+                + " tnum:" + tag.get(SupportedTag.TRACK)
+                + " release:" + tag.get(SupportedTag.ALBUM));
+
+        recording.search(recording.getSearchFilter().getQuery());
+
+        List<RecordingResultWs2> results = recording.getFullSearchResultList();
+
+        List<SuggestionItem> items = new ArrayList<>();
+        for(RecordingResultWs2 recordingResultWs2 : results) {
+            RecordingWs2 recordingWs2 = recordingResultWs2.getRecording();
+
+            Id3Tag resultTag = new Id3TagParcelable();
+            resultTag.put(SupportedTag.TITLE, recordingWs2.getTitle());
+            resultTag.put(SupportedTag.ARTIST, recordingWs2.getArtistCreditString());
+            resultTag.put(SupportedTag.YEAR, recordingWs2.getReleases().get(0).getYear());
+            resultTag.put(SupportedTag.ALBUM, recordingWs2.getReleases().get(0).getTitle());
+            resultTag.put(SupportedTag.TRACK, ""+ recordingWs2.getReleases().get(0).getMediumList().getMedia().get(0).getPosition());
+
+            SuggestionItem item = new SuggestionItem(resultTag, recordingResultWs2.getScore());
+            items.add(item);
+//            Log.wtf(this.getClass().toString(), item.getTitle());
+        }
+
+        return items;
+    }
+
+    @Deprecated
     private List<SuggestionItem> search(HttpClient client, Id3Tag tag) {
         Set<SuggestionItem> infosSet = new HashSet<>();
 
@@ -85,18 +138,7 @@ public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<List<Sugge
         return infos;
     }
 
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-        super.onProgressUpdate(values);
-    }
-
-    @Override
-    protected void onPostExecute(List<List<SuggestionItem>> lists) {
-        adapter.putSuggestions(lists);
-        adapter.notifyDataSetChanged();
-        callback.run();
-    }
-
+    @Deprecated
     private List<SuggestionItem> searchForQuery(HttpClient client, String title, String artist, String album) {
         List<SuggestionItem> infos = new ArrayList<>();
 

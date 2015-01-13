@@ -89,7 +89,6 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         // Init Floating Action Button
         ObservableScrollView scrollView = (ObservableScrollView) findViewById(R.id.scroll_tag_form);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_valid);
-        fab.attachToScrollView(scrollView);
         fab.setOnClickListener(this);
 
         // Init resources

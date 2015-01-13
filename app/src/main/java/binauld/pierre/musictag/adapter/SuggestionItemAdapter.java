@@ -132,7 +132,7 @@ public class SuggestionItemAdapter extends BaseAdapter {
         return suggestionItems.get(selectedPosition);
     }
 
-    public void putSuggestions(List<List<SuggestionItem>> lists) {
-        this.suggestionItems.addAll(lists.get(0));
+    public void putSuggestions(List<SuggestionItem> items) {
+        this.suggestionItems.addAll(items);
     }
 }

@@ -42,6 +42,8 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
     private View waitingFooter;
     private View reloadFooter;
 
+    private FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,13 +75,13 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
         listView = (ListView) findViewById(R.id.list_suggestion);
         listView.setAdapter(adapter);
 
+        // Init Floating Action Button
+        fab = (FloatingActionButton) findViewById(R.id.fab_valid);
+        fab.setOnClickListener(this);
+
         // Load content
         this.loadContent();
 
-        // Init Floating Action Button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_valid);
-        fab.attachToListView(listView);
-        fab.setOnClickListener(this);
 
     }
 
@@ -162,6 +164,8 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
             finishWithCanceledResult();
         } else if(!isNetworkAvailable()) {
             //TODO: When retry, progress bar is weird.
+            //TODO: Animation
+            fab.hide(true);
             changeFooter(reloadFooter);
             Button retry = (Button) findViewById(R.id.button_retry);
             retry.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +175,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
                 }
             });
         } else {
+            fab.show(true);
             changeFooter(waitingFooter);
             loader = new SuggestionLoader(adapter, new Runnable() {
                 @Override

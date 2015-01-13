@@ -16,7 +16,7 @@ import binauld.pierre.musictag.wrapper.musicbrainz.MusicBrainzWrapper;
 /**
  * An AsyncTask which allow to load suggestions from MusicBrainz.
  */
-public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<List<SuggestionItem>>> {
+public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<SuggestionItem>> {
 
     private MusicBrainzWrapper musicBrainzWrapper = new MusicBrainzWrapper();
     private SuggestionItemAdapter adapter;
@@ -36,26 +36,24 @@ public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<List<Sugge
 
     //TODO: Load asynchronously
     @Override
-    protected List<List<SuggestionItem>> doInBackground(Id3Tag... tags) {
-        List<List<SuggestionItem>> suggestions = new ArrayList<>();
+    protected List<SuggestionItem> doInBackground(Id3Tag... tags) {
+        List<SuggestionItem> items = new ArrayList<>();
 
         for (Id3Tag tag : tags) {
             List<ScoredId3Tag> resultTags = musicBrainzWrapper.search(tag);
-            List<SuggestionItem> items = new ArrayList<>();
             for (ScoredId3Tag resultTag : resultTags) {
                 items.add(new SuggestionItem(resultTag.getTag(), resultTag.getScore()));
             }
-            Collections.sort(items, comparator);
-            suggestions.add(items);
         }
+        Collections.sort(items, comparator);
 
 
-        return suggestions;
+        return items;
     }
 
     @Override
-    protected void onPostExecute(List<List<SuggestionItem>> lists) {
-        adapter.putSuggestions(lists);
+    protected void onPostExecute(List<SuggestionItem> items) {
+        adapter.putSuggestions(items);
         adapter.notifyDataSetChanged();
         callback.run();
     }

@@ -37,5 +37,5 @@ dependencies {
     compile 'com.github.ksoichiro:android-observablescrollview:1.3.1'
     compile 'com.melnykov:floatingactionbutton:1.1.0'
     compile 'org.jdom:jdom-legacy:1.1.3'
-    compile files('lib/MusicBrainzWs2-java.jar')
+    compile files('lib/jdom.jar')
 }

@@ -3,6 +3,7 @@ package binauld.pierre.musictag.activities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
     private Id3Tag id3Tag;
     private SuggestionItem localSuggestion;
     private SuggestionItemAdapter adapter;
+    private SuggestionLoader loader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +46,17 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        // Init resources
+        Resources res = getResources();
+
         // Init title
-        setTitle(getResources().getString(R.string.title_activity_tag_suggestion));
+        setTitle(res.getString(R.string.title_activity_tag_suggestion));
 
         // Init content
         this.initContent();
 
         // Init adapter
-        adapter = new SuggestionItemAdapter(localSuggestion);
+        adapter = new SuggestionItemAdapter(localSuggestion, res);
 
         // Init List View
         final ListView listView = (ListView) findViewById(R.id.list_suggestion);
@@ -104,6 +109,12 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        loader.cancel(true);
+        super.onBackPressed();
+    }
+
     /**
      * Finish and return the selected tag if it is not the first one.
      * The first one is the one sent with the starting intent.
@@ -134,16 +145,20 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
      */
     private void initContent() {
         this.id3Tag = ((Id3TagParcelable) getIntent().getParcelableExtra(TAG_KEY)).getId3Tag();
+        //TODO: Magic Number
         localSuggestion = new SuggestionItem(id3Tag, 101);
     }
 
-    //TODO: Stop loader when back pressed
+    /**
+     * Load suggestions or finish activity if Id3 tag has not been provided.
+     * @param callback Callback call after loading exectuoin.
+     */
     private void loadContent(Runnable callback) {
         if (null == id3Tag) {
             Log.e(this.getClass().toString(), "No tags has been provided.");
             finishWithCanceledResult();
         } else {
-            SuggestionLoader loader = new SuggestionLoader(adapter, callback);
+            loader = new SuggestionLoader(adapter, callback);
             loader.execute(id3Tag);
         }
     }

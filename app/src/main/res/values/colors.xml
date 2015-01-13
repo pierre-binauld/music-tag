@@ -9,5 +9,7 @@
     <color name="color_accent_pressed">#f57c00</color>
     <color name="color_accent_fallback">#f57c00</color>
 
+    <color name="cardview_background_local">#fff3e0</color>
+    <color name="cardview_background">@color/cardview_light_background</color>
 
 </resources>

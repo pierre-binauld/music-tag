@@ -8,8 +8,8 @@ import java.util.List;
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
 import binauld.pierre.musictag.item.SuggestionItem;
 import binauld.pierre.musictag.tag.Id3Tag;
-import binauld.pierre.musictag.wrapper.musicbrainz.MusicBrainzWrapper;
 import binauld.pierre.musictag.tag.ScoredId3Tag;
+import binauld.pierre.musictag.wrapper.musicbrainz.MusicBrainzWrapper;
 
 /**
  * An AsyncTask which allow to load suggestions from MusicBrainz.
@@ -27,27 +27,18 @@ public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<List<Sugge
 
     @Override
     protected List<List<SuggestionItem>> doInBackground(Id3Tag... tags) {
-        //TODO: To review
-        List<List<SuggestionItem>> infoList = new ArrayList<>();
+        List<List<SuggestionItem>> suggestions = new ArrayList<>();
 
-        int i = 0;
-        publishProgress(0);
         for (Id3Tag tag : tags) {
             List<ScoredId3Tag> resultTags = musicBrainzWrapper.search(tag);
             List<SuggestionItem> items = new ArrayList<>();
             for (ScoredId3Tag resultTag : resultTags) {
                 items.add(new SuggestionItem(resultTag.getTag(), resultTag.getScore()));
             }
-            publishProgress(++i);
-            infoList.add(items);
+            suggestions.add(items);
         }
 
-        return infoList;
-    }
-
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-        super.onProgressUpdate(values);
+        return suggestions;
     }
 
     @Override

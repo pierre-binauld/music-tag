@@ -11,7 +11,7 @@ import org.jaudiotagger.tag.Tag;
 public class NumericTagSetter implements TagSetter {
     @Override
     public void setTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
-        //TODO: if it is blank then remove
+        //TODO: if it is blank then remove from tag
         if (!StringUtils.isBlank(value) && StringUtils.isNumeric(value)) {
             tags.setField(key, value);
         }

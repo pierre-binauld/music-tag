@@ -1,5 +1,6 @@
 package binauld.pierre.musictag.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,11 +62,19 @@ public class SuggestionItemAdapter extends BaseAdapter {
             viewHolder = (SuggestionViewHolder) convertView.getTag();
         }
 
+        //TODO: sort by score.
         // object item based on the position
         SuggestionItem item = suggestionItems.get(position);
 
         // assign values if the object is not null
         if (item != null) {
+            if(0 == position) {
+//                viewHolder.card.setBackgroundColor(Color.parseColor("#fff3e0"));
+                //TODO: put this in res
+                viewHolder.card.setBackgroundColor(Color.parseColor("#fff3e0"));
+            } else {
+                viewHolder.card.setBackgroundColor(Color.parseColor("#ffffff"));
+            }
             viewHolder.txtTrack.setText(item.getTrack());
             viewHolder.txtTitle.setText(item.getTitle());
             viewHolder.txtAlbum.setText(item.getTAlbum());

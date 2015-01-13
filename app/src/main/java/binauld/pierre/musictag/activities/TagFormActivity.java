@@ -161,10 +161,8 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
      * Start the suggestion activity.
      */
     private void callSuggestionActivity() {
-        Intent intent = new Intent(this, TagSuggestionActivity.class);
-        //TODO: Improve Supported tag logic.
-//        Id3Tag tag = jAudioTaggerWrapper.build(audioItem.getAudioFile());
         updateId3TagFromViews();
+        Intent intent = new Intent(this, TagSuggestionActivity.class);
         intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(id3Tag));
         startActivityForResult(intent, SUGGESTION_REQUEST_CODE);
     }

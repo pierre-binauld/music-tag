@@ -13,6 +13,8 @@ import android.widget.ListView;
 
 import com.melnykov.fab.FloatingActionButton;
 
+import org.apache.commons.lang.StringUtils;
+
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
 import binauld.pierre.musictag.item.SuggestionItem;
@@ -42,6 +44,9 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        // Init title
+        setTitle(getResources().getString(R.string.title_activity_tag_suggestion));
+
         // Init content
         this.initContent();
 
@@ -58,6 +63,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
         this.loadContent(new Runnable() {
             @Override
             public void run() {
+                //TODO: Is the footer is really gone?
                 footer.setVisibility(View.GONE);
             }
         });
@@ -72,7 +78,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_tag_suggestion, menu);
+//        getMenuInflater().inflate(R.menu.menu_tag_suggestion, menu);
         return true;
     }
 

@@ -14,12 +14,10 @@ import android.widget.ListView;
 
 import com.melnykov.fab.FloatingActionButton;
 
-import org.apache.commons.lang.StringUtils;
-
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
-import binauld.pierre.musictag.item.SuggestionItem;
 import binauld.pierre.musictag.io.SuggestionLoader;
+import binauld.pierre.musictag.item.SuggestionItem;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.Id3TagParcelable;
 
@@ -28,6 +26,7 @@ import binauld.pierre.musictag.tag.Id3TagParcelable;
  */
 public class TagSuggestionActivity extends Activity implements View.OnClickListener {
 
+    public static final int MAX_SCORE_PLUS_ONE = 101;
     public static final String TAG_KEY = "id3_tag";
 
     private Id3Tag id3Tag;
@@ -68,8 +67,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
         this.loadContent(new Runnable() {
             @Override
             public void run() {
-                //TODO: Is the footer is really gone?
-                footer.setVisibility(View.GONE);
+                listView.removeFooterView(footer);
             }
         });
 
@@ -145,8 +143,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
      */
     private void initContent() {
         this.id3Tag = ((Id3TagParcelable) getIntent().getParcelableExtra(TAG_KEY)).getId3Tag();
-        //TODO: Magic Number
-        localSuggestion = new SuggestionItem(id3Tag, 101);
+        localSuggestion = new SuggestionItem(id3Tag, MAX_SCORE_PLUS_ONE);
     }
 
     /**

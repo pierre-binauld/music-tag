@@ -1,7 +1,6 @@
 package binauld.pierre.musictag.adapter;
 
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +75,6 @@ public class SuggestionItemAdapter extends BaseAdapter {
             viewHolder = (SuggestionViewHolder) convertView.getTag();
         }
 
-        //TODO: sort by score.
         // object item based on the position
         SuggestionItem item = suggestionItems.get(position);
 

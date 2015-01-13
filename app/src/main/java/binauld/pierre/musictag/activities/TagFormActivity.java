@@ -171,7 +171,6 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
      * Initialize the audio item and finish if it is not possible.
      */
     private void initContent() {
-        //TODO: maybe crash on suggestion return
         if (null == providedItem) {
             Log.e(this.getClass().toString(), "No item has been provided.");
             finish();

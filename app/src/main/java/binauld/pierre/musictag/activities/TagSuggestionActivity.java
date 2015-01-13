@@ -2,14 +2,18 @@ package binauld.pierre.musictag.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.melnykov.fab.FloatingActionButton;
@@ -34,6 +38,10 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
     private SuggestionItemAdapter adapter;
     private SuggestionLoader loader;
 
+    private ListView listView;
+    private View waitingFooter;
+    private View reloadFooter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,19 +65,16 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
         // Init adapter
         adapter = new SuggestionItemAdapter(localSuggestion, res);
 
+        // Init footer
+        waitingFooter = LayoutInflater.from(this).inflate(R.layout.suggestion_list_waiting_footer_view, listView, false);
+        reloadFooter = LayoutInflater.from(this).inflate(R.layout.suggestion_list_retry_footer_view, listView, false);
+
         // Init List View
-        final ListView listView = (ListView) findViewById(R.id.list_suggestion);
-        final View footer = LayoutInflater.from(this).inflate(R.layout.suggestion_list_footer_view, listView, false);
-        listView.addFooterView(footer);
+        listView = (ListView) findViewById(R.id.list_suggestion);
         listView.setAdapter(adapter);
 
         // Load content
-        this.loadContent(new Runnable() {
-            @Override
-            public void run() {
-                listView.removeFooterView(footer);
-            }
-        });
+        this.loadContent();
 
         // Init Floating Action Button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_valid);
@@ -109,7 +114,9 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
-        loader.cancel(true);
+        if(null != loader) {
+            loader.cancel(true);
+        }
         super.onBackPressed();
     }
 
@@ -148,15 +155,56 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
 
     /**
      * Load suggestions or finish activity if Id3 tag has not been provided.
-     * @param callback Callback call after loading exectuoin.
      */
-    private void loadContent(Runnable callback) {
+    private void loadContent() {
         if (null == id3Tag) {
             Log.e(this.getClass().toString(), "No tags has been provided.");
             finishWithCanceledResult();
+        } else if(!isNetworkAvailable()) {
+            //TODO: When retry, progress bar is weird.
+            changeFooter(reloadFooter);
+            Button retry = (Button) findViewById(R.id.button_retry);
+            retry.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    loadContent();
+                }
+            });
         } else {
-            loader = new SuggestionLoader(adapter, callback);
+            changeFooter(waitingFooter);
+            loader = new SuggestionLoader(adapter, new Runnable() {
+                @Override
+                public void run() {
+                    changeFooter(null);
+                }
+            });
             loader.execute(id3Tag);
         }
     }
+
+    /**
+     * Change the list view footer.
+     * If footer is null, then just remove the footer.
+     * @param footer The footer.
+     */
+    private void changeFooter(View footer) {
+        listView.removeFooterView(waitingFooter);
+        listView.removeFooterView(reloadFooter);
+        if(null != footer) {
+            listView.addFooterView(footer);
+        }
+    }
+
+    /**
+     * Check the network is available.
+     * @return A boolean.
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
 }

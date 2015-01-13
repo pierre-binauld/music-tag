@@ -52,7 +52,6 @@ public class MusicBrainzWrapper {
 
         recording.search(recording.getSearchFilter().getQuery());
 
-        //TODO: Crash if internet not work
         return recording.getFirstSearchResultPage();
     }
 
@@ -72,7 +71,4 @@ public class MusicBrainzWrapper {
 
         return resultTag;
     }
-
-
-
 }

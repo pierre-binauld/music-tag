@@ -38,6 +38,10 @@
             android:name=".activities.TagSuggestionActivity"
             android:label="@string/title_activity_tag_suggestion" >
         </activity>
+        <activity
+            android:name=".activities.OrganisationActivity"
+            android:label="@string/title_activity_organisation" >
+        </activity>
     </application>
 
 </manifest>

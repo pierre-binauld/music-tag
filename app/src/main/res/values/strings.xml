@@ -21,6 +21,8 @@
     <string name="disc">Disc No</string>
     <string name="track">Track</string>
     <string name="title_activity_tag_suggestion">TagSuggestionActivity</string>
+    <string name="title_activity_organisation">OrganisationActivity</string>
+    <string name="action_organisation">Organisation</string>
     <string name="action_download_suggestion">Suggestions</string>
 
 </resources>

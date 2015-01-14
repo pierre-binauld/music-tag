@@ -7,4 +7,10 @@
         android:orderInCategory="100"
         android:icon="@drawable/ic_settings_white_48dp"
         android:showAsAction="never" />
+    <item
+        android:id="@+id/action_organisation"
+        android:title="@string/action_organisation"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_settings_white_48dp"
+        android:showAsAction="always" />
 </menu>

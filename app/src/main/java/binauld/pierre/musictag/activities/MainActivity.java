@@ -152,6 +152,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 return true;
             case R.id.action_organisation:
                 Intent intent2 = new Intent(this, OrganisationActivity.class);
+                FolderItem folder = (FolderItem) adapter.getCurrentNode();
+                OrganisationActivity.root = folder.getFile();
                 startActivity(intent2);
                 return true;
             default:

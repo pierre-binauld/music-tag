@@ -2,6 +2,7 @@ package binauld.pierre.musictag.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,10 +13,31 @@ import android.widget.EditText;
 import com.melnykov.fab.FloatingActionButton;
 import com.melnykov.fab.ObservableScrollView;
 
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.item.FolderItem;
 
 public class OrganisationActivity extends Activity implements View.OnClickListener {
     private EditText placeholder;
+    public static File root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +146,138 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
     }
 
     private void processOrganisation() {
-        Log.e("ProcessOrganisation", "TODOOOOOOOOOOOOOOOOOOOOO");
+        List<File> files = recursiveDirectoryContent(root);
+        String placeholderContent = placeholder.getText().toString();
+        //list all music files
+        for(File f : files){
+            AudioFile audio = null;
+            try {
+                audio = AudioFileIO.read(f);
+            } catch (CannotReadException e) {
+                Log.e("error", e.getMessage());
+            } catch (IOException e) {
+                Log.e("error", e.getMessage());
+            } catch (TagException e) {
+                Log.e("error", e.getMessage());
+            } catch (ReadOnlyFileException e) {
+                Log.e("error", e.getMessage());
+            } catch (InvalidAudioFrameException e) {
+                Log.e("error", e.getMessage());
+            }
+            String newPath = formatePath(placeholderContent, audio);
+
+            Log.e("New Path : ", newPath);
+
+        }
+    }
+
+    private String formatePath(String placeholder, AudioFile audio){
+        String newPath = new String(placeholder);
+        Tag tags = audio.getTag();
+
+        String title = "\\{title\\}";
+        String artist = "\\{artist\\}";
+        String album = "\\{album\\}";
+        String year = "\\{year\\}";
+        String disc = "\\{disc\\}";
+        String track = "\\{track\\}";
+        String album_artist = "\\{album_artist\\}";
+        String composer = "\\{composer\\}";
+        String grouping = "\\{grouping\\}";
+        String genre = "\\{genre\\}";
+
+        String newTitle = getTheTag(title, tags, FieldKey.TITLE);
+        String newArtist = getTheTag(artist, tags, FieldKey.ARTIST);
+        String newAlbum = getTheTag(album, tags, FieldKey.ALBUM);
+        String newYear = getTheTag(year, tags, FieldKey.YEAR);
+        String newDisc = getTheTag(disc, tags, FieldKey.DISC_NO);
+        String newTrack = getTheTag(track, tags, FieldKey.TRACK);
+        String newAlbumArtist = getTheTag(album_artist, tags, FieldKey.ALBUM_ARTIST);
+        String newComposer = getTheTag(composer, tags, FieldKey.COMPOSER);
+        String newGrouping = getTheTag(grouping, tags, FieldKey.GROUPING);
+        String newGenre = getTheTag(genre, tags, FieldKey.GENRE);
+
+        newPath = newPath.replaceAll(title, newTitle);
+        newPath = newPath.replaceAll(artist, newArtist);
+        newPath = newPath.replaceAll(album, newAlbum);
+        newPath = newPath.replaceAll(year, newYear);
+        newPath = newPath.replaceAll(disc, newDisc);
+        newPath = newPath.replaceAll(track, newTrack);
+        newPath = newPath.replaceAll(album_artist, newAlbumArtist);
+        newPath = newPath.replaceAll(composer, newComposer);
+        newPath = newPath.replaceAll(grouping, newGrouping);
+        newPath = newPath.replaceAll(genre, newGenre);
+
+        return newPath;
+    }
+
+    public String getTheTag(String component, Tag tags, FieldKey id){
+        if(tags != null && tags.getFirst(id) != null && !tags.getFirst(id).equals("")) {
+            return tags.getFirst(id);
+        }else {
+            return component;
+        }
+    }
+
+    public List<File> recursiveDirectoryContent(File folder){
+        File[] filesInFolder = folder.listFiles();
+        List<File> files = new ArrayList<>();
+        for(File f : filesInFolder){
+            if (f.isDirectory()){
+                List<File> filesInSubFolder = recursiveDirectoryContent(f);
+                for(File file : filesInSubFolder) {
+                    files.add(file);
+                }
+            }
+            else{
+                files.add(f);
+            }
+        }
+        return files;
+    }
+
+    private void moveFile(String inputPath, String inputFile, String outputPath) {
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+
+            //create output directory if it doesn't exist
+            File dir = new File (outputPath);
+            if (!dir.exists())
+            {
+                dir.mkdirs();
+            }
+
+
+            in = new FileInputStream(inputPath + inputFile);
+            out = new FileOutputStream(outputPath + inputFile);
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            in = null;
+
+            // write the output file
+            out.flush();
+            out.close();
+            out = null;
+
+            // delete the original file
+            new File(inputPath + inputFile).delete();
+
+
+        }
+
+        catch (FileNotFoundException fnfe1) {
+            Log.e("tag", fnfe1.getMessage());
+        }
+        catch (Exception e) {
+            Log.e("tag", e.getMessage());
+        }
+
     }
 }

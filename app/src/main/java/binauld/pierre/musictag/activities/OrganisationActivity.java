@@ -2,7 +2,6 @@ package binauld.pierre.musictag.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.melnykov.fab.FloatingActionButton;
-import com.melnykov.fab.ObservableScrollView;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -33,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.item.FolderItem;
 
 public class OrganisationActivity extends Activity implements View.OnClickListener {
     private EditText placeholder;
@@ -153,15 +150,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             AudioFile audio = null;
             try {
                 audio = AudioFileIO.read(f);
-            } catch (CannotReadException e) {
-                Log.e("error", e.getMessage());
-            } catch (IOException e) {
-                Log.e("error", e.getMessage());
-            } catch (TagException e) {
-                Log.e("error", e.getMessage());
-            } catch (ReadOnlyFileException e) {
-                Log.e("error", e.getMessage());
-            } catch (InvalidAudioFrameException e) {
+            } catch (CannotReadException | InvalidAudioFrameException | ReadOnlyFileException | TagException | IOException e) {
                 Log.e("error", e.getMessage());
             }
             String newPath = formatePath(placeholderContent, audio);
@@ -172,7 +161,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
     }
 
     private String formatePath(String placeholder, AudioFile audio){
-        String newPath = new String(placeholder);
+        String newPath = placeholder;
         Tag tags = audio.getTag();
 
         String title = "\\{title\\}";
@@ -238,8 +227,8 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
 
     private void moveFile(String inputPath, String inputFile, String outputPath) {
 
-        InputStream in = null;
-        OutputStream out = null;
+        InputStream in;
+        OutputStream out;
         try {
 
             //create output directory if it doesn't exist
@@ -259,12 +248,10 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
                 out.write(buffer, 0, read);
             }
             in.close();
-            in = null;
 
             // write the output file
             out.flush();
             out.close();
-            out = null;
 
             // delete the original file
             new File(inputPath + inputFile).delete();

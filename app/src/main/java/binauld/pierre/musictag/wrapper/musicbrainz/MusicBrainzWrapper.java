@@ -20,14 +20,32 @@ import binauld.pierre.musictag.tag.SupportedTag;
 public class MusicBrainzWrapper {
 
     private QueryBuilder queryBuilder = new QueryBuilder();
+    private Recording recording;
+    private boolean firstPage;
+
+    public void initQuery(Id3Tag id3Tag, long pageLimit) {
+        firstPage = true;
+        recording = new Recording();
+        RecordingSearchFilterWs2 filter = recording.getSearchFilter();
+
+        filter.setLimit(pageLimit);
+        filter.setQuery(queryBuilder.build(id3Tag));
+
+        recording.search(recording.getSearchFilter().getQuery());
+    }
 
     /**
      * Search Id3Tag with its score from an Id3Tag.
-     * @param tag The Id3Tag to search from.
      * @return Id3Tags found.
      */
-    public List<ScoredId3Tag> search(Id3Tag tag) {
-        List<RecordingResultWs2> results = searchRecordings(tag);
+    public List<ScoredId3Tag> nextSearchPage() {
+        List<RecordingResultWs2> results;
+        if(firstPage) {
+            results = recording.getFirstSearchResultPage();
+            firstPage = false;
+        } else {
+            results = recording.getNextSearchResultPage();
+        }
 
         List<ScoredId3Tag> tags = new ArrayList<>();
         for(RecordingResultWs2 recordingResultWs2 : results) {
@@ -44,13 +62,13 @@ public class MusicBrainzWrapper {
      * @return Recordings found.
      */
     private List<RecordingResultWs2> searchRecordings(Id3Tag tag) {
-        Recording recording = new Recording();
-        RecordingSearchFilterWs2 filter = recording.getSearchFilter();
-
-        filter.setLimit(20L);
-        filter.setQuery(queryBuilder.build(tag));
-
-        recording.search(recording.getSearchFilter().getQuery());
+//        Recording recording = new Recording();
+//        RecordingSearchFilterWs2 filter = recording.getSearchFilter();
+//
+//        filter.setLimit(20L);
+//        filter.setQuery(queryBuilder.build(tag));
+//
+//        recording.search(recording.getSearchFilter().getQuery());
 
         return recording.getFirstSearchResultPage();
     }

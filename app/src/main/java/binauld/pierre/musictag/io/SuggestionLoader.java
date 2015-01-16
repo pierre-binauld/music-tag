@@ -3,7 +3,6 @@ package binauld.pierre.musictag.io;
 import android.os.AsyncTask;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import binauld.pierre.musictag.wrapper.musicbrainz.MusicBrainzWrapper;
 /**
  * An AsyncTask which allow to load suggestions from MusicBrainz.
  */
-public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<SuggestionItem>> {
+public class SuggestionLoader extends AsyncTask<Id3Tag, List<SuggestionItem>, Integer> {
 
     private MusicBrainzWrapper musicBrainzWrapper = new MusicBrainzWrapper();
     private SuggestionItemAdapter adapter;
@@ -36,25 +35,36 @@ public class SuggestionLoader extends AsyncTask<Id3Tag, Integer, List<Suggestion
 
     //TODO: Load asynchronously
     @Override
-    protected List<SuggestionItem> doInBackground(Id3Tag... tags) {
-        List<SuggestionItem> items = new ArrayList<>();
+    protected Integer doInBackground(Id3Tag... tags) {
 
+        int count = 0;
         for (Id3Tag tag : tags) {
-            List<ScoredId3Tag> resultTags = musicBrainzWrapper.search(tag);
-            for (ScoredId3Tag resultTag : resultTags) {
-                items.add(new SuggestionItem(resultTag.getTag(), resultTag.getScore()));
+            musicBrainzWrapper.initQuery(tag, 1L);
+            for(int i=0; i<20;i++) {
+                List<SuggestionItem> items = new ArrayList<>();
+                List<ScoredId3Tag> resultTags = musicBrainzWrapper.nextSearchPage();
+                for (ScoredId3Tag resultTag : resultTags) {
+                    items.add(new SuggestionItem(resultTag.getTag(), resultTag.getScore()));
+                }
+//                Collections.sort(items, comparator);
+                publishProgress(items);
+                count += items.size();
             }
         }
-        Collections.sort(items, comparator);
 
-
-        return items;
+        return count;
     }
 
     @Override
-    protected void onPostExecute(List<SuggestionItem> items) {
-        adapter.putSuggestions(items);
+    protected void onProgressUpdate(List<SuggestionItem>... values) {
+        for(List<SuggestionItem> items : values) {
+            adapter.putSuggestions(items);
+        }
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onPostExecute(Integer count) {
         callback.run();
     }
 

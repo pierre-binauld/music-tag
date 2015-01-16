@@ -146,7 +146,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             switch (resultCode) {
                 case RESULT_OK:
                     Id3TagParcelable id3TagParcelable = data.getParcelableExtra(TagSuggestionActivity.TAG_KEY);
-                    id3Tag = id3TagParcelable.getId3Tag();
+                    id3Tag.update(id3TagParcelable.getId3Tag());
                     fillViews(id3Tag);
                     break;
                 case RESULT_CANCELED:

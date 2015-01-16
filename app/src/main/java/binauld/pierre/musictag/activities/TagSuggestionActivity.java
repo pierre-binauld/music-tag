@@ -165,6 +165,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
         } else if(!isNetworkAvailable()) {
             //TODO: When retry, progress bar is weird.
             //TODO: Animation
+            //TODO: Do not recreate page when conf change.
             fab.hide(true);
             changeFooter(reloadFooter);
             Button retry = (Button) findViewById(R.id.button_retry);

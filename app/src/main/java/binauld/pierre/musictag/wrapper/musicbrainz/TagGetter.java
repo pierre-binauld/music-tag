@@ -45,9 +45,10 @@ public abstract class TagGetter {
         getters.put(SupportedTag.YEAR, new YearGetter());
         getters.put(SupportedTag.TRACK, new TrackGetter());
 //        getters.put(SupportedTag.DISC_NO, new DiscNoGetter());
-//        getters.put(SupportedTag.GROUPING, new GroupingGetter());
-//        getters.put(SupportedTag.GENRE, new GenreGetter());
 //        getters.put(SupportedTag.COMPOSER, new ComposerGetter());
+
+        //TODO: Have to do a lookup to find more tags
+        getters.put(SupportedTag.GROUPING, new GroupingGetter());
     }
 
     /**
@@ -128,6 +129,22 @@ public abstract class TagGetter {
             }
 
             return String.valueOf(medium.getPosition());
+        }
+    }
+
+    /**
+     * Getter class to get the composer tag.
+     */
+    static class GroupingGetter extends TagGetter {
+        @Override
+        public String get(RecordingWs2 recordingWs2) {
+
+            ReleaseWs2 release = getRelease(recordingWs2);
+            if (null == release) {
+                return "";
+            }
+
+            return release.getLabelInfoString();
         }
     }
 }

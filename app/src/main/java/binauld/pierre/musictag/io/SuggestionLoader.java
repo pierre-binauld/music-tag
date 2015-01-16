@@ -33,14 +33,14 @@ public class SuggestionLoader extends AsyncTask<Id3Tag, List<SuggestionItem>, In
         this.callback = callback;
     }
 
-    //TODO: Load asynchronously
     @Override
     protected Integer doInBackground(Id3Tag... tags) {
 
         int count = 0;
         for (Id3Tag tag : tags) {
-            musicBrainzWrapper.initQuery(tag, 1L);
-            for(int i=0; i<20;i++) {
+            musicBrainzWrapper.initQuery(tag, 3L);
+            //TODO: Magic number !
+            for(int i=0; i<7;i++) {
                 List<SuggestionItem> items = new ArrayList<>();
                 List<ScoredId3Tag> resultTags = musicBrainzWrapper.nextSearchPage();
                 for (ScoredId3Tag resultTag : resultTags) {

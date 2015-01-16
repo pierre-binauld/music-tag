@@ -57,30 +57,12 @@ public class MusicBrainzWrapper {
     }
 
     /**
-     * Search recordings from an Id3Tag.
-     * @param tag The Id3Tag to search from.
-     * @return Recordings found.
-     */
-    private List<RecordingResultWs2> searchRecordings(Id3Tag tag) {
-//        Recording recording = new Recording();
-//        RecordingSearchFilterWs2 filter = recording.getSearchFilter();
-//
-//        filter.setLimit(20L);
-//        filter.setQuery(queryBuilder.build(tag));
-//
-//        recording.search(recording.getSearchFilter().getQuery());
-
-        return recording.getFirstSearchResultPage();
-    }
-
-    /**
      * Build an Id3Tag from a RecordingResultWs2.
      * @param recordingResultWs2 The RecordingResultWs2 to build from.
      * @return The Id3Tag built.
      */
     private Id3Tag build(RecordingResultWs2 recordingResultWs2) {
         RecordingWs2 recordingWs2 = recordingResultWs2.getRecording();
-        // Create a new Id3Tag assure to wipe out all tag.
         Id3Tag resultTag = new Id3Tag();
 
         for(Map.Entry<SupportedTag, TagGetter> entry : TagGetter.getters.entrySet()) {

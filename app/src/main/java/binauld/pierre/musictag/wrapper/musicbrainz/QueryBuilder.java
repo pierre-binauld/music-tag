@@ -20,12 +20,14 @@ public class QueryBuilder {
         parameters.put(SupportedTag.ARTIST, "artist");
         parameters.put(SupportedTag.TRACK, "tnum");
         parameters.put(SupportedTag.ALBUM, "release");
-//        parameters.put(SupportedTag.ALBUM_ARTIST, "");
+        parameters.put(SupportedTag.ALBUM_ARTIST, "artistname");
+        parameters.put(SupportedTag.DISC_NO, "position");
+        parameters.put(SupportedTag.YEAR, "date");
+
+        //TODO: Have to do a lookup to find more tags
 //        parameters.put(SupportedTag.COMPOSER, "");
 //        parameters.put(SupportedTag.GROUPING, "");
 //        parameters.put(SupportedTag.GENRE, "");
-//        parameters.put(SupportedTag.DISC_NO, "");
-//        parameters.put(SupportedTag.YEAR, "");
     }
 
     StringBuilder query = new StringBuilder();

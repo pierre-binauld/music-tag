@@ -21,4 +21,9 @@
     <string name="action_valid">Enregistrer</string>
     <string name="action_download_suggestion" >Suggestions</string>
     <string name="action_organisation">Organisation</string>
+    <string name="underscore">_</string>
+    <string name="slash">/</string>
+    <string name="hyphen">-</string>
+    <string name="space">Espace</string>
+    <string name="unknown">Inconnu</string>
 </resources>

@@ -24,5 +24,10 @@
     <string name="title_activity_organisation">OrganisationActivity</string>
     <string name="action_organisation">Organisation</string>
     <string name="action_download_suggestion">Suggestions</string>
+    <string name="underscore">_</string>
+    <string name="slash">/</string>
+    <string name="hyphen">-</string>
+    <string name="space">Space</string>
+    <string name="unknown">Unknown</string>
 
 </resources>

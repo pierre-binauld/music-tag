@@ -65,6 +65,14 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         btn_grouping.setOnClickListener(this);
         Button btn_genre = (Button) findViewById(R.id.btn_genre);
         btn_genre.setOnClickListener(this);
+        Button btn_space = (Button) findViewById(R.id.btn_space);
+        btn_space.setOnClickListener(this);
+        Button btn_hyphen = (Button) findViewById(R.id.btn_hyphen);
+        btn_hyphen.setOnClickListener(this);
+        Button btn_underscore = (Button) findViewById(R.id.btn_underscore);
+        btn_underscore.setOnClickListener(this);
+        Button btn_slash = (Button) findViewById(R.id.btn_slash);
+        btn_slash.setOnClickListener(this);
 
     }
 
@@ -127,6 +135,18 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             case R.id.btn_genre:
                 addContentToPlaceHolder("{genre}");
                 break;
+            case R.id.btn_slash:
+                addContentToPlaceHolder("/");
+                break;
+            case R.id.btn_hyphen:
+                addContentToPlaceHolder("-");
+                break;
+            case R.id.btn_underscore:
+                addContentToPlaceHolder("_");
+                break;
+            case R.id.btn_space:
+                addContentToPlaceHolder(" ");
+                break;
             default:
                 break;
         }
@@ -153,10 +173,11 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             } catch (CannotReadException | InvalidAudioFrameException | ReadOnlyFileException | TagException | IOException e) {
                 Log.e("error", e.getMessage());
             }
-            String newPath = formatePath(placeholderContent, audio);
+            String newPath = root.getPath() + "/" + formatePath(placeholderContent, audio) + "/";
+            String oldPath = f.getPath().substring(0,f.getPath().lastIndexOf("/")) + "/";
 
-            Log.e("New Path : ", newPath);
-
+            moveFile(oldPath, f.getName(), newPath);
+            deleteEmptyFolders(root);
         }
     }
 
@@ -175,16 +196,16 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         String grouping = "\\{grouping\\}";
         String genre = "\\{genre\\}";
 
-        String newTitle = getTheTag(title, tags, FieldKey.TITLE);
-        String newArtist = getTheTag(artist, tags, FieldKey.ARTIST);
-        String newAlbum = getTheTag(album, tags, FieldKey.ALBUM);
-        String newYear = getTheTag(year, tags, FieldKey.YEAR);
-        String newDisc = getTheTag(disc, tags, FieldKey.DISC_NO);
-        String newTrack = getTheTag(track, tags, FieldKey.TRACK);
-        String newAlbumArtist = getTheTag(album_artist, tags, FieldKey.ALBUM_ARTIST);
-        String newComposer = getTheTag(composer, tags, FieldKey.COMPOSER);
-        String newGrouping = getTheTag(grouping, tags, FieldKey.GROUPING);
-        String newGenre = getTheTag(genre, tags, FieldKey.GENRE);
+        String newTitle = getTheTag(tags, FieldKey.TITLE);
+        String newArtist = getTheTag(tags, FieldKey.ARTIST);
+        String newAlbum = getTheTag(tags, FieldKey.ALBUM);
+        String newYear = getTheTag(tags, FieldKey.YEAR);
+        String newDisc = getTheTag(tags, FieldKey.DISC_NO);
+        String newTrack = getTheTag(tags, FieldKey.TRACK);
+        String newAlbumArtist = getTheTag(tags, FieldKey.ALBUM_ARTIST);
+        String newComposer = getTheTag(tags, FieldKey.COMPOSER);
+        String newGrouping = getTheTag(tags, FieldKey.GROUPING);
+        String newGenre = getTheTag(tags, FieldKey.GENRE);
 
         newPath = newPath.replaceAll(title, newTitle);
         newPath = newPath.replaceAll(artist, newArtist);
@@ -200,11 +221,11 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         return newPath;
     }
 
-    public String getTheTag(String component, Tag tags, FieldKey id){
+    public String getTheTag(Tag tags, FieldKey id){
         if(tags != null && tags.getFirst(id) != null && !tags.getFirst(id).equals("")) {
             return tags.getFirst(id);
         }else {
-            return component;
+            return getString(R.string.unknown);
         }
     }
 
@@ -237,8 +258,6 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             {
                 dir.mkdirs();
             }
-
-
             in = new FileInputStream(inputPath + inputFile);
             out = new FileOutputStream(outputPath + inputFile);
 
@@ -255,8 +274,6 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
 
             // delete the original file
             new File(inputPath + inputFile).delete();
-
-
         }
 
         catch (FileNotFoundException fnfe1) {
@@ -266,5 +283,31 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             Log.e("tag", e.getMessage());
         }
 
+    }
+
+    private boolean deleteEmptyFolders(File file){
+        if (file.isDirectory()) {
+            String[] children = file.list();
+            if(children.length == 0){
+                Log.e("To Delete", file.getName());
+                file.delete();
+                return true;
+            }
+            else {
+                boolean test = false;
+                for (int i = 0; i < children.length; i++) {
+                    if(deleteEmptyFolders(new File(file, children[i]))){
+                        test = true;
+                    }
+                }
+                if(test) {
+                    return deleteEmptyFolders(file);
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 }

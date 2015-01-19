@@ -11,6 +11,9 @@ import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.service.CacheService;
 
+/**
+ * Load an artwork in background.
+ */
 public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
 
     private final WeakReference<ImageView> imageViewReference;
@@ -27,7 +30,6 @@ public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
         this.artworkSize = artworkSize;
     }
 
-    // Decode image in background.
     @Override
     protected Bitmap doInBackground(LibraryItem... items) {
         item = items[0];
@@ -45,7 +47,6 @@ public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
         return bitmap;
     }
 
-    // Once complete, see if ImageView is still around and set bitmap.
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         if (isCancelled()) {

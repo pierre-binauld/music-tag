@@ -20,7 +20,9 @@
     <string name="genre">Genre</string>
     <string name="disc">Disc No</string>
     <string name="track">Track</string>
-    <string name="title_activity_tag_suggestion">TagSuggestionActivity</string>
+    <string name="title_activity_tag_suggestion">Suggestions from MusicBrainz</string>
     <string name="action_download_suggestion">Suggestions</string>
+    <string name="invalid_connection_state_message">No internet connection !</string>
+    <string name="retry">Retry</string>
 
 </resources>

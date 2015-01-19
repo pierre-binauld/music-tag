@@ -1,5 +1,6 @@
 package binauld.pierre.musictag.adapter;
 
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,16 +12,31 @@ import java.util.List;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.item.SuggestionItem;
 
-
+/**
+ * Adapter for suggestion item.
+ */
 public class SuggestionItemAdapter extends BaseAdapter {
 
     private List<SuggestionItem> suggestionItems;
     private int selectedPosition;
 
-    public SuggestionItemAdapter(SuggestionItem suggestion) {
+    private int defaultBackgroundColor;
+    private int localBackgroundColor;
+
+    private int cardElevation;
+    private int selectedCardElevation;
+
+
+    public SuggestionItemAdapter(SuggestionItem suggestion, Resources res) {
         this.selectedPosition = 0;
         this.suggestionItems = new ArrayList<>();
         this.suggestionItems.add(suggestion);
+
+        this.localBackgroundColor = res.getColor(R.color.cardview_background_local);
+        this.defaultBackgroundColor = res.getColor(R.color.cardview_background);
+
+        this.cardElevation = res.getInteger(R.integer.cardview_elevation);
+        this.selectedCardElevation = res.getInteger(R.integer.cardview_elevation_selected);
     }
 
     @Override
@@ -64,6 +80,11 @@ public class SuggestionItemAdapter extends BaseAdapter {
 
         // assign values if the object is not null
         if (item != null) {
+            if(0 == position) {
+                viewHolder.card.setBackgroundColor(localBackgroundColor);
+            } else {
+                viewHolder.card.setBackgroundColor(defaultBackgroundColor);
+            }
             viewHolder.txtTrack.setText(item.getTrack());
             viewHolder.txtTitle.setText(item.getTitle());
             viewHolder.txtAlbum.setText(item.getTAlbum());
@@ -72,10 +93,9 @@ public class SuggestionItemAdapter extends BaseAdapter {
 
             viewHolder.rbItem.setChecked(position == selectedPosition);
             if(viewHolder.rbItem.isChecked()) {
-                //TODO: put this in res
-                viewHolder.card.setCardElevation(10);
+                viewHolder.card.setCardElevation(selectedCardElevation);
             } else {
-                viewHolder.card.setCardElevation(3);
+                viewHolder.card.setCardElevation(cardElevation);
             }
             viewHolder.card.setTag(position);
             viewHolder.card.setOnClickListener(new View.OnClickListener() {
@@ -112,7 +132,7 @@ public class SuggestionItemAdapter extends BaseAdapter {
         return suggestionItems.get(selectedPosition);
     }
 
-    public void putSuggestions(List<List<SuggestionItem>> lists) {
-        this.suggestionItems.addAll(lists.get(0));
+    public void putSuggestions(List<SuggestionItem> items) {
+        this.suggestionItems.addAll(items);
     }
 }

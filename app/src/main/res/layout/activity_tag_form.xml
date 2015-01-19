@@ -200,7 +200,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_action_done_24dp"
+        android:src="@drawable/ic_action_content_save_24dp"
         fab:fab_colorNormal="@color/color_accent"
         fab:fab_colorPressed="@color/color_accent_pressed"
         fab:fab_colorRipple="@color/color_accent_hover" />

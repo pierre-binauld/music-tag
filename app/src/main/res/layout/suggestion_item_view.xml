@@ -131,11 +131,7 @@
                     android:layout_margin="@dimen/text_margin_half"
                     android:layout_weight="3"
                     android:layout_gravity="center_vertical"
-<<<<<<< Temporary merge branch 1
-                    android:text="Year" />
-=======
                     android:text="@string/genre" />
->>>>>>> Temporary merge branch 2
 
                 <TextView
                     android:id="@+id/txt_year"

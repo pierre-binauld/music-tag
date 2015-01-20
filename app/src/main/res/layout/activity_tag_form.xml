@@ -1,189 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbars="vertical">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <com.melnykov.fab.ObservableScrollView
+        android:id="@+id/scroll_tag_form"
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:scrollbars="vertical">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_filename"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            card_view:cardCornerRadius="@dimen/card_corner_radius"
-            card_view:contentPadding="@dimen/activity_horizontal_margin"
-            card_view:cardElevation="@dimen/card_elevation">
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/lbl_filename"
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_filename"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"/>
-        </android.support.v7.widget.CardView>
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                card_view:cardCornerRadius="@dimen/card_corner_radius"
+                card_view:contentPadding="@dimen/activity_horizontal_margin"
+                card_view:cardElevation="@dimen/card_elevation">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_title_artist_album"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            card_view:cardCornerRadius="@dimen/card_corner_radius"
-            card_view:contentPadding="@dimen/activity_horizontal_margin"
-            card_view:cardElevation="@dimen/card_elevation">
+                <TextView
+                    android:id="@+id/lbl_filename"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center" />
+            </android.support.v7.widget.CardView>
 
-            <LinearLayout
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_title_artist_album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                card_view:cardCornerRadius="@dimen/card_corner_radius"
+                card_view:contentPadding="@dimen/activity_horizontal_margin"
+                card_view:cardElevation="@dimen/card_elevation">
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_title"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/title"
-                    android:inputType="textCapWords" />
+                    android:orientation="vertical">
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_artist"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/artist"
-                    android:inputType="textCapWords" />
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/title"
+                        android:inputType="textCapWords" />
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_album"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/album"
-                    android:inputType="textCapWords" />
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_artist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/artist"
+                        android:inputType="textCapWords" />
 
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_album"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/album"
+                        android:inputType="textCapWords" />
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_year_disk_track"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            card_view:cardCornerRadius="@dimen/card_corner_radius"
-            card_view:contentPadding="@dimen/activity_horizontal_margin"
-            card_view:cardElevation="@dimen/card_elevation">
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
 
-            <LinearLayout
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_year_disc_track"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                card_view:cardCornerRadius="@dimen/card_corner_radius"
+                card_view:contentPadding="@dimen/activity_horizontal_margin"
+                card_view:cardElevation="@dimen/card_elevation">
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_year"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/year"
-                    android:inputType="date"
-                    android:layout_weight="1" />
+                    android:orientation="horizontal">
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_disk"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/disk"
-                    android:inputType="number"
-                    android:layout_weight="1" />
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_year"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/year"
+                        android:inputType="date"
+                        android:layout_weight="1" />
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_track"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/track"
-                    android:inputType="number"
-                    android:layout_weight="1" />
-            </LinearLayout>
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_disc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/disc"
+                        android:inputType="number"
+                        android:layout_weight="1" />
 
-        </android.support.v7.widget.CardView>
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_track"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/track"
+                        android:inputType="number"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
 
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_others"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            card_view:cardCornerRadius="@dimen/card_corner_radius"
-            card_view:contentPadding="@dimen/activity_horizontal_margin"
-            card_view:cardElevation="@dimen/card_elevation">
-
-            <LinearLayout
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_others"
                 android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                card_view:cardCornerRadius="@dimen/card_corner_radius"
+                card_view:contentPadding="@dimen/activity_horizontal_margin"
+                card_view:cardElevation="@dimen/card_elevation">
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_album_artist"
-                    android:layout_height="wrap_content"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:hint="@string/album_artist"
-                    android:inputType="textCapWords" />
+                    android:orientation="vertical"
+                    android:layout_height="match_parent">
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_composer"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:hint="@string/composer"
-                    android:inputType="textCapWords" />
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_album_artist"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:hint="@string/album_artist"
+                        android:inputType="textCapWords" />
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_grouping"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:hint="@string/grouping"
-                    android:inputType="textCapWords" />
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_composer"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:hint="@string/composer"
+                        android:inputType="textCapWords" />
 
-                <com.iangclifton.android.floatlabel.FloatLabel
-                    android:id="@+id/txt_genre"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
-                    android:hint="@string/genre"
-                    android:inputType="textCapWords" />
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_grouping"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:hint="@string/grouping"
+                        android:inputType="textCapWords" />
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_artwork"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            card_view:cardCornerRadius="@dimen/card_corner_radius"
-            card_view:cardElevation="@dimen/card_elevation">
+                    <com.iangclifton.android.floatlabel.FloatLabel
+                        android:id="@+id/txt_genre"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:hint="@string/genre"
+                        android:inputType="textCapWords" />
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
 
-            <ImageView
-                android:id="@+id/img_artwork"
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_artwork"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </android.support.v7.widget.CardView>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                card_view:cardCornerRadius="@dimen/card_corner_radius"
+                card_view:cardElevation="@dimen/card_elevation">
 
-    </LinearLayout>
-</ScrollView>
+                <ImageView
+                    android:id="@+id/img_artwork"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+    </com.melnykov.fab.ObservableScrollView>
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fab_valid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_action_content_save_24dp"
+        fab:fab_colorNormal="@color/color_accent"
+        fab:fab_colorPressed="@color/color_accent_pressed"
+        fab:fab_colorRipple="@color/color_accent_hover" />
+</FrameLayout>

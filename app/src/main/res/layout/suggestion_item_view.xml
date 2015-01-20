@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_suggestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_margin_half"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        card_view:cardCornerRadius="@dimen/card_corner_radius"
+        card_view:contentPadding="@dimen/activity_horizontal_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/txt_track">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txt_track"
+                    android:textSize="@dimen/text_size"
+                    android:textColor="@android:color/primary_text_light"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="@dimen/text_margin_half" />
+
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:textSize="@dimen/text_size"
+                    android:textColor="@android:color/primary_text_light"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/txt_track"
+                    android:layout_toRightOf="@id/txt_track"
+                    android:layout_toStartOf="@+id/rb_suggestion"
+                    android:layout_toLeftOf="@+id/rb_suggestion"
+                    android:layout_margin="@dimen/text_margin_half" />
+
+                <RadioButton
+                    android:id="@+id/rb_suggestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:clickable="false" />
+
+            </RelativeLayout>
+
+            <View
+                style="@style/Divider"
+                android:id="@+id/divider"
+                android:layout_marginTop="@dimen/text_margin_half"
+                android:layout_marginBottom="@dimen/text_margin_half" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lbl_artist"
+                    android:textSize="@dimen/label_text_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/text_margin_half"
+                    android:layout_weight="3"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/artist" />
+
+                <TextView
+                    android:id="@+id/txt_artist"
+                    android:textSize="@dimen/text_size"
+                    android:textColor="@android:color/primary_text_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/text_margin_half"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lbl_album"
+                    android:textSize="@dimen/label_text_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/text_margin_half"
+                    android:layout_weight="3"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/album" />
+
+                <TextView
+                    android:id="@+id/txt_album"
+                    android:textSize="@dimen/text_size"
+                    android:textColor="@android:color/primary_text_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/text_margin_half"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lbl_genre"
+                    android:textSize="@dimen/label_text_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/text_margin_half"
+                    android:layout_weight="3"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/genre" />
+
+                <TextView
+                    android:id="@+id/txt_year"
+                    android:textSize="@dimen/text_size"
+                    android:textColor="@android:color/primary_text_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/text_margin_half"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+</FrameLayout>

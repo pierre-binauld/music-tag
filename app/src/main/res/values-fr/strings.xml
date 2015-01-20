@@ -6,7 +6,7 @@
     <string name="album_artist">Artiste de l\'Album</string>
     <string name="artist">Artiste</string>
     <string name="composer">Compositeur</string>
-    <string name="disk">N° Disque</string>
+    <string name="disc">N° Disque</string>
     <string name="file">fichier</string>
     <string name="files">fichiers</string>
     <string name="genre">Genre</string>
@@ -19,4 +19,7 @@
     <string name="track">Piste</string>
     <string name="year">Année</string>
     <string name="action_valid">Enregistrer</string>
+    <string name="action_download_suggestion" >Suggestions</string>
+    <string name="invalid_connection_state_message">Pas de connexion internet !</string>
+    <string name="retry">Rééssayer</string>
 </resources>

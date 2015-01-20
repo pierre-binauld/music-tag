@@ -9,6 +9,9 @@ import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
 
+/**
+ * A Bitmap Drawable containing a bitmap loader.
+ */
 public class AsyncDrawable extends BitmapDrawable {
     private final WeakReference<ArtworkLoader> bitmapWorkerTaskReference;
 

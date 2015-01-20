@@ -38,6 +38,8 @@ public class FolderItem extends NodeItem {
         }
     }
 
+    //TODO: Check on emulator
+
 
     @Override
     public String getPrimaryInformation() {

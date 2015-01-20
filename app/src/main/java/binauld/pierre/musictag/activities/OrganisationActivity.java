@@ -6,11 +6,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.melnykov.fab.FloatingActionButton;
 
+import org.apache.commons.io.FilenameUtils;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -35,10 +37,12 @@ import binauld.pierre.musictag.R;
 public class OrganisationActivity extends Activity implements View.OnClickListener {
     private EditText placeholder;
     public static File root;
+    public static final int RELOAD_LIST = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_organisation);
         placeholder = (EditText) findViewById(R.id.edit_text_organisation);
 
@@ -104,6 +108,8 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.organisation_valid:
                 processOrganisation();
+                setResult(RELOAD_LIST);
+                finish();
                 break;
             case R.id.btn_title:
                 addContentToPlaceHolder("{title}");
@@ -163,6 +169,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
     }
 
     private void processOrganisation() {
+        setProgressBarIndeterminateVisibility(true);
         List<File> files = recursiveDirectoryContent(root);
         String placeholderContent = placeholder.getText().toString();
         //list all music files
@@ -173,12 +180,13 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             } catch (CannotReadException | InvalidAudioFrameException | ReadOnlyFileException | TagException | IOException e) {
                 Log.e("error", e.getMessage());
             }
-            String newPath = root.getPath() + "/" + formatePath(placeholderContent, audio) + "/";
+            String newPath = root.getPath() + "/" + formatePath(placeholderContent, audio);
             String oldPath = f.getPath().substring(0,f.getPath().lastIndexOf("/")) + "/";
 
-            moveFile(oldPath, f.getName(), newPath);
+            moveFile(oldPath + f.getName(), newPath);
             deleteEmptyFolders(root);
         }
+        setProgressBarIndeterminateVisibility(false);
     }
 
     private String formatePath(String placeholder, AudioFile audio){
@@ -218,7 +226,16 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         newPath = newPath.replaceAll(grouping, newGrouping);
         newPath = newPath.replaceAll(genre, newGenre);
 
-        return newPath;
+        File f = new File(newPath + "." + FilenameUtils.getExtension(audio.getFile().getName()));
+        int i = 1;
+        do{
+            if(f.exists()) {
+                f = new File(newPath + " (" + i + ")." + FilenameUtils.getExtension(audio.getFile().getName()));
+                i++;
+            }
+        }while (f.exists());
+
+        return f.getPath();
     }
 
     public String getTheTag(Tag tags, FieldKey id){
@@ -246,20 +263,32 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         return files;
     }
 
-    private void moveFile(String inputPath, String inputFile, String outputPath) {
-
+    private void moveFile(String inputPath, String outputPath) {
         InputStream in;
         OutputStream out;
         try {
-
+            int indexOfSlash = outputPath.lastIndexOf("/");
+            String outputDir = outputPath.substring(0, indexOfSlash);
             //create output directory if it doesn't exist
-            File dir = new File (outputPath);
+            File dir = new File (outputDir);
             if (!dir.exists())
             {
                 dir.mkdirs();
             }
-            in = new FileInputStream(inputPath + inputFile);
-            out = new FileOutputStream(outputPath + inputFile);
+            File f = new File(outputPath);
+            int i = 1;
+            do{
+                if(f.exists()) {
+                    int indexOfPoint = outputPath.lastIndexOf(".");
+                    String outputBegin = outputPath.substring(0, indexOfPoint);
+                    String outputEnd = outputPath.substring(indexOfPoint, outputPath.length());
+                    f = new File(outputBegin + " (" + i + ")" + outputEnd);
+                    i++;
+                }
+            }while (f.exists());
+
+            in = new FileInputStream(inputPath);
+            out = new FileOutputStream(f.getPath());
 
             byte[] buffer = new byte[1024];
             int read;
@@ -273,7 +302,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             out.close();
 
             // delete the original file
-            new File(inputPath + inputFile).delete();
+            new File(inputPath).delete();
         }
 
         catch (FileNotFoundException fnfe1) {

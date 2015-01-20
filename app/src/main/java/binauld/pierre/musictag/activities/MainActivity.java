@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,6 +49,7 @@ import binauld.pierre.musictag.service.Locator;
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, ObservableScrollViewCallbacks {
 
     private static final int TAG_UPDATE_REQUEST = 1;
+    private static final int ORGANISATION_REQUEST = 2;
 
     private LibraryItemLoaderManager manager;
     private LibraryItemAdapter adapter;
@@ -154,7 +156,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 Intent intent2 = new Intent(this, OrganisationActivity.class);
                 FolderItem folder = (FolderItem) adapter.getCurrentNode();
                 OrganisationActivity.root = folder.getFile();
-                startActivity(intent2);
+                startActivityForResult(intent2, ORGANISATION_REQUEST);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -190,6 +192,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 adapter.notifyDataSetChanged();
+            }
+        }
+        else{
+            if (requestCode == ORGANISATION_REQUEST) {
+                // Make sure the request was successful
+                if (resultCode == OrganisationActivity.RELOAD_LIST) {
+                    Log.e("organisation", "work finished");
+                    adapter.notifyDataSetChanged();
+                }
             }
         }
     }
@@ -283,5 +294,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             switchNode((FolderItem) parent);
             return true;
         }
+    }
+
+    public void reloadListview(){
+        adapter.notifyDataSetChanged();
     }
 }

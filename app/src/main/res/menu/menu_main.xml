@@ -12,5 +12,5 @@
         android:title="@string/action_organisation"
         android:orderInCategory="100"
         android:icon="@drawable/ic_settings_white_48dp"
-        android:showAsAction="always" />
+        android:showAsAction="never" />
 </menu>

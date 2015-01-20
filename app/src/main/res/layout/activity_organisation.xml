@@ -14,7 +14,8 @@
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:layout_height="wrap_content"
-            android:focusable="true" android:focusableInTouchMode="true">
+            android:focusable="true" android:focusableInTouchMode="true"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
             <android.support.v7.widget.CardView
                 android:id="@+id/card_text_organisation"
                 android:layout_width="match_parent"
@@ -53,82 +54,118 @@
                 card_view:contentPadding="@dimen/activity_horizontal_margin"
                 card_view:cardElevation="@dimen/card_elevation">
 
-                <LinearLayout
+                <RelativeLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent">
                     <Button
                         android:id="@+id/btn_title"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/title"/>
                     <Button
                         android:id="@+id/btn_artist"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/artist"/>
+                        android:text="@string/artist"
+                        android:layout_toRightOf="@+id/btn_title"/>
                     <Button
                         android:id="@+id/btn_album"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/album"/>
+                        android:text="@string/album"
+                        android:layout_toRightOf="@+id/btn_artist"/>
                     <Button
                         android:id="@+id/btn_year"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/year"/>
+                        android:text="@string/year"
+                        android:layout_below="@+id/btn_title"/>
                     <Button
                         android:id="@+id/btn_disc"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/disc"/>
+                        android:text="@string/disc"
+                        android:layout_toRightOf="@+id/btn_year"
+                        android:layout_below="@+id/btn_title"/>
                     <Button
                         android:id="@+id/btn_track"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/track"/>
+                        android:text="@string/track"
+                        android:layout_toRightOf="@+id/btn_disc"
+                        android:layout_below="@+id/btn_title"/>
                     <Button
                         android:id="@+id/btn_album_artist"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/album_artist"/>
+                        android:text="@string/album_artist"
+                        android:layout_below="@+id/btn_year"/>
                     <Button
                         android:id="@+id/btn_composer"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/composer"/>
+                        android:text="@string/composer"
+                        android:layout_toRightOf="@+id/btn_album_artist"
+                        android:layout_below="@+id/btn_year"/>
                     <Button
                         android:id="@+id/btn_grouping"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/grouping"/>
+                        android:text="@string/grouping"
+                        android:layout_below="@+id/btn_album_artist"/>
                     <Button
                         android:id="@+id/btn_genre"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/genre"/>
+                        android:text="@string/genre"
+                        android:layout_toRightOf="@+id/btn_grouping"
+                        android:layout_below="@+id/btn_album_artist"/>
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_tags_symboles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                card_view:cardCornerRadius="@dimen/card_corner_radius"
+                card_view:contentPadding="@dimen/activity_horizontal_margin"
+                card_view:cardElevation="@dimen/card_elevation">
+
+                <RelativeLayout
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
                     <Button
                         android:id="@+id/btn_slash"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/slash"/>
                     <Button
                         android:id="@+id/btn_underscore"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/underscore"/>
+                        android:text="@string/underscore"
+                        android:layout_toRightOf="@+id/btn_slash"/>
                     <Button
                         android:id="@+id/btn_hyphen"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/hyphen"/>
+                        android:text="@string/hyphen"
+                        android:layout_toRightOf="@+id/btn_underscore"/>
                     <Button
                         android:id="@+id/btn_space"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/space"/>
+                        android:text="@string/space"
+                        android:layout_toRightOf="@+id/btn_hyphen"/>
 
-                </LinearLayout>
+                </RelativeLayout>
 
             </android.support.v7.widget.CardView>
 

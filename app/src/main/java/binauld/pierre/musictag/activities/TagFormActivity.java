@@ -2,6 +2,7 @@ package binauld.pierre.musictag.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -17,23 +18,28 @@ import com.iangclifton.android.floatlabel.FloatLabel;
 import com.melnykov.fab.FloatingActionButton;
 import com.melnykov.fab.ObservableScrollView;
 
-import org.apache.commons.lang.StringUtils;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.datatype.Artwork;
-
-import java.io.IOException;
-
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
+import binauld.pierre.musictag.io.AsyncTaskExecutor;
+import binauld.pierre.musictag.io.LibraryItemLoader;
+import binauld.pierre.musictag.io.LibraryItemLoaderManager;
+import binauld.pierre.musictag.io.TagFormLoader;
+import binauld.pierre.musictag.io.TagSaver;
 import binauld.pierre.musictag.item.AudioItem;
+import binauld.pierre.musictag.item.FolderItem;
+import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.NodeItem;
 import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.Id3TagParcelable;
+import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
+import binauld.pierre.musictag.wrapper.FileWrapper;
 import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 
 /**
@@ -41,10 +47,15 @@ import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
  */
 public class TagFormActivity extends Activity implements View.OnClickListener {
 
-    private static List<AudioItem> providedItem;
+    private static List<LibraryItem> providedItems;
+    private static LibraryItemLoaderManager providedManager;
 
-    public static void provideItem(List<AudioItem> items) {
-        TagFormActivity.providedItem = items;
+    public static void provideItemLoaderManager(LibraryItemLoaderManager manager) {
+        TagFormActivity.providedManager = manager;
+    }
+
+    public static void provideItems(List<LibraryItem> items) {
+        TagFormActivity.providedItems = items;
     }
 
     public static final int SUGGESTION_REQUEST_CODE = 1;
@@ -53,11 +64,19 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
     private ArtworkService artworkService;
 
-    private AudioItem audioItem;
-    private Id3Tag id3Tag;
+    private LibraryItemLoaderManager loaderManager;
+    private List<LibraryItem> items;
+    private LibraryItem[] itemArray;
+    private MultipleId3Tag multipleId3Tag;
+
+    HashMap<SupportedTag, EditText> views = new HashMap<>();
+    ;
+
+    private ProgressDialog loadingDialog;
+    private ProgressDialog savingDialog;
 
     private ImageView img_artwork;
-    private TextView lbl_filename;
+    private TextView txt_filename;
     private EditText txt_title;
     private EditText txt_artist;
     private EditText txt_album;
@@ -69,8 +88,9 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private EditText txt_disc;
     private EditText txt_track;
 
-    private final String alertMessage = " : Please note this will change all selected song";
-    JAudioTaggerWrapper jAudioTaggerWrapper = new JAudioTaggerWrapper();
+    //TODO: Magic String
+    private final String multipleTagMessage = "(Different accross multiple songs)";
+    FileWrapper wrapper = new JAudioTaggerWrapper();
 
 
     @Override
@@ -91,7 +111,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
         // Init Floating Action Button
         ObservableScrollView scrollView = (ObservableScrollView) findViewById(R.id.scroll_tag_form);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_valid);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_save);
         fab.setOnClickListener(this);
 
         // Init resources
@@ -105,128 +125,21 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         initViews();
         initActivityTitle();
 
-        // Fill views
-        fillViews(id3Tag);
+        // Load content
+        loadContent();
+
+//        // Fill views
+//        fillViews(id3Tags);
     }
 
-    public void initContent() {
-        if (null == providedItem) {
-            Log.e(this.getClass().toString(), "No item has been provided.");
-            finish();
-        } else {
-            initFields();
-            if(TagFormActivity.providedItem.size() == 1) {
-                fillTextForOneAudio();
-            }
-            else{
-                fillTextForSomeAudios();
-            }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(null != loadingDialog) {
+            loadingDialog.dismiss();
         }
-    }
-
-    public void initFields(){
-        img_artwork = (ImageView) findViewById(R.id.img_artwork);
-        lbl_filename = (TextView) findViewById(R.id.lbl_filename);
-        txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
-        txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
-        txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
-        txt_year = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
-        txt_disk = ((FloatLabel) findViewById(R.id.txt_disk)).getEditText();
-        txt_track = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
-        txt_album_artist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
-        txt_composer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
-        txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
-        txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
-    }
-
-    public void fillTextForOneAudio(){
-        audioItem = TagFormActivity.providedItem.get(0);
-        AudioFile audioFile = audioItem.getAudioFile();
-        Tag tags = audioFile.getTag();
-
-        // fill in fieldtext
-        Artwork artwork = tags.getFirstArtwork();
-
-        if (null != artwork) {
-            artworkService.setArtwork(audioItem, img_artwork, 200);
-        }
-        lbl_filename.setText(audioFile.getFile().getAbsolutePath());
-        txt_title.setText(tags.getFirst(FieldKey.TITLE));
-        txt_artist.setText(tags.getFirst(FieldKey.ARTIST));
-        txt_album.setText(tags.getFirst(FieldKey.ALBUM));
-        txt_year.setText(tags.getFirst(FieldKey.YEAR));
-        txt_disk.setText(tags.getFirst(FieldKey.DISC_NO));
-        txt_track.setText(tags.getFirst(FieldKey.TRACK));
-        txt_album_artist.setText(tags.getFirst(FieldKey.ALBUM_ARTIST));
-        txt_composer.setText(tags.getFirst(FieldKey.COMPOSER));
-        txt_grouping.setText(tags.getFirst(FieldKey.GROUPING));
-        txt_genre.setText(tags.getFirst(FieldKey.GENRE));
-    }
-
-    public void fillTextForSomeAudios(){
-        audioItem = TagFormActivity.providedItem.get(0);
-        AudioFile audioFile = audioItem.getAudioFile();
-        Tag tags = audioFile.getTag();
-
-        boolean sameTitle = true, sameArtist = true, sameAlbum = true, sameYear = true,
-                sameDisk = true, sameTrack = true, sameAlbum_Artist = true,
-                sameComposer = true, sameGrouping = true, sameGenre = true;
-
-        String currentTitle = tags.getFirst(FieldKey.TITLE);
-        String currentArtist = tags.getFirst(FieldKey.ARTIST);
-        String currentAlbum = tags.getFirst(FieldKey.ALBUM);
-        String currentYear = tags.getFirst(FieldKey.YEAR);
-        String currentDisk = tags.getFirst(FieldKey.DISC_NO);
-        String currentTrack = tags.getFirst(FieldKey.TRACK);
-        String currentAlbum_Artist = tags.getFirst(FieldKey.ALBUM_ARTIST);
-        String currentComposer = tags.getFirst(FieldKey.COMPOSER);
-        String currentGrouping = tags.getFirst(FieldKey.GROUPING);
-        String currentGenre = tags.getFirst(FieldKey.GENRE);
-
-        String pathOfAllFiles = "";
-
-        for(AudioItem audio : providedItem){
-            pathOfAllFiles += audio.getAudioFile().getFile().getAbsolutePath() + " \n";
-            if(sameTitle || sameArtist || sameAlbum || sameYear ||
-                    sameDisk || sameTrack || sameAlbum_Artist ||
-                    sameComposer || sameGrouping || sameGenre){
-                audioFile = audio.getAudioFile();
-                tags = audioFile.getTag();
-
-                if(sameTitle && !currentTitle.equals(tags.getFirst(FieldKey.TITLE))){sameTitle = false;}
-                if(sameArtist && !currentArtist.equals(tags.getFirst(FieldKey.ARTIST))){sameArtist = false;}
-                if(sameAlbum && !currentAlbum.equals(tags.getFirst(FieldKey.ALBUM))){sameAlbum = false;}
-                if(sameYear && !currentYear.equals(tags.getFirst(FieldKey.YEAR))){sameYear = false;}
-                if(sameDisk && !currentDisk.equals(tags.getFirst(FieldKey.DISC_NO))){sameDisk = false;}
-                if(sameTrack && !currentTrack.equals(tags.getFirst(FieldKey.TRACK))){sameTrack = false;}
-                if(sameAlbum_Artist && !currentAlbum_Artist.equals(tags.getFirst(FieldKey.ALBUM_ARTIST))){sameAlbum_Artist = false;}
-                if(sameComposer && !currentComposer.equals(tags.getFirst(FieldKey.COMPOSER))){sameComposer = false;}
-                if(sameGrouping && !currentGrouping.equals(tags.getFirst(FieldKey.GROUPING))){sameGrouping = false;}
-                if(sameGenre && !currentGenre.equals(tags.getFirst(FieldKey.GENRE))){sameGenre = false;}
-
-            }
-        }
-
-        lbl_filename.setText(pathOfAllFiles.substring(0, pathOfAllFiles.length() - 2));
-
-        attributeText(sameTitle, txt_title, currentTitle);
-        attributeText(sameArtist, txt_artist, currentArtist);
-        attributeText(sameAlbum, txt_album, currentAlbum);
-        attributeText(sameYear, txt_year, currentYear);
-        attributeText(sameDisk, txt_disk, currentDisk);
-        attributeText(sameTrack, txt_track, currentTrack);
-        attributeText(sameAlbum_Artist, txt_album_artist, currentAlbum_Artist);
-        attributeText(sameComposer, txt_composer, currentComposer);
-        attributeText(sameGrouping, txt_grouping, currentGrouping);
-        attributeText(sameGenre, txt_genre, currentGenre);
-
-    }
-
-    public void attributeText(boolean boolTest, EditText txt_field, String currentText){
-        if(boolTest && !currentText.equals("")) {
-            txt_field.setText(currentText);
-        }else{
-            txt_field.setHint(txt_field.getHint() + alertMessage);
+        if(null != savingDialog) {
+            savingDialog.dismiss();
         }
     }
 
@@ -255,8 +168,8 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fab_valid:
-                saveChangeAndFinish();
+            case R.id.fab_save:
+                saveContentAndFinish();
                 break;
             default:
                 break;
@@ -270,8 +183,8 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             switch (resultCode) {
                 case RESULT_OK:
                     Id3TagParcelable id3TagParcelable = data.getParcelableExtra(TagSuggestionActivity.TAG_KEY);
-                    id3Tag.update(id3TagParcelable.getId3Tag());
-                    fillViews(id3Tag);
+//                    id3Tags.put(id3TagParcelable.getId3Tag());
+//                    fillViews(id3Tags);
                     break;
                 case RESULT_CANCELED:
                 default:
@@ -284,31 +197,19 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
      * Start the suggestion activity.
      */
     private void callSuggestionActivity() {
-        updateId3TagFromViews();
+//        updateId3TagFromViews();
         Intent intent = new Intent(this, TagSuggestionActivity.class);
-        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(id3Tag));
+//        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(id3Tags));
         startActivityForResult(intent, SUGGESTION_REQUEST_CODE);
     }
 
-    /**
-     * Initialize the audio item and finish if it is not possible.
-     */
-    private void initContent() {
-        if (null == providedItem) {
-            Log.e(this.getClass().toString(), "No item has been provided.");
-            finish();
-        } else {
-            audioItem = TagFormActivity.providedItem;
-            id3Tag = jAudioTaggerWrapper.build(audioItem.getAudioFile());
-        }
-    }
 
     /**
      * Initialize views.
      */
     private void initViews() {
         img_artwork = (ImageView) findViewById(R.id.img_artwork);
-        lbl_filename = (TextView) findViewById(R.id.lbl_filename);
+        txt_filename = (TextView) findViewById(R.id.txt_filename);
         txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
         txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
         txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
@@ -319,119 +220,329 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         txt_composer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
         txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
         txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
+
+        views.put(SupportedTag.TITLE, txt_title);
+        views.put(SupportedTag.ARTIST, txt_artist);
+        views.put(SupportedTag.ALBUM, txt_album);
+        views.put(SupportedTag.YEAR, txt_year);
+        views.put(SupportedTag.DISC_NO, txt_disc);
+        views.put(SupportedTag.TRACK, txt_track);
+        views.put(SupportedTag.ALBUM_ARTIST, txt_album_artist);
+        views.put(SupportedTag.COMPOSER, txt_composer);
+        views.put(SupportedTag.GROUPING, txt_grouping);
+        views.put(SupportedTag.GENRE, txt_genre);
     }
 
-    /**
-     * Fill views.
-     */
-    private void fillViews(Id3Tag id3Tag) {
-        AudioFile audioFile = audioItem.getAudioFile();
-        Tag tags = audioFile.getTag();
-
-        Artwork artwork = tags.getFirstArtwork();
-        if (null != artwork) {
-            artworkService.setArtwork(audioItem, img_artwork, 200);
+    public void fillViews(/*List<LibraryItem> items, MultipleId3Tag multipleId3Tag*/) {
+        StringBuilder builder = new StringBuilder();
+        for (LibraryItem item : items) {
+            buildFilenameString(builder, item);
         }
+        builder.deleteCharAt(builder.length() - 1);
+        txt_filename.setText(builder.toString());
 
-        lbl_filename.setText(audioFile.getFile().getAbsolutePath());
-        txt_title.setText(id3Tag.get(SupportedTag.TITLE));
-        txt_artist.setText(id3Tag.get(SupportedTag.ARTIST));
-        txt_album.setText(id3Tag.get(SupportedTag.ALBUM));
-        txt_year.setText(id3Tag.get(SupportedTag.YEAR));
-        txt_disc.setText(id3Tag.get(SupportedTag.DISC_NO));
-        txt_track.setText(id3Tag.get(SupportedTag.TRACK));
-        txt_album_artist.setText(id3Tag.get(SupportedTag.ALBUM_ARTIST));
-        txt_composer.setText(id3Tag.get(SupportedTag.COMPOSER));
-        txt_grouping.setText(id3Tag.get(SupportedTag.GROUPING));
-        txt_genre.setText(id3Tag.get(SupportedTag.GENRE));
+        Id3Tag id3Tag = multipleId3Tag.getId3Tag();
+        for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
+            if (multipleId3Tag.isAMultipleTag(entry.getKey())) {
+                entry.getValue().setText(multipleTagMessage);
+            } else {
+                entry.getValue().setText(id3Tag.get(entry.getKey()));
+            }
+        }
     }
 
-    private void updateId3TagFromViews() {
-        id3Tag.put(SupportedTag.TITLE, txt_title.getText().toString());
-        id3Tag.put(SupportedTag.ARTIST, txt_artist.getText().toString());
-        id3Tag.put(SupportedTag.ALBUM, txt_album.getText().toString());
-        id3Tag.put(SupportedTag.ALBUM_ARTIST, txt_album_artist.getText().toString());
-        id3Tag.put(SupportedTag.COMPOSER, txt_composer.getText().toString());
-        id3Tag.put(SupportedTag.GROUPING, txt_grouping.getText().toString());
-        id3Tag.put(SupportedTag.GENRE, txt_genre.getText().toString());
-        id3Tag.put(SupportedTag.YEAR, txt_year.getText().toString());
-        id3Tag.put(SupportedTag.DISC_NO, txt_disc.getText().toString());
-        id3Tag.put(SupportedTag.TRACK, txt_track.getText().toString());
+    private void buildFilenameString(StringBuilder filenames, LibraryItem item) {
+        if (item.isAudioItem()) {
+            filenames.append(((AudioItem) item).getAudioFile().getFile().getAbsolutePath());
+            filenames.append("\n");
+        } else {
+            NodeItem node = (NodeItem) item;
+            for (LibraryItem child : node.getChildren()) {
+                buildFilenameString(filenames, child);
+            }
+        }
     }
+
+//    public boolean areItemsLoaded() {
+//        boolean loaded = true;
+//        for(LibraryItem item : items) {
+//            if(!item.isAudioItem()) {
+//                if(((NodeItem) item).getState() != LoadingState.LOADED) {
+//                    loaded = false;
+//                    break;
+//                }
+//            }
+//        }
+//
+//        return loaded;
+//    }
+
+//    /**
+//     * Fill views.
+//     */
+//    private void fillViews() {
+//
+//        boolean loaded = true;
+//        String filenames = "";
+//        for(LibraryItem item : audioItems) {
+//            if(item.isAudioItem()) {
+//                AudioItem audioItem = (AudioItem) item;
+//                filenames += audioItem.getAudioFile().getFile().getAbsolutePath() + "\n";
+//
+//            } else if (loaded) {
+//                NodeItem nodeItem = (NodeItem) item;
+//
+//                if(nodeItem.getState() != LoadingState.LOADED) {
+//                    loaded = false;
+//                }
+//            }
+//        }
+//
+//        txt_filename.setText(filenames.substring(0, filenames.length() - 2));
+//
+//        AudioFile audioFile = audioItems.getAudioFile();
+//        Tag tags = audioFile.getTag();
+//
+//        Artwork artwork = tags.getFirstArtwork();
+//        if (null != artwork) {
+//            artworkService.setArtwork(audioItems, img_artwork, 200);
+//        }
+//
+//        txt_filename.setText(audioFile.getFile().getAbsolutePath());
+//        txt_title.setText(id3Tag.get(SupportedTag.TITLE));
+//        txt_artist.setText(id3Tag.get(SupportedTag.ARTIST));
+//        txt_album.setText(id3Tag.get(SupportedTag.ALBUM));
+//        txt_year.setText(id3Tag.get(SupportedTag.YEAR));
+//        txt_disc.setText(id3Tag.get(SupportedTag.DISC_NO));
+//        txt_track.setText(id3Tag.get(SupportedTag.TRACK));
+//        txt_album_artist.setText(id3Tag.get(SupportedTag.ALBUM_ARTIST));
+//        txt_composer.setText(id3Tag.get(SupportedTag.COMPOSER));
+//        txt_grouping.setText(id3Tag.get(SupportedTag.GROUPING));
+//        txt_genre.setText(id3Tag.get(SupportedTag.GENRE));
+//    }
+
+//    private void updateId3TagFromViews() {
+//        id3Tags.put(SupportedTag.TITLE, txt_title.getText().toString());
+//        id3Tags.put(SupportedTag.ARTIST, txt_artist.getText().toString());
+//        id3Tags.put(SupportedTag.ALBUM, txt_album.getText().toString());
+//        id3Tags.put(SupportedTag.ALBUM_ARTIST, txt_album_artist.getText().toString());
+//        id3Tags.put(SupportedTag.COMPOSER, txt_composer.getText().toString());
+//        id3Tags.put(SupportedTag.GROUPING, txt_grouping.getText().toString());
+//        id3Tags.put(SupportedTag.GENRE, txt_genre.getText().toString());
+//        id3Tags.put(SupportedTag.YEAR, txt_year.getText().toString());
+//        id3Tags.put(SupportedTag.DISC_NO, txt_disc.getText().toString());
+//        id3Tags.put(SupportedTag.TRACK, txt_track.getText().toString());
+//    }
 
     /**
      * Save the modification into the audio file and finish the activity.
      */
-    private void saveChangeAndFinish() {
-        Intent intent = new Intent();
-        try {
-            AudioFile audioFile = audioItem.getAudioFile();
-            updateId3TagFromViews();
-            jAudioTaggerWrapper.save(id3Tag, audioFile);
+//    private void saveChangeAndFinish() {
+//        Intent intent = new Intent();
+//        try {
+//            AudioFile audioFile = audioItems.getAudioFile();
+//            updateId3TagFromViews();
+//            jAudioTaggerWrapper.save(id3Tags, audioFile);
+//
+//            setResult(RESULT_OK, intent);
+//        } catch (IOException e) {
+//            Log.e(this.getClass().toString(), e.getMessage(), e);
+//            setResult(RESULT_CANCELED, intent);
+//        }
+//
+//        finish();
+//    }
 
-            setResult(RESULT_OK, intent);
-        } catch (IOException e) {
-            Log.e(this.getClass().toString(), e.getMessage(), e);
-            setResult(RESULT_CANCELED, intent);
-        }
+    /**
+     * Initialize the audio item and finish if it is not possible.
+     */
+    public void initContent() {
+        if (null == providedItems) {
+            Log.e(this.getClass().toString(), "No item has been provided.");
+            finish();
+        } else if (null == providedManager) {
+            //TODO: Maybe delete this
+            Log.e(this.getClass().toString(), "No loader manager has been provided.");
+            finish();
+        } else {
+            items = TagFormActivity.providedItems;
+            loaderManager = TagFormActivity.providedManager;
+            itemArray = items.toArray(new LibraryItem[items.size()]);
+//            id3Tags = new ArrayList<>();
 
-        finish();
-    }
-
-    
-    public void saveOneFile(boolean writeIfBlank) throws FieldDataInvalidException, CannotWriteException {
-        AudioFile audioFile = audioItem.getAudioFile();
-        Tag tags = audioFile.getTag();
-        setTagField(tags, FieldKey.TITLE, txt_title.getText().toString(), writeIfBlank);
-        setTagField(tags, FieldKey.ARTIST, txt_artist.getText().toString(), writeIfBlank);
-        setTagField(tags, FieldKey.ALBUM, txt_album.getText().toString(), writeIfBlank);
-        setTagField(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString(), writeIfBlank);
-        setTagField(tags, FieldKey.COMPOSER, txt_composer.getText().toString(), writeIfBlank);
-        setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString(), writeIfBlank);
-        setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString(), writeIfBlank);
-        setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
-        setNumericTagField(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
-        setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
-        audioFile.setTag(tags);
-
-        AudioFileIO.write(audioFile);
-    }
-
-    public void saveSomeFiles() throws FieldDataInvalidException, CannotWriteException {
-
-        for(AudioItem audioIt : providedItem) {
-            audioItem = audioIt;
-            saveOneFile(false);
+//            id3Tags = jAudioTaggerWrapper.build(audioItems.getAudioFile());
         }
     }
+
+
     /**
      * Initialize the activity title.
      */
     private void initActivityTitle() {
         String title;
-        if(providedItem.size() > 1) {
-            title = "Multiple Selection";
-        }
-        else {
-            title = audioItem.getPrimaryInformation();
-            if (StringUtils.isNotBlank(audioItem.getSecondaryInformation())) {
-                title += " - " + audioItem.getSecondaryInformation();
-            }
-        }
+//        if(providedItems.size() > 1) {
+        //TODO: Magic String
+        title = "Multiple Selection";
+//        }
+//        else {
+//            title = audioItems.getPrimaryInformation();
+//            if (StringUtils.isNotBlank(audioItems.getSecondaryInformation())) {
+//                title += " - " + audioItems.getSecondaryInformation();
+//            }
+//        }
 
         setTitle(title);
     }
 
-    private static void setNumericTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
-        if (!StringUtils.isBlank(value) && StringUtils.isNumeric(value)) {
-            tags.setField(key, value);
-        }
+
+    private void loadContent() {
+
+        //TODO: Magic String
+        loadingDialog = ProgressDialog.show(TagFormActivity.this, "",
+                "Loading. Please wait...", true);
+
+        LibraryItemLoader.Callback tagFormLoaderLauncher = new LibraryItemLoader.Callback() {
+
+            @Override
+            public void onProgressUpdate(FolderItem item) {
+
+            }
+
+            @Override
+            public void onPostExecute(List<FolderItem> results) {
+                TagFormLoader.Callback callback = new TagFormLoader.Callback() {
+                    @Override
+                    public void onPostExecute(MultipleId3Tag multipleId3Tag) {
+                        TagFormActivity.this.multipleId3Tag = multipleId3Tag;
+                        fillViews(/*items, multipleId3Tag*/);
+                        loadingDialog.dismiss();
+                    }
+                };
+                AsyncTaskExecutor.execute(new TagFormLoader(callback), itemArray);
+            }
+        };
+
+        AsyncTaskExecutor.execute(loaderManager.get(true, tagFormLoaderLauncher), itemArray);
     }
 
-    private static void setTagField(Tag tags, FieldKey key, String value) throws FieldDataInvalidException {
-        if (StringUtils.isBlank(value)) {
-            value = "";
+    public void saveContentAndFinish() {
+        //TODO: Magic String
+        savingDialog = ProgressDialog.show(TagFormActivity.this, "",
+                "Saving. Please wait...", true);
+        for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
+            String value = entry.getValue().getText().toString();
+            if (!value.equals(multipleTagMessage)) {
+                multipleId3Tag.set(entry.getKey(), value);
+            }
         }
-        tags.setField(key, value);
+
+        TagSaver saver = new TagSaver(multipleId3Tag, wrapper, new TagSaver.Callback() {
+            @Override
+            public void onPostExecution() {
+                savingDialog.dismiss();
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+
+        AsyncTaskExecutor.execute(saver, itemArray);
     }
+
+//    public void attributeText(boolean boolTest, EditText txt_field, String currentText){
+//        if(boolTest && !currentText.equals("")) {
+//            txt_field.setText(currentText);
+//        }else{
+//            txt_field.setHint(txt_field.getHint() + alertMessage);
+//        }
+//    }
+
+//    public void saveOneFile(boolean writeIfBlank) throws FieldDataInvalidException, CannotWriteException {
+//        AudioFile audioFile = audioItems.getAudioFile();
+//        Tag tags = audioFile.getTag();
+////        setTagField(tags, FieldKey.TITLE, txt_title.getText().toString(), writeIfBlank);
+////        setTagField(tags, FieldKey.ARTIST, txt_artist.getText().toString(), writeIfBlank);
+////        setTagField(tags, FieldKey.ALBUM, txt_album.getText().toString(), writeIfBlank);
+////        setTagField(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString(), writeIfBlank);
+////        setTagField(tags, FieldKey.COMPOSER, txt_composer.getText().toString(), writeIfBlank);
+////        setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString(), writeIfBlank);
+////        setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString(), writeIfBlank);
+////        setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
+////        setNumericTagField(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
+////        setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
+//        audioFile.setTag(tags);
+//
+//        AudioFileIO.write(audioFile);
+//    }
+
+//    public void saveSomeFiles() throws FieldDataInvalidException, CannotWriteException {
+//
+//        for(AudioItem audioIt : providedItems) {
+//            audioItems = audioIt;
+//            saveOneFile(false);
+//        }
+//    }
+
+
+//    public void fillTextForOneAudio(){
+//        audioItems = TagFormActivity.providedItems.get(0);
+//        id3Tags = jAudioTaggerWrapper.build(audioItems.getAudioFile());
+//    }
+//
+//    public void fillTextForSomeAudios(){
+//        audioItems = TagFormActivity.providedItems.get(0);
+//        id3Tags = jAudioTaggerWrapper.build(audioItems.getAudioFile());
+//
+//        boolean sameTitle = true, sameArtist = true, sameAlbum = true, sameYear = true,
+//                sameDisk = true, sameTrack = true, sameAlbum_Artist = true,
+//                sameComposer = true, sameGrouping = true, sameGenre = true;
+//
+//        String currentTitle = id3Tags.get(SupportedTag.TITLE);
+//        String currentArtist = id3Tags.get(SupportedTag.ARTIST);
+//        String currentAlbum = id3Tags.get(SupportedTag.ALBUM);
+//        String currentYear = id3Tags.get(SupportedTag.YEAR);
+//        String currentDisk = id3Tags.get(SupportedTag.DISC_NO);
+//        String currentTrack = id3Tags.get(SupportedTag.TRACK);
+//        String currentAlbum_Artist = id3Tags.get(SupportedTag.ALBUM_ARTIST);
+//        String currentComposer = id3Tags.get(SupportedTag.COMPOSER);
+//        String currentGrouping = id3Tags.get(SupportedTag.GROUPING);
+//        String currentGenre = id3Tags.get(SupportedTag.GENRE);
+//
+//        String pathOfAllFiles = "";
+//
+//        for(AudioItem audio : providedItems){
+//            pathOfAllFiles += audio.getAudioFile().getFile().getAbsolutePath() + " \n";
+//            if(sameTitle || sameArtist || sameAlbum || sameYear ||
+//                    sameDisk || sameTrack || sameAlbum_Artist ||
+//                    sameComposer || sameGrouping || sameGenre){
+//                id3Tags = jAudioTaggerWrapper.build(audio.getAudioFile());
+//
+//                if(sameTitle && !currentTitle.equals(id3Tags.get(SupportedTag.TITLE))){sameTitle = false;}
+//                if(sameArtist && !currentArtist.equals(id3Tags.get(SupportedTag.ARTIST))){sameArtist = false;}
+//                if(sameAlbum && !currentAlbum.equals(id3Tags.get(SupportedTag.ALBUM))){sameAlbum = false;}
+//                if(sameYear && !currentYear.equals(id3Tags.get(SupportedTag.YEAR))){sameYear = false;}
+//                if(sameDisk && !currentDisk.equals(id3Tags.get(SupportedTag.DISC_NO))){sameDisk = false;}
+//                if(sameTrack && !currentTrack.equals(id3Tags.get(SupportedTag.TRACK))){sameTrack = false;}
+//                if(sameAlbum_Artist && !currentAlbum_Artist.equals(id3Tags.get(SupportedTag.ALBUM_ARTIST))){sameAlbum_Artist = false;}
+//                if(sameComposer && !currentComposer.equals(id3Tags.get(SupportedTag.COMPOSER))){sameComposer = false;}
+//                if(sameGrouping && !currentGrouping.equals(id3Tags.get(SupportedTag.GROUPING))){sameGrouping = false;}
+//                if(sameGenre && !currentGenre.equals(id3Tags.get(SupportedTag.GENRE))){sameGenre = false;}
+//
+//            }
+//        }
+//
+//        txt_filename.setText(pathOfAllFiles.substring(0, pathOfAllFiles.length() - 2));
+//
+//        attributeText(sameTitle, txt_title, currentTitle);
+//        attributeText(sameArtist, txt_artist, currentArtist);
+//        attributeText(sameAlbum, txt_album, currentAlbum);
+//        attributeText(sameYear, txt_year, currentYear);
+//        attributeText(sameDisk, txt_disc, currentDisk);
+//        attributeText(sameTrack, txt_track, currentTrack);
+//        attributeText(sameAlbum_Artist, txt_album_artist, currentAlbum_Artist);
+//        attributeText(sameComposer, txt_composer, currentComposer);
+//        attributeText(sameGrouping, txt_grouping, currentGrouping);
+//        attributeText(sameGenre, txt_genre, currentGenre);
+//
+//    }
 }

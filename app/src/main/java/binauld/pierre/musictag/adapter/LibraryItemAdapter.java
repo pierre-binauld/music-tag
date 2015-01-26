@@ -1,31 +1,17 @@
 package binauld.pierre.musictag.adapter;
 
 
-import android.app.Activity;
-import android.content.Intent;
-import android.util.Log;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.jaudiotagger.audio.AudioFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.activities.TagFormActivity;
-import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
-import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
-import binauld.pierre.musictag.item.AudioItem;
-import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
 import binauld.pierre.musictag.service.ArtworkService;
@@ -34,89 +20,59 @@ import binauld.pierre.musictag.service.ArtworkService;
  * Adapt a list of library item for a list view.
  */
 public class LibraryItemAdapter extends BaseAdapter {
-    private List<AudioItem> audios;
-
-    public void toggleSelection(int position) {
-        LibraryItem item = (LibraryItem) getItem(position);
-        if (item.isAudioItem()) {
-            AudioItem audio = (AudioItem) item;
-            toggleAudio(audio);
-        }
-        else{
-            FolderItem folder = (FolderItem) item;
-            if(!alreadySelected(folder)) {
-                List<File> files = recursiveDirectoryContent(folder);
-                LibraryItemFactory factory = LibraryItemFactoryHelper.buildFactory(folder.getResources(), folder.getFilter(), new ResourceBitmapDecoder(folder.getResources(), R.drawable.list_item_placeholder));
 
 
-                for (File f : files) {
-                    AudioItem audioItem = new AudioItem();
-                    audioItem.setParent(folder);
-                    try {
-                        factory.update(audioItem, f);
-                    } catch (IOException e) {
-                        Log.e(this.getClass().toString(), e.getMessage(), e);
-                    }
-                    audios.add(audioItem);
-                }
-            }
-        }
-    }
 
-    public void toggleAudio(AudioItem audio){
-        if(audios.contains(audio)){
-            audios.remove(audio);
-        }else{
-            audios.add(audio);
-        }
-    }
+//    public void toggleAudio(AudioItem audio){
+//        if(audios.contains(audio)){
+//            audios.remove(audio);
+//        }else{
+//            audios.add(audio);
+//        }
+//    }
 
-    /**
-     * Check if the folder is already selected and then delete audioitem in the list.
-     * @param folder the checked folder item
-     * @return a boolean to know if the folder was selected before the check.
-     */
-    public boolean alreadySelected(FolderItem folder){
-        boolean alreadySelected = false;
-        List<AudioItem> audiosToDelete = new ArrayList<>();
-        for(AudioItem audio : audios){
-            if(audio.getParent() == folder){
-                alreadySelected = true;
-                audiosToDelete.add(audio);
-            }
-        }
-        for(AudioItem audio : audiosToDelete){
-            audios.remove(audio);
-        }
-        return alreadySelected;
-    }
+//    /**
+//     * Check if the folder is already selected and then delete audioitem in the list.
+//     * @param folder the checked folder item
+//     * @return a boolean to know if the folder was selected before the check.
+//     */
+//    public boolean alreadySelected(FolderItem folder){
+//        boolean alreadySelected = false;
+//        List<AudioItem> audiosToDelete = new ArrayList<>();
+//        for(AudioItem audio : audios){
+//            if(audio.getParent() == folder){
+//                alreadySelected = true;
+//                audiosToDelete.add(audio);
+//            }
+//        }
+//        for(AudioItem audio : audiosToDelete){
+//            audios.remove(audio);
+//        }
+//        return alreadySelected;
+//    }
 
-    public List<File> recursiveDirectoryContent(FolderItem folder){
-        File[] filesInFolder = folder.getFileList();
-        List<File> files = new ArrayList<>();
-        for(File f : filesInFolder){
-            if (f.isDirectory()){
-                List<File> filesInSubFolder = recursiveDirectoryContent(new FolderItem(f, folder.getFilter(), folder.getResources()));
-                for(File file : filesInSubFolder) {
-                    files.add(file);
-                }
-            }
-            else{
-                files.add(f);
-            }
-        }
-        return files;
-    }
+//    public List<File> recursiveDirectoryContent(FolderItem folder){
+//        File[] filesInFolder = folder.getFileList();
+//        List<File> files = new ArrayList<>();
+//        for(File f : filesInFolder){
+//            if (f.isDirectory()){
+//                List<File> filesInSubFolder = recursiveDirectoryContent(new FolderItem(f, folder.getFilter(), folder.getResources()));
+//                for(File file : filesInSubFolder) {
+//                    files.add(file);
+//                }
+//            }
+//            else{
+//                files.add(f);
+//            }
+//        }
+//        return files;
+//    }
 
-    public Intent sendSelection(Activity activity) {
-        Intent intent = new Intent(activity, TagFormActivity.class);
-        TagFormActivity.provideItem(audios);
-        return intent;
-    }
-
-    public void resetSelection(){
-        audios.clear();
-    }
+//    public Intent sendSelection(Activity activity) {
+//        Intent intent = new Intent(activity, TagFormActivity.class);
+//        TagFormActivity.provideItems(audios);
+//        return intent;
+//    }
 
     static class ViewHolder {
         TextView firstLine;
@@ -132,7 +88,6 @@ public class LibraryItemAdapter extends BaseAdapter {
     public LibraryItemAdapter(ArtworkService artworkService, int artworkSize) {
         this.artworkService = artworkService;
         this.artworkSize = artworkSize;
-        audios = new ArrayList<>();
     }
 
     @Override
@@ -159,6 +114,7 @@ public class LibraryItemAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
+        ListView listView = (ListView) parent;
 
         if (convertView == null) {
 
@@ -189,10 +145,43 @@ public class LibraryItemAdapter extends BaseAdapter {
             viewHolder.secondLine.setText(item.getSecondaryInformation());
             artworkService.setArtwork(item, viewHolder.thumbnail, artworkSize);
             convertView.setTag(viewHolder);
+            if(listView.isItemChecked(position)) {
+                //TODO: Magic Color!
+                convertView.setBackgroundColor(Color.parseColor("#ffb74d"));
+            } else {
+//                convertView.setBackgroundColor(Color.parseColor("#fafafa"));
+            }
         }
 
         return convertView;
     }
+
+
+
+//        if (item.isAudioItem()) {
+//            AudioItem audio = (AudioItem) item;
+//            toggleAudio(audio);
+//        }
+//        else{
+//            FolderItem folder = (FolderItem) item;
+//            if(!alreadySelected(folder)) {
+//                List<File> files = recursiveDirectoryContent(folder);
+//                LibraryItemFactory factory = LibraryItemFactoryHelper.buildFactory(folder.getResources(), folder.getFilter(), new ResourceBitmapDecoder(folder.getResources(), R.drawable.list_item_placeholder));
+//
+//
+//                for (File f : files) {
+//                    AudioItem audioItem = new AudioItem();
+//                    audioItem.setParent(folder);
+//                    try {
+//                        factory.put(audioItem, f);
+//                    } catch (IOException e) {
+//                        Log.e(this.getClass().toString(), e.getMessage(), e);
+//                    }
+//                    audios.add(audioItem);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Set the progress bar.

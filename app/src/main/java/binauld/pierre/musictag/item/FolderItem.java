@@ -4,6 +4,8 @@ import android.content.res.Resources;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 import binauld.pierre.musictag.R;
 
@@ -16,18 +18,19 @@ public class FolderItem extends NodeItem {
     private File[] fileList;
     private String secondaryInformation;
     private FileFilter filter;
-    private Resources res;
+    private List<FolderItem> folderItems;
 
     public FolderItem(File file, FileFilter filter, Resources res) {
         this(file, filter, null, res);
     }
 
     public FolderItem(File file, FileFilter filter, NodeItem parent, Resources res) {
+        //TODO: Use AudioFile logic
         super(parent);
         this.file = file;
         this.filter = filter;
-        this.res = res;
         this.fileList = file.listFiles(filter);
+        this.folderItems = new ArrayList<>();
 
         int fileNumber = getLength();
         this.secondaryInformation = fileNumber + " ";
@@ -68,14 +71,6 @@ public class FolderItem extends NodeItem {
     }
 
     /**
-     * Get the resources.
-     * @return The resources.
-     */
-    public Resources getResources() {
-        return res;
-    }
-
-    /**
      * Get the number of sub file.
      * @return The number of sub file.
      */
@@ -93,6 +88,14 @@ public class FolderItem extends NodeItem {
 
     @Override
     public int getMaxChildren() {
-        return fileList.length;
+        if(null != fileList) {
+            return fileList.length;
+        } else {
+            return 0;
+        }
+    }
+
+    public List<FolderItem> getFolderItems() {
+        return folderItems;
     }
 }

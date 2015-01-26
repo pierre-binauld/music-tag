@@ -11,7 +11,7 @@ public class Id3Tag extends HashMap<SupportedTag, String> {
      * Update tag from another tag.
      * @param in The other tag.
      */
-    public void update(Id3Tag in) {
+    public void put(Id3Tag in) {
         for(Entry<SupportedTag, String> entry : in.entrySet()) {
             this.put(entry.getKey(), entry.getValue());
         }

@@ -25,6 +25,7 @@ import java.util.Map;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
+import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.io.AsyncTaskExecutor;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
@@ -48,14 +49,14 @@ import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 public class TagFormActivity extends Activity implements View.OnClickListener {
 
     private static List<LibraryItem> providedItems;
-    private static LibraryItemLoaderManager providedManager;
-
-    public static void provideItemLoaderManager(LibraryItemLoaderManager manager) {
-        TagFormActivity.providedManager = manager;
-    }
+    private static LibraryItemFactory providedItemFactory;
 
     public static void provideItems(List<LibraryItem> items) {
         TagFormActivity.providedItems = items;
+    }
+
+    public static void provideItemFactory(LibraryItemFactory itemFactory) {
+        TagFormActivity.providedItemFactory = itemFactory;
     }
 
     public static final int SUGGESTION_REQUEST_CODE = 1;
@@ -63,6 +64,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private Resources res;
 
     private ArtworkService artworkService;
+    private LibraryItemFactory itemFactory;
 
     private LibraryItemLoaderManager loaderManager;
     private List<LibraryItem> items;
@@ -70,7 +72,6 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private MultipleId3Tag multipleId3Tag;
 
     HashMap<SupportedTag, EditText> views = new HashMap<>();
-    ;
 
     private ProgressDialog loadingDialog;
     private ProgressDialog savingDialog;
@@ -88,8 +89,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private EditText txt_disc;
     private EditText txt_track;
 
-    //TODO: Magic String
-    private final String multipleTagMessage = "(Different accross multiple songs)";
+    private String multipleTagMessage;
     FileWrapper wrapper = new JAudioTaggerWrapper();
 
 
@@ -98,38 +98,40 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
         // Init content
-        initContent();
+        if(initContent()) {
+            loaderManager = new LibraryItemLoaderManager(itemFactory, 200);
 
-        //Init layout
-        this.setContentView(R.layout.activity_tag_form);
+            //Init layout
+            this.setContentView(R.layout.activity_tag_form);
 
-        // Init action bar
-        ActionBar actionBar = getActionBar();
-        if (null != actionBar) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+            // Init action bar
+            ActionBar actionBar = getActionBar();
+            if (null != actionBar) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
 
-        // Init Floating Action Button
-        ObservableScrollView scrollView = (ObservableScrollView) findViewById(R.id.scroll_tag_form);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_save);
-        fab.setOnClickListener(this);
+            // Init Floating Action Button
+            ObservableScrollView scrollView = (ObservableScrollView) findViewById(R.id.scroll_tag_form);
+            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_save);
+            fab.setOnClickListener(this);
 
-        // Init resources
-        res = getResources();
+            // Init resources
+            res = getResources();
+            multipleTagMessage = res.getString(R.string.multiple_tag_message);
 
-        // Init service(s)
-        BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
-        artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
+            // Init service(s)
+            BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
+            artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
 
-        // Init views
-        initViews();
-        initActivityTitle();
+            // Init views
+            initViews();
 
-        // Load content
-        loadContent();
+            // Load content
+            loadContent();
 
 //        // Fill views
 //        fillViews(id3Tags);
+        }
     }
 
     @Override
@@ -356,50 +358,28 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     /**
      * Initialize the audio item and finish if it is not possible.
      */
-    public void initContent() {
+    public boolean initContent() {
         if (null == providedItems) {
             Log.e(this.getClass().toString(), "No item has been provided.");
             finish();
-        } else if (null == providedManager) {
-            //TODO: Maybe delete this
-            Log.e(this.getClass().toString(), "No loader manager has been provided.");
+            return false;
+        } else if (null == providedItemFactory) {
+            Log.e(this.getClass().toString(), "No item factory has been provided.");
             finish();
+            return false;
         } else {
             items = TagFormActivity.providedItems;
-            loaderManager = TagFormActivity.providedManager;
             itemArray = items.toArray(new LibraryItem[items.size()]);
-//            id3Tags = new ArrayList<>();
-
-//            id3Tags = jAudioTaggerWrapper.build(audioItems.getAudioFile());
+            itemFactory =TagFormActivity.providedItemFactory;
+            return true;
         }
-    }
-
-
-    /**
-     * Initialize the activity title.
-     */
-    private void initActivityTitle() {
-        String title;
-//        if(providedItems.size() > 1) {
-        //TODO: Magic String
-        title = "Multiple Selection";
-//        }
-//        else {
-//            title = audioItems.getPrimaryInformation();
-//            if (StringUtils.isNotBlank(audioItems.getSecondaryInformation())) {
-//                title += " - " + audioItems.getSecondaryInformation();
-//            }
-//        }
-
-        setTitle(title);
     }
 
 
     private void loadContent() {
 
-        //TODO: Magic String
-        loadingDialog = ProgressDialog.show(TagFormActivity.this, "",
-                "Loading. Please wait...", true);
+        loadingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.loading),
+                res.getString(R.string.please_wait), true);
 
         LibraryItemLoader.Callback tagFormLoaderLauncher = new LibraryItemLoader.Callback() {
 
@@ -426,11 +406,11 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     }
 
     public void saveContentAndFinish() {
-        //TODO: Magic String
-        savingDialog = ProgressDialog.show(TagFormActivity.this, "",
-                "Saving. Please wait...", true);
+        savingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.saving),
+                res.getString(R.string.please_wait), true);
         for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
             String value = entry.getValue().getText().toString();
+            //TODO: Find another way
             if (!value.equals(multipleTagMessage)) {
                 multipleId3Tag.set(entry.getKey(), value);
             }

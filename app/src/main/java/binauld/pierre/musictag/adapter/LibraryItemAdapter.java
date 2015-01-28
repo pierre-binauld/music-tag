@@ -200,7 +200,7 @@ public class LibraryItemAdapter extends BaseAdapter {
                 progressBar.setVisibility(View.GONE);
             } else {
                 progressBar.setVisibility(View.VISIBLE);
-                progressBar.setMax(currentNode.getMaxChildren());
+                progressBar.setMax(currentNode.getMaxChildrenCount());
                 updateProgressBar();
             }
         }

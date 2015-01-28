@@ -2,6 +2,7 @@ package binauld.pierre.musictag.wrapper.jaudiotagger;
 
 import android.util.Log;
 
+import org.jaudiotagger.audio.AudioFileFilter;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
@@ -129,5 +130,10 @@ public class JAudioTaggerWrapper implements FileWrapper {
         } catch (CannotWriteException | TagException | ReadOnlyFileException | CannotReadException | InvalidAudioFrameException e) {
             throw new IOException(e);
         }
+    }
+
+    @Override
+    public FileFilter getFileFilter() {
+        return new AudioFileFilter(true);
     }
 }

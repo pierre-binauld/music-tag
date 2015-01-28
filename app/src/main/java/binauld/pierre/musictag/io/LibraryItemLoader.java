@@ -39,7 +39,7 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
     private Callback callback;
 
 
-    public LibraryItemLoader(/*FolderItem node,*/ LibraryItemFactory libraryItemFactory, Comparator<LibraryItem> comparator, int updateStep, boolean drillDown, Callback callback) {
+    public LibraryItemLoader(LibraryItemFactory libraryItemFactory, Comparator<LibraryItem> comparator, int updateStep, boolean drillDown, Callback callback) {
         this.updateStep = updateStep;
         this.drillDown = drillDown;
 
@@ -114,7 +114,7 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
         } while (!queue.isEmpty() && drillDown);
     }
 
-    public void loadItem(FolderItem rootItem, FolderItem currentFolderItem) {
+    private void loadItem(FolderItem rootItem, FolderItem currentFolderItem) {
 
         int invalidItemCount = 0;
 
@@ -143,7 +143,6 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
 
                 j = ++j % updateStep;
                 if (j == 0 || i == currentFiles.length - 1) {
-                    //TODO: folderItem.getComparator();
                     Collections.sort(currentItems.getWorkingList(), comparator);
                     currentItems.push();
 //                    currentFolderItems.push();

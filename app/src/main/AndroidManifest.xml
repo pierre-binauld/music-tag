@@ -33,7 +33,8 @@
         </activity>
         <activity
             android:name=".activities.TagFormActivity"
-            android:windowSoftInputMode="stateUnchanged" >
+            android:windowSoftInputMode="stateUnchanged"
+            android:label="@string/title_activity_tag_form" >
         </activity>
         <activity
             android:name=".activities.TagSuggestionActivity"

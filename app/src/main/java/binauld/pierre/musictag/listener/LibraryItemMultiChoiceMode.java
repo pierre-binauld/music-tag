@@ -1,5 +1,6 @@
 package binauld.pierre.musictag.listener;
 
+import android.content.res.Resources;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -20,22 +21,30 @@ import binauld.pierre.musictag.item.LibraryItem;
 public class LibraryItemMultiChoiceMode implements AbsListView.MultiChoiceModeListener {
     private LibraryItemAdapter adapter;
     private ListView listView;
-    protected MainActivity activity;
+    private MainActivity activity;
     private SparseArray<LibraryItem> selectedItems;
+
+    private String selectedItemString;
+    private String selectedItemsString;
 
     public LibraryItemMultiChoiceMode(LibraryItemAdapter adapter, ListView listView, MainActivity activity) {
         this.adapter = adapter;
         this.listView = listView;
         this.activity = activity;
         this.selectedItems = new SparseArray<>();
+        selectedItemString = activity.getResources().getString(R.string.selected_item);
+        selectedItemsString = activity.getResources().getString(R.string.selected_items);
     }
 
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         // Set the CAB title according to total checked items
-        //TODO: Magic String !
         final int checkedCount = listView.getCheckedItemCount();
-        mode.setTitle(checkedCount + " Selected");
+        if (checkedCount > 1) {
+            mode.setTitle(checkedCount + " " + selectedItemsString);
+        } else {
+            mode.setTitle(checkedCount + " " + selectedItemString);
+        }
 
 //      Calls toggleSelection method from ListViewAdapter Class
         toggleSelection(position, checked);

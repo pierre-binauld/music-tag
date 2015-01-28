@@ -40,7 +40,7 @@ public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
         if (null != bitmap) {
             cacheService.put(key, bitmap);
         } else if (decoder != defaultArtworkDecoder) {
-            item.switchDecoder(defaultArtworkDecoder);
+            item.setDecoder(defaultArtworkDecoder);
             bitmap = this.doInBackground(item);
         }
 

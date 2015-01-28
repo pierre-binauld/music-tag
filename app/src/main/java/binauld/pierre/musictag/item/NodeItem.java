@@ -38,7 +38,7 @@ public abstract class NodeItem extends ChildItem {
      * Get the maximum number of possible children.
      * @return The maximum number of possible children.
      */
-    public abstract int getMaxChildren();
+    public abstract int getMaxChildrenCount();
 
     /**
      * Get the number of children node.

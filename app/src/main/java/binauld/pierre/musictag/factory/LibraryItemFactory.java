@@ -28,11 +28,11 @@ public class LibraryItemFactory {
     private FileFilter filter;
     private Resources res;
 
-    public LibraryItemFactory(BitmapDecoder defaultArtworkDecoder, BitmapDecoder folderBitmapDecoder, FileFilter filter, Resources res) {
-        this.wrapper = new JAudioTaggerWrapper();
+    public LibraryItemFactory(FileWrapper wrapper, BitmapDecoder defaultArtworkDecoder, BitmapDecoder folderBitmapDecoder, Resources res) {
+        this.wrapper = wrapper;
         this.folderBitmapDecoder = folderBitmapDecoder;
         this.defaultArtworkDecoder = defaultArtworkDecoder;
-        this.filter = filter;
+        this.filter = wrapper.getFileFilter();
         this.res = res;
     }
 
@@ -62,15 +62,14 @@ public class LibraryItemFactory {
         AudioItem audioItem = new AudioItem();
         audioItem.setParent(parent);
         audioItem.setAudioFile(audioFile);
-        //TODO: meh
-        audioItem.switchDecoder(decoder);
+        audioItem.setDecoder(decoder);
 
         return audioItem;
     }
 
     public FolderItem buildFolderItem(File file, NodeItem parent) {
         FolderItem folder = new FolderItem(file, filter, parent, res);
-        folder.switchDecoder(folderBitmapDecoder);
+        folder.setDecoder(folderBitmapDecoder);
         return folder;
     }
 
@@ -81,9 +80,9 @@ public class LibraryItemFactory {
 //                AudioFile audio = AudioFileIO.read(file);
 //                item.setAudioFile(audio);
 //                if(null != audio.getTag().getFirstArtwork()) {
-//                    item.switchDecoder(new AudioFileBitmapDecoder(audio));
+//                    item.setDecoder(new AudioFileBitmapDecoder(audio));
 //                } else {
-//                    item.switchDecoder(defaultArtworkDecoder);
+//                    item.setDecoder(defaultArtworkDecoder);
 //                }
 //
 //            } catch (CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {

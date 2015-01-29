@@ -21,12 +21,12 @@
     <string name="disc">Disc No</string>
     <string name="track">Track</string>
     <string name="title_activity_tag_suggestion">Suggestions from MusicBrainz</string>
-    <string name="title_activity_organisation">OrganisationActivity</string>
+    <string name="title_activity_organisation">Organisation</string>
     <string name="action_organisation">Organisation</string>
     <string name="action_download_suggestion">Suggestions</string>
-    <string name="underscore">_</string>
-    <string name="slash">/</string>
-    <string name="hyphen">-</string>
+    <string name="underscore" translatable="false">_</string>
+    <string name="slash" translatable="false">/</string>
+    <string name="hyphen" translatable="false">-</string>
     <string name="space">Space</string>
     <string name="unknown">Unknown</string>
     <string name="invalid_connection_state_message">No internet connection !</string>

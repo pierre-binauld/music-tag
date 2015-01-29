@@ -23,9 +23,7 @@
     <string name="invalid_connection_state_message">Pas de connexion internet !</string>
     <string name="retry">Rééssayer</string>
     <string name="action_organisation">Organisation</string>
-    <string name="underscore">_</string>
-    <string name="slash">/</string>
-    <string name="hyphen">-</string>
     <string name="space">Espace</string>
     <string name="unknown">Inconnu</string>
+    <string name="title_activity_organisation">Organisation</string>
 </resources>

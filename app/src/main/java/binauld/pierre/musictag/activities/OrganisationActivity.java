@@ -33,11 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.item.LibraryItem;
 
 public class OrganisationActivity extends Activity implements View.OnClickListener {
     private EditText placeholder;
     public static File root;
+    public static List<LibraryItem> libraryItems;
     public static final int RELOAD_LIST = 10;
+    private List<File> files;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,9 +171,21 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         placeholder.setSelection(cursorPosition+s.length());
     }
 
+    private void filesSelection(){
+        if(libraryItems == null){
+            files = recursiveDirectoryContent(root);
+        }
+        else{
+            for(LibraryItem libraryItem : libraryItems){
+                if(libraryItem.isAudioItem()){
+
+                }
+            }
+        }
+    }
+
     private void processOrganisation() {
-        setProgressBarIndeterminateVisibility(true);
-        List<File> files = recursiveDirectoryContent(root);
+        filesSelection();
         String placeholderContent = placeholder.getText().toString();
         //list all music files
         for(File f : files){

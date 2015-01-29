@@ -13,23 +13,13 @@ import android.widget.EditText;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.apache.commons.io.FilenameUtils;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -283,8 +273,8 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             new File(inputPath).delete();
         }
 
-        catch (FileNotFoundException fnfe1) {
-            Log.e("File not found : Error during moveFile", fnfe1.getMessage());
+        catch (FileNotFoundException e) {
+            Log.e("File not found : Error during moveFile", e.getMessage());
         }
         catch (Exception e) {
             Log.e("Error during moveFile", e.getMessage());

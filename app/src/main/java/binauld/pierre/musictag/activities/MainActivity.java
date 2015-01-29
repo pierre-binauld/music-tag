@@ -223,7 +223,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (backToParent()) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && backToParent()) {
             return true;
         }
 

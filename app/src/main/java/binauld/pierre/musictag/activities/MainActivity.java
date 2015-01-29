@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
@@ -21,6 +22,8 @@ import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,13 +34,14 @@ import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
+import binauld.pierre.musictag.io.AsyncTaskExecutor;
 import binauld.pierre.musictag.io.LibraryItemLoader;
 import binauld.pierre.musictag.io.LibraryItemLoaderManager;
-import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
 import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.listener.LibraryItemMultiChoiceMode;
 import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.service.Locator;
@@ -61,7 +65,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     private LibraryItemFactory itemFactory;
     private FileFilter filter;
-    private AudioItem updating;
+
+    private LibraryItemMultiChoiceMode libraryItemMultiChoiceMode;
+//    private List<LibraryItem> updating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +113,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         adapter.setProgressBar(progressBar);
 
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(adapter, itemFactory, res.getInteger(R.integer.artwork_loader_update_step));
+        manager = new LibraryItemLoaderManager(itemFactory, res.getInteger(R.integer.artwork_loader_update_step));
 
         // Load items
         switchNode(getSourceNode());
@@ -117,6 +123,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         listView.setOnItemClickListener(this);
         listView.setScrollViewCallbacks(this);
         listView.setAdapter(adapter);
+
+        // Init multi choice mode listener
+        libraryItemMultiChoiceMode = new LibraryItemMultiChoiceMode(adapter, listView, this);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(libraryItemMultiChoiceMode);
     }
 
     @Override
@@ -177,11 +188,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             switchNode(node);
             adapter.notifyDataSetChanged();
         } else {
-            updating = (AudioItem) item;
-            Intent intent = new Intent(this, TagFormActivity.class);
-            TagFormActivity.provideItem(updating);
-//            intent.putExtra(TagFormActivity.AUDIO_FILE_KEY, updating.getAudioFile().getFile());
-            startActivityForResult(intent, TAG_UPDATE_REQUEST);
+            List<LibraryItem> items = new ArrayList<>();
+            items.add(item);
+            callTagFormActivity(items);
         }
     }
 
@@ -190,8 +199,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Check which request we're responding to
         if (requestCode == TAG_UPDATE_REQUEST) {
             // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                adapter.notifyDataSetChanged();
+            switch (resultCode) {
+                case RESULT_OK:
+                    listView.clearChoices();
+                    listView.setItemChecked(-1, false);
+                    libraryItemMultiChoiceMode.clearSelection();
+                    adapter.notifyDataSetChanged();
+                    break;
+                default:
+                    break;
             }
         }
         else{
@@ -247,6 +263,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 //        }
     }
 
+    public void callTagFormActivity(List<LibraryItem> items) {
+        Intent intent = new Intent(this, TagFormActivity.class);
+        TagFormActivity.provideItems(items);
+        TagFormActivity.provideItemLoaderManager(manager);
+        startActivityForResult(intent, TAG_UPDATE_REQUEST);
+    }
+
     /**
      * Get the source folder item from shared preferences.
      *
@@ -269,16 +292,49 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     private void switchNode(FolderItem node) {
         adapter.setCurrentNode(node);
         adapter.notifyDataSetChanged();
-        if(null == node.getParent()) {
+        if (null == node.getParent()) {
             setTitle(res.getString(R.string.app_name));
         } else {
             setTitle(node.getPrimaryInformation());
         }
 
         if (node.getState() == LoadingState.NOT_LOADED) {
-            LibraryItemLoader loader = manager.get();
-            manager.execute(loader, node.getFileList());
+            LibraryItemLoader loader = manager.get(false, new LibraryItemLoader.Callback() {
+
+                @Override
+                public void onProgressUpdate(FolderItem item) {
+                    if (adapter.getCurrentNode().equals(item)) {
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onPostExecute(List<FolderItem> items) {
+//                    if (adapter.getCurrentNode().equals(item)) {
+//                        adapter.notifyDataSetChanged();
+//                    }
+                }
+            });
+
+            AsyncTaskExecutor.execute(loader, node);
         }
+
+//        manager.load(node, false, new LibraryItemLoader.Callback() {
+//
+//            @Override
+//            public void onProgressUpdate(FolderItem item) {
+//                if(adapter.getCurrentNode().equals(item)){
+//                    adapter.notifyDataSetChanged();
+//                }
+//            }
+//
+//            @Override
+//            public void onPostExecute(FolderItem item) {
+//                if(adapter.getCurrentNode().equals(item)){
+//                    adapter.notifyDataSetChanged();
+//                }
+//            }
+//        });
     }
 
     /**

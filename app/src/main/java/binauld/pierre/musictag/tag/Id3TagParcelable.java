@@ -4,39 +4,47 @@ package binauld.pierre.musictag.tag;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.jaudiotagger.audio.AudioFile;
-
 import java.util.Map;
 
-public class Id3TagParcelable extends Id3Tag implements Parcelable {
+/**
+ * A wrapper of Id3Tag to make him parcelable.
+ */
+public class Id3TagParcelable implements Parcelable {
 
-    public static final Parcelable.Creator<Id3Tag> CREATOR = new Parcelable.Creator<Id3Tag>() {
-        public Id3Tag createFromParcel(Parcel in) {
+    public static final Parcelable.Creator<Id3TagParcelable> CREATOR = new Parcelable.Creator<Id3TagParcelable>() {
+        public Id3TagParcelable createFromParcel(Parcel in) {
             return new Id3TagParcelable(in);
         }
 
-        public Id3Tag[] newArray(int size) {
-            return new Id3Tag[size];
+        public Id3TagParcelable[] newArray(int size) {
+            return new Id3TagParcelable[size];
         }
     };
 
+    private Id3Tag id3Tag;
+
     private Id3TagParcelable(Parcel in) {
+        this.id3Tag = new Id3Tag();
         final int size = in.readInt();
 
         for (int i = 0; i < size; i++) {
             final SupportedTag tag = (SupportedTag) in.readSerializable();
             final String value = in.readString();
 
-            tags.put(tag, value);
+            id3Tag.put(tag, value);
         }
     }
 
-    public Id3TagParcelable() {
-
+    public Id3TagParcelable(Id3Tag id3Tag) {
+        this.id3Tag = id3Tag;
     }
 
-    public Id3TagParcelable(AudioFile audioFile) {
-        super(audioFile);
+    /**
+     * Get the Id3Tag.
+     * @return The Id3Tag.
+     */
+    public Id3Tag getId3Tag() {
+        return id3Tag;
     }
 
     @Override
@@ -46,12 +54,11 @@ public class Id3TagParcelable extends Id3Tag implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeInt(tags.size());
+        out.writeInt(id3Tag.size());
 
-        for (Map.Entry<SupportedTag, String> entry : tags.entrySet()) {
+        for (Map.Entry<SupportedTag, String> entry : id3Tag.entrySet()) {
             out.writeSerializable(entry.getKey());
             out.writeString(entry.getValue());
         }
     }
-
 }

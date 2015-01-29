@@ -2,15 +2,18 @@ package binauld.pierre.musictag.item;
 
 
 import org.apache.commons.lang.StringUtils;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.tag.FieldKey;
+
+import binauld.pierre.musictag.tag.SupportedTag;
+import binauld.pierre.musictag.wrapper.AudioFile;
 
 /**
  * Represent an audio file in a library.
  */
 public class AudioItem extends ChildItem {
 
-    private AudioFile audio;
+    private AudioFile audioFile;
+    private String primaryInformation;
+    private String secondaryInformation;
 
     @Override
     public boolean isAudioItem() {
@@ -19,16 +22,12 @@ public class AudioItem extends ChildItem {
 
     @Override
     public String getPrimaryInformation() {
-        String primary = audio.getTag().getFirst(FieldKey.TITLE);
-        if(StringUtils.isBlank(primary)) {
-            primary = audio.getFile().getName();
-        }
-        return primary;
+        return primaryInformation;
     }
 
     @Override
     public String getSecondaryInformation() {
-        return audio.getTag().getFirst(FieldKey.ARTIST);
+        return secondaryInformation;
     }
 
     /**
@@ -36,7 +35,7 @@ public class AudioItem extends ChildItem {
      * @return The audio file.
      */
     public AudioFile getAudioFile() {
-        return audio;
+        return audioFile;
     }
 
     /**
@@ -44,7 +43,14 @@ public class AudioItem extends ChildItem {
      * @param audio The audio file.
      */
     public void setAudioFile(AudioFile audio) {
-        this.audio = audio;
+        this.audioFile = audio;
+
+        this.primaryInformation = audioFile.getId3Tag().get(SupportedTag.TITLE);
+        if(StringUtils.isBlank(primaryInformation)) {
+            primaryInformation = audioFile.getFile().getName();
+        }
+
+        this.secondaryInformation = audio.getId3Tag().get(SupportedTag.ARTIST);
     }
 
 }

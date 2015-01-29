@@ -20,6 +20,8 @@
     <string name="year">Année</string>
     <string name="action_valid">Enregistrer</string>
     <string name="action_download_suggestion" >Suggestions</string>
+    <string name="invalid_connection_state_message">Pas de connexion internet !</string>
+    <string name="retry">Rééssayer</string>
     <string name="action_organisation">Organisation</string>
     <string name="underscore">_</string>
     <string name="slash">/</string>

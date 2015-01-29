@@ -370,7 +370,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         } else {
             items = TagFormActivity.providedItems;
             itemArray = items.toArray(new LibraryItem[items.size()]);
-            itemFactory =TagFormActivity.providedItemFactory;
+            itemFactory = TagFormActivity.providedItemFactory;
             return true;
         }
     }

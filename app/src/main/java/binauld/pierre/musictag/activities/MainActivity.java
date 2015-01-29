@@ -165,8 +165,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 return true;
             case R.id.action_organisation:
                 Intent intent2 = new Intent(this, OrganisationActivity.class);
-                FolderItem folder = (FolderItem) adapter.getCurrentNode();
-                OrganisationActivity.root = folder.getFile();
+                List<LibraryItem> folder = new ArrayList<>();
+                folder.add(adapter.getCurrentNode());
+                OrganisationActivity.libraryItems = folder;
                 startActivityForResult(intent2, ORGANISATION_REQUEST);
                 return true;
             default:
@@ -299,7 +300,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         }
 
         if (node.getState() == LoadingState.NOT_LOADED) {
-            LibraryItemLoader loader = manager.get(false, new LibraryItemLoader.Callback() {
+            LibraryItemLoader loader = manager.get(true, new LibraryItemLoader.Callback() {
 
                 @Override
                 public void onProgressUpdate(FolderItem item) {

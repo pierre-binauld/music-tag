@@ -30,17 +30,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.tag.Id3Tag;
+import binauld.pierre.musictag.tag.SupportedTag;
 
 public class OrganisationActivity extends Activity implements View.OnClickListener {
     private EditText placeholder;
-    public static File root;
     public static List<LibraryItem> libraryItems;
     public static final int RELOAD_LIST = 10;
-    private List<File> files;
+    private HashMap<SupportedTag, String> supportedPlaceholderMapping;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.organisation_valid);
         fab.setOnClickListener(this);
+        initPlaceholderMap();
 
         Button btn_title = (Button) findViewById(R.id.btn_title);
         btn_title.setOnClickListener(this);
@@ -115,34 +121,34 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
                 finish();
                 break;
             case R.id.btn_title:
-                addContentToPlaceHolder("{title}");
+                addContentToPlaceHolder("[title]");
                 break;
             case R.id.btn_artist:
-                addContentToPlaceHolder("{artist}");
+                addContentToPlaceHolder("[artist]");
                 break;
             case R.id.btn_album:
-                addContentToPlaceHolder("{album}");
+                addContentToPlaceHolder("[album]");
                 break;
             case R.id.btn_year:
-                addContentToPlaceHolder("{year}");
+                addContentToPlaceHolder("[year]");
                 break;
             case R.id.btn_disc:
-                addContentToPlaceHolder("{disc}");
+                addContentToPlaceHolder("[disc]");
                 break;
             case R.id.btn_track:
-                addContentToPlaceHolder("{track}");
+                addContentToPlaceHolder("[track]");
                 break;
             case R.id.btn_album_artist:
-                addContentToPlaceHolder("{album_artist}");
+                addContentToPlaceHolder("[album_artist]");
                 break;
             case R.id.btn_composer:
-                addContentToPlaceHolder("{composer}");
+                addContentToPlaceHolder("[composer]");
                 break;
             case R.id.btn_grouping:
-                addContentToPlaceHolder("{grouping}");
+                addContentToPlaceHolder("[grouping]");
                 break;
             case R.id.btn_genre:
-                addContentToPlaceHolder("{genre}");
+                addContentToPlaceHolder("[genre]");
                 break;
             case R.id.btn_slash:
                 addContentToPlaceHolder("/");
@@ -171,111 +177,68 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         placeholder.setSelection(cursorPosition+s.length());
     }
 
-    private void filesSelection(){
-        if(libraryItems == null){
-            files = recursiveDirectoryContent(root);
-        }
-        else{
-            for(LibraryItem libraryItem : libraryItems){
-                if(libraryItem.isAudioItem()){
+    private void initPlaceholderMap(){
+        supportedPlaceholderMapping = new HashMap<>();
+        supportedPlaceholderMapping.put(SupportedTag.TITLE, "\\[title\\]");
+        supportedPlaceholderMapping.put(SupportedTag.ARTIST, "\\[artist\\]");
+        supportedPlaceholderMapping.put(SupportedTag.ALBUM, "\\[album\\]");
+        supportedPlaceholderMapping.put(SupportedTag.YEAR, "\\[year\\]");
+        supportedPlaceholderMapping.put(SupportedTag.DISC_NO, "\\[disc\\]");
+        supportedPlaceholderMapping.put(SupportedTag.TRACK, "\\[track\\]");
+        supportedPlaceholderMapping.put(SupportedTag.ALBUM_ARTIST, "\\[album_artist\\]");
+        supportedPlaceholderMapping.put(SupportedTag.COMPOSER, "\\[composer\\]");
+        supportedPlaceholderMapping.put(SupportedTag.GROUPING, "\\[grouping\\]");
+        supportedPlaceholderMapping.put(SupportedTag.GENRE, "\\[genre\\]");
+    }
 
+    private void filesSelection(List<LibraryItem> libItems){
+        for(LibraryItem libraryItem: libItems){
+            String placeholderContent = placeholder.getText().toString();
+            if(libraryItem.isAudioItem()){
+                AudioItem audioItem = (AudioItem) libraryItem;
+                binauld.pierre.musictag.wrapper.AudioFile audioFile = audioItem.getAudioFile();
+                File file = audioFile.getFile();
+                Id3Tag id3Tag = audioFile.getId3Tag();
+                for(Map.Entry<SupportedTag, String> entry : supportedPlaceholderMapping.entrySet()){
+                    String tag;
+                    if(id3Tag.containsKey(entry.getKey()) && !id3Tag.get(entry.getKey()).equals("")){
+                        tag = id3Tag.get(entry.getKey());
+                    }
+                    else{
+                        tag = getString(R.string.unknown);
+                    }
+                    placeholderContent = placeholderContent.replaceAll(entry.getValue(), tag);
                 }
+                placeholderContent = formatEndNameFile(placeholderContent, FilenameUtils.getExtension(file.getName()));
+                String filePath = file.getPath();
+                String oldPath = filePath.substring(0,filePath.lastIndexOf("/")) + "/" + file.getName();
+                // TODO changer pour mettre le truc automatique
+                placeholderContent = "/storage/emulated/0/Music/" + placeholderContent;
+                moveFile(oldPath, placeholderContent);
+            }
+            else {
+                NodeItem nodeItem = (NodeItem) libraryItem;
+                filesSelection(nodeItem.getChildren());
             }
         }
+        deleteEmptyFolders(new File("/storage/emulated/0/Music/"));
     }
 
     private void processOrganisation() {
-        filesSelection();
-        String placeholderContent = placeholder.getText().toString();
-        //list all music files
-        for(File f : files){
-            AudioFile audio = null;
-            try {
-                audio = AudioFileIO.read(f);
-            } catch (CannotReadException | InvalidAudioFrameException | ReadOnlyFileException | TagException | IOException e) {
-                Log.e("error", e.getMessage());
-            }
-            String newPath = root.getPath() + "/" + formatePath(placeholderContent, audio);
-            String oldPath = f.getPath().substring(0,f.getPath().lastIndexOf("/")) + "/";
-
-            moveFile(oldPath + f.getName(), newPath);
-            deleteEmptyFolders(root);
-        }
-        setProgressBarIndeterminateVisibility(false);
+        filesSelection(libraryItems);
     }
 
-    private String formatePath(String placeholder, AudioFile audio){
-        String newPath = placeholder;
-        Tag tags = audio.getTag();
-
-        String title = "\\{title\\}";
-        String artist = "\\{artist\\}";
-        String album = "\\{album\\}";
-        String year = "\\{year\\}";
-        String disc = "\\{disc\\}";
-        String track = "\\{track\\}";
-        String album_artist = "\\{album_artist\\}";
-        String composer = "\\{composer\\}";
-        String grouping = "\\{grouping\\}";
-        String genre = "\\{genre\\}";
-
-        String newTitle = getTheTag(tags, FieldKey.TITLE);
-        String newArtist = getTheTag(tags, FieldKey.ARTIST);
-        String newAlbum = getTheTag(tags, FieldKey.ALBUM);
-        String newYear = getTheTag(tags, FieldKey.YEAR);
-        String newDisc = getTheTag(tags, FieldKey.DISC_NO);
-        String newTrack = getTheTag(tags, FieldKey.TRACK);
-        String newAlbumArtist = getTheTag(tags, FieldKey.ALBUM_ARTIST);
-        String newComposer = getTheTag(tags, FieldKey.COMPOSER);
-        String newGrouping = getTheTag(tags, FieldKey.GROUPING);
-        String newGenre = getTheTag(tags, FieldKey.GENRE);
-
-        newPath = newPath.replaceAll(title, newTitle);
-        newPath = newPath.replaceAll(artist, newArtist);
-        newPath = newPath.replaceAll(album, newAlbum);
-        newPath = newPath.replaceAll(year, newYear);
-        newPath = newPath.replaceAll(disc, newDisc);
-        newPath = newPath.replaceAll(track, newTrack);
-        newPath = newPath.replaceAll(album_artist, newAlbumArtist);
-        newPath = newPath.replaceAll(composer, newComposer);
-        newPath = newPath.replaceAll(grouping, newGrouping);
-        newPath = newPath.replaceAll(genre, newGenre);
-
-        File f = new File(newPath + "." + FilenameUtils.getExtension(audio.getFile().getName()));
+    private String formatEndNameFile(String path, String extension){
+        File f = new File(path + "." + extension);
         int i = 1;
         do{
             if(f.exists()) {
-                f = new File(newPath + " (" + i + ")." + FilenameUtils.getExtension(audio.getFile().getName()));
+                f = new File(path + " (" + i + ")." + extension);
                 i++;
             }
         }while (f.exists());
 
         return f.getPath();
-    }
-
-    public String getTheTag(Tag tags, FieldKey id){
-        if(tags != null && tags.getFirst(id) != null && !tags.getFirst(id).equals("")) {
-            return tags.getFirst(id);
-        }else {
-            return getString(R.string.unknown);
-        }
-    }
-
-    public List<File> recursiveDirectoryContent(File folder){
-        File[] filesInFolder = folder.listFiles();
-        List<File> files = new ArrayList<>();
-        for(File f : filesInFolder){
-            if (f.isDirectory()){
-                List<File> filesInSubFolder = recursiveDirectoryContent(f);
-                for(File file : filesInSubFolder) {
-                    files.add(file);
-                }
-            }
-            else{
-                files.add(f);
-            }
-        }
-        return files;
     }
 
     private void moveFile(String inputPath, String outputPath) {
@@ -321,10 +284,10 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         }
 
         catch (FileNotFoundException fnfe1) {
-            Log.e("tag", fnfe1.getMessage());
+            Log.e("File not found : Error during moveFile", fnfe1.getMessage());
         }
         catch (Exception e) {
-            Log.e("tag", e.getMessage());
+            Log.e("Error during moveFile", e.getMessage());
         }
 
     }

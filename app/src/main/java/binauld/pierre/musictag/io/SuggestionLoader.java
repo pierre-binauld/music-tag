@@ -17,16 +17,12 @@ import binauld.pierre.musictag.wrapper.musicbrainz.MusicBrainzWrapper;
  */
 public class SuggestionLoader extends AsyncTask<Id3Tag, List<SuggestionItem>, Integer> {
 
+    public static final Long UPDATE_STATE = 3L;
+    public static final Integer UPDATE_STATE_COUNT = 7;
+
     private MusicBrainzWrapper musicBrainzWrapper = new MusicBrainzWrapper();
     private SuggestionItemAdapter adapter;
     private Runnable callback;
-
-    private Comparator<SuggestionItem> comparator = new Comparator<SuggestionItem>() {
-        @Override
-        public int compare(SuggestionItem item1, SuggestionItem item2) {
-            return item2.getScore() - item1.getScore();
-        }
-    };
 
     public SuggestionLoader(SuggestionItemAdapter adapter, Runnable callback) {
         this.adapter = adapter;
@@ -38,15 +34,13 @@ public class SuggestionLoader extends AsyncTask<Id3Tag, List<SuggestionItem>, In
 
         int count = 0;
         for (Id3Tag tag : tags) {
-            musicBrainzWrapper.initQuery(tag, 3L);
-            //TODO: Magic number !
-            for(int i=0; i<7;i++) {
+            musicBrainzWrapper.initQuery(tag, UPDATE_STATE);
+            for(int i=0; i<UPDATE_STATE_COUNT;i++) {
                 List<SuggestionItem> items = new ArrayList<>();
                 List<ScoredId3Tag> resultTags = musicBrainzWrapper.nextSearchPage();
                 for (ScoredId3Tag resultTag : resultTags) {
                     items.add(new SuggestionItem(resultTag.getTag(), resultTag.getScore()));
                 }
-//                Collections.sort(items, comparator);
                 publishProgress(items);
                 count += items.size();
             }

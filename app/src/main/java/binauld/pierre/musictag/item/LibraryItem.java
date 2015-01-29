@@ -44,5 +44,5 @@ public interface LibraryItem {
      * Allow to change the bitmap decoder.
      * @param bitmapDecoder The bitmap decoder.
      */
-    void switchDecoder(BitmapDecoder bitmapDecoder);
+    void setDecoder(BitmapDecoder bitmapDecoder);
 }

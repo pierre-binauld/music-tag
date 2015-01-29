@@ -9,6 +9,7 @@ import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
+import binauld.pierre.musictag.wrapper.FileWrapper;
 
 public class LibraryItemFactoryHelper {
 
@@ -18,8 +19,8 @@ public class LibraryItemFactoryHelper {
      * @param defaultArtworkBitmapDecoder The default artwork bitmap decoder.
      * @return A library item factory.
      */
-    public static LibraryItemFactory buildFactory(Resources res, FileFilter filter, BitmapDecoder defaultArtworkBitmapDecoder) {
+    public static LibraryItemFactory buildFactory(Resources res, FileWrapper wrapper, BitmapDecoder defaultArtworkBitmapDecoder) {
         BitmapDecoder folderBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.folder);
-        return new LibraryItemFactory(defaultArtworkBitmapDecoder, folderBitmapDecoder, filter, res);
+        return new LibraryItemFactory(wrapper, defaultArtworkBitmapDecoder, folderBitmapDecoder, res);
     }
 }

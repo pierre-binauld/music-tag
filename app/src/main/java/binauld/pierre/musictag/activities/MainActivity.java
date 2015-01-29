@@ -31,7 +31,6 @@ import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryItemAdapter;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
-import binauld.pierre.musictag.factory.FileFilterFactory;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
 import binauld.pierre.musictag.io.AsyncTaskExecutor;
@@ -45,6 +44,8 @@ import binauld.pierre.musictag.listener.LibraryItemMultiChoiceMode;
 import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.service.Locator;
+import binauld.pierre.musictag.wrapper.FileWrapper;
+import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 
 /**
  * Main activity of the app.
@@ -60,11 +61,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     private ObservableListView listView;
 
+    private FileWrapper wrapper;
+
     private Resources res;
     private SharedPreferences sharedPrefs;
 
     private LibraryItemFactory itemFactory;
-    private FileFilter filter;
 
     private LibraryItemMultiChoiceMode libraryItemMultiChoiceMode;
 //    private List<LibraryItem> updating;
@@ -98,12 +100,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         ArtworkService artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
         artworkService.initDefaultArtwork(artworkSize);
 
-        // Init filter
-        FileFilterFactory filterFactory = new FileFilterFactory();
-        filter = filterFactory.build();
+        wrapper = new JAudioTaggerWrapper();
 
         // Init factory
-        itemFactory = LibraryItemFactoryHelper.buildFactory(res, filter, defaultArtworkBitmapDecoder);
+        itemFactory = LibraryItemFactoryHelper.buildFactory(res, wrapper, defaultArtworkBitmapDecoder);
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -266,7 +266,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     public void callTagFormActivity(List<LibraryItem> items) {
         Intent intent = new Intent(this, TagFormActivity.class);
         TagFormActivity.provideItems(items);
-        TagFormActivity.provideItemLoaderManager(manager);
+        TagFormActivity.provideItemFactory(itemFactory);
         startActivityForResult(intent, TAG_UPDATE_REQUEST);
     }
 
@@ -310,31 +310,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
                 @Override
                 public void onPostExecute(List<FolderItem> items) {
-//                    if (adapter.getCurrentNode().equals(item)) {
-//                        adapter.notifyDataSetChanged();
-//                    }
                 }
             });
 
             AsyncTaskExecutor.execute(loader, node);
         }
-
-//        manager.load(node, false, new LibraryItemLoader.Callback() {
-//
-//            @Override
-//            public void onProgressUpdate(FolderItem item) {
-//                if(adapter.getCurrentNode().equals(item)){
-//                    adapter.notifyDataSetChanged();
-//                }
-//            }
-//
-//            @Override
-//            public void onPostExecute(FolderItem item) {
-//                if(adapter.getCurrentNode().equals(item)){
-//                    adapter.notifyDataSetChanged();
-//                }
-//            }
-//        });
     }
 
     /**

@@ -16,19 +16,18 @@ public class FolderItem extends NodeItem {
 
     private File file;
     private File[] fileList;
-    private String secondaryInformation;
-    private FileFilter filter;
     private List<FolderItem> folderItems;
+
+    private String secondaryInformation;
 
     public FolderItem(File file, FileFilter filter, Resources res) {
         this(file, filter, null, res);
     }
 
     public FolderItem(File file, FileFilter filter, NodeItem parent, Resources res) {
-        //TODO: Use AudioFile logic
+        //TODO: Use AudioFile logic: contains 1 object witch extends Displayable interface. Items have to be used in a tree.
         super(parent);
         this.file = file;
-        this.filter = filter;
         this.fileList = file.listFiles(filter);
         this.folderItems = new ArrayList<>();
 
@@ -63,14 +62,6 @@ public class FolderItem extends NodeItem {
     }
 
     /**
-     * Get the filter.
-     * @return The filter.
-     */
-    public FileFilter getFilter() {
-        return filter;
-    }
-
-    /**
      * Get the number of sub file.
      * @return The number of sub file.
      */
@@ -87,7 +78,7 @@ public class FolderItem extends NodeItem {
     }
 
     @Override
-    public int getMaxChildren() {
+    public int getMaxChildrenCount() {
         if(null != fileList) {
             return fileList.length;
         } else {

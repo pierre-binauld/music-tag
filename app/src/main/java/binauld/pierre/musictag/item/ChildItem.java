@@ -29,7 +29,7 @@ public abstract class ChildItem implements LibraryItem {
     }
 
     @Override
-    public void switchDecoder(BitmapDecoder decoder) {
+    public void setDecoder(BitmapDecoder decoder) {
         this.decoder = decoder;
     }
 }

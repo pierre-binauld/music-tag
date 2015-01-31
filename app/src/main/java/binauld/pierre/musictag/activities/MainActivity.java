@@ -20,7 +20,6 @@ import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCal
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,14 +31,13 @@ import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
 import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
-import binauld.pierre.musictag.io.AsyncTaskExecutor;
-import binauld.pierre.musictag.io.LibraryItemLoader;
-import binauld.pierre.musictag.io.LibraryItemLoaderManager;
-import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
 import binauld.pierre.musictag.item.NodeItem;
 import binauld.pierre.musictag.listener.LibraryItemMultiChoiceMode;
+import binauld.pierre.musictag.loader.AsyncTaskExecutor;
+import binauld.pierre.musictag.loader.LibraryItemLoader;
+import binauld.pierre.musictag.loader.LibraryItemLoaderManager;
 import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.service.Locator;
@@ -176,7 +174,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
         if (!item.isAudioItem()) {
-            FolderItem node = (FolderItem) item;
+            NodeItem node = (NodeItem) item;
             switchNode(node);
             adapter.notifyDataSetChanged();
         } else {
@@ -258,12 +256,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      *
      * @return The source folder item.
      */
-    public FolderItem getSourceNode() {
+    public NodeItem getSourceNode() {
         String sourceFolder = sharedPrefs.getString(
                 res.getString(R.string.source_folder_preference_key),
                 res.getString(R.string.source_folder_preference_default));
 
-        return itemFactory.buildFolderItem(new File(sourceFolder), null);
+        return itemFactory.buildNodeItem(new File(sourceFolder), null);
     }
 
     /**
@@ -272,27 +270,27 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      *
      * @param node The node to switch to.
      */
-    private void switchNode(FolderItem node) {
+    private void switchNode(NodeItem node) {
         adapter.setCurrentNode(node);
         adapter.notifyDataSetChanged();
         if (null == node.getParent()) {
             setTitle(res.getString(R.string.app_name));
         } else {
-            setTitle(node.getPrimaryInformation());
+            setTitle(node.getItemable().getPrimaryInformation());
         }
 
         if (node.getState() == LoadingState.NOT_LOADED) {
             LibraryItemLoader loader = manager.get(false, new LibraryItemLoader.Callback() {
 
                 @Override
-                public void onProgressUpdate(FolderItem item) {
+                public void onProgressUpdate(NodeItem item) {
                     if (adapter.getCurrentNode().equals(item)) {
                         adapter.notifyDataSetChanged();
                     }
                 }
 
                 @Override
-                public void onPostExecute(List<FolderItem> items) {
+                public void onPostExecute(List<NodeItem> items) {
                 }
             });
 
@@ -310,7 +308,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         if (parent == null) {
             return false;
         } else {
-            switchNode((FolderItem) parent);
+            switchNode((NodeItem) parent);
             return true;
         }
     }

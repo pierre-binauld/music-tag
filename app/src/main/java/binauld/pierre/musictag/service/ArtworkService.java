@@ -5,10 +5,10 @@ import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.io.ArtworkLoader;
-import binauld.pierre.musictag.io.AsyncDrawable;
-import binauld.pierre.musictag.io.DefaultArtworkLoader;
-import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.itemable.Itemable;
+import binauld.pierre.musictag.loader.ArtworkLoader;
+import binauld.pierre.musictag.loader.AsyncDrawable;
+import binauld.pierre.musictag.loader.DefaultArtworkLoader;
 
 /**
  * Help to build artwork from audio file.
@@ -36,9 +36,9 @@ public class ArtworkService {
      * @param item      Current item.
      * @param imageView Associated image view.
      */
-    public void setArtwork(LibraryItem item, ImageView imageView, int artworkSize) {
+    public void setArtwork(Itemable item, ImageView imageView, int artworkSize) {
 
-        final String key = item.getDecoder().getKey(artworkSize, artworkSize);
+        final String key = item.getBitmapDecoder().getKey(artworkSize, artworkSize);
 
         final Bitmap bitmap = cacheService.get(key);
 
@@ -61,11 +61,11 @@ public class ArtworkService {
      * @param imageView The image view which has to display artwork thumbnail.
      * @return False if the same work is in progress.
      */
-    private boolean cancelPotentialWork(LibraryItem item, ImageView imageView) {
+    private boolean cancelPotentialWork(Itemable item, ImageView imageView) {
         final ArtworkLoader artworkLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
 
         if (artworkLoader != null) {
-            final LibraryItem taskItem = artworkLoader.getWorkingItem();
+            final Itemable taskItem = artworkLoader.getWorkingItem();
             // If bitmapData is not yet set or it differs from the new data
             if (taskItem == null || taskItem != item) {
                 // Cancel previous task

@@ -2,6 +2,7 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +13,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.item.itemable.Folder;
+import binauld.pierre.musictag.item.itemable.Itemable;
 import binauld.pierre.musictag.service.ArtworkService;
 
 /**
  * Adapt a list of library item for a list view.
  */
 public class LibraryItemAdapter extends BaseAdapter {
-
+    private Drawable background;
 
 
 //    public void toggleAudio(AudioItem audio){
@@ -131,13 +133,16 @@ public class LibraryItemAdapter extends BaseAdapter {
             // store the holder with the view.
             convertView.setTag(viewHolder);
 
+            if(null == background) {
+                background = convertView.getBackground();
+            }
         } else {
             // just use the viewHolder
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         // object item based on the position
-        LibraryItem item = currentNode.getChild(position);
+        Itemable item = currentNode.getChild(position).getItemable();
 
         // assign values if the object is not null
         if (item != null) {
@@ -149,7 +154,7 @@ public class LibraryItemAdapter extends BaseAdapter {
                 //TODO: Magic Color!
                 convertView.setBackgroundColor(Color.parseColor("#ffb74d"));
             } else {
-//                convertView.setBackgroundColor(Color.parseColor("#fafafa"));
+                convertView.setBackground(background);
             }
         }
 
@@ -200,7 +205,7 @@ public class LibraryItemAdapter extends BaseAdapter {
                 progressBar.setVisibility(View.GONE);
             } else {
                 progressBar.setVisibility(View.VISIBLE);
-                progressBar.setMax(currentNode.getMaxChildrenCount());
+                progressBar.setMax(((Folder)currentNode.getItemable()).getMaxChildrenCount());
                 updateProgressBar();
             }
         }

@@ -8,13 +8,12 @@ import java.io.FileFilter;
 import java.io.IOException;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.item.AudioItem;
-import binauld.pierre.musictag.item.FolderItem;
+import binauld.pierre.musictag.item.ChildItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.wrapper.AudioFile;
+import binauld.pierre.musictag.item.itemable.AudioFile;
+import binauld.pierre.musictag.item.itemable.Folder;
 import binauld.pierre.musictag.wrapper.FileWrapper;
-import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 
 /**
  * Build a library item from a source file.
@@ -46,50 +45,32 @@ public class LibraryItemFactory {
      */
     public LibraryItem build(File file, NodeItem parent) throws IOException {
         if (file.isDirectory()) {
-            return buildFolderItem(file, parent);
+            return buildNodeItem(file, parent);
         } else {
-            return buildAudioItem(file, parent);
+            return buildItem(file, parent);
         }
     }
 
-    public AudioItem buildAudioItem(File file, NodeItem parent) throws IOException {
+    public ChildItem buildItem(File file, NodeItem parent) throws IOException {
         AudioFile audioFile = wrapper.build(file);
         BitmapDecoder decoder = audioFile.getBitmapDecoder();
         if(null == decoder) {
             decoder = defaultArtworkDecoder;
         }
+        audioFile.setBitmapDecoder(decoder);
 
-        AudioItem audioItem = new AudioItem();
+        ChildItem audioItem = new ChildItem(audioFile);
         audioItem.setParent(parent);
-        audioItem.setAudioFile(audioFile);
-        audioItem.setDecoder(decoder);
+//        audioItem.setAudioFile(audioFile);
+//        audioItem.setBitmapDecoder(decoder);
 
         return audioItem;
     }
 
-    public FolderItem buildFolderItem(File file, NodeItem parent) {
-        FolderItem folder = new FolderItem(file, filter, parent, res);
-        folder.setDecoder(folderBitmapDecoder);
-        return folder;
+    public NodeItem buildNodeItem(File file, NodeItem parent) {
+        Folder folder = new Folder(file, filter, res);
+        folder.setBitmapDecoder(folderBitmapDecoder);
+        NodeItem node = new NodeItem(folder, parent);
+        return node;
     }
-
-//    @Deprecated
-//    private void put(AudioItem item, File file) throws IOException {
-//        if (!file.isDirectory()) {
-//            try {
-//                AudioFile audio = AudioFileIO.read(file);
-//                item.setAudioFile(audio);
-//                if(null != audio.getTag().getFirstArtwork()) {
-//                    item.setDecoder(new AudioFileBitmapDecoder(audio));
-//                } else {
-//                    item.setDecoder(defaultArtworkDecoder);
-//                }
-//
-//            } catch (CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-//                throw new IOException(e);
-//            }
-//        } else {
-//            throw new IOException(file.getAbsolutePath() + " is not a directory.");
-//        }
-//    }
 }

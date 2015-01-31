@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.io;
+package binauld.pierre.musictag.loader;
 
 
 import android.os.AsyncTask;
@@ -6,11 +6,10 @@ import android.util.Log;
 
 import java.io.IOException;
 
-import binauld.pierre.musictag.item.AudioItem;
-import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.item.itemable.AudioFile;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
-import binauld.pierre.musictag.wrapper.AudioFile;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 
 public class TagSaver extends AsyncTask<LibraryItem, Void, Void> {
@@ -41,17 +40,18 @@ public class TagSaver extends AsyncTask<LibraryItem, Void, Void> {
     public void save(LibraryItem item) {
         if (item.isAudioItem()) {
             try {
-                AudioItem audioItem = (AudioItem) item;
-                AudioFile audioFile = audioItem.getAudioFile();
+//                AudioItem audioItem = (AudioItem) item;
+                AudioFile audioFile = (AudioFile)item.getItemable();
                 multipleId3Tag.update(audioFile.getId3Tag());
-                audioItem.setAudioFile(audioFile);
+                //TODO: warn primary info not updated
+//                audioItem.setAudioFile(audioFile);
                 fileWrapper.save(audioFile);
             } catch (IOException e) {
                 Log.w(this.getClass().toString(), e.getMessage(), e);
             }
         } else {
-            FolderItem folderItem = (FolderItem) item;
-            for (LibraryItem li : folderItem.getChildren()) {
+            NodeItem nodeItem = (NodeItem) item;
+            for (LibraryItem li : nodeItem.getChildren()) {
                 save(li);
             }
         }

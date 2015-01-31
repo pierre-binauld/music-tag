@@ -5,21 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import binauld.pierre.musictag.collection.MultipleBufferedList;
+import binauld.pierre.musictag.item.itemable.Itemable;
 
 /**
  * Represent a folder in a library.
  */
-public abstract class NodeItem extends ChildItem {
+public class NodeItem extends ChildItem {
 
     private MultipleBufferedList<LibraryItem> children;
     private LoadingState state;
     private int invalidItemCount;
+    private List<NodeItem> nodeItems = new ArrayList<>();
 
-    public NodeItem() {
-        this(null);
+    public NodeItem(Itemable itemable) {
+        this(itemable, null);
     }
 
-    public NodeItem(NodeItem parent) {
+    public NodeItem(Itemable itemable, NodeItem parent) {
+        super(itemable);
         this.parent = parent;
         this.children = new MultipleBufferedList<>(new MultipleBufferedList.ListFactory<LibraryItem>() {
             public List<LibraryItem> buildEmptyList() {
@@ -29,16 +32,16 @@ public abstract class NodeItem extends ChildItem {
         this.state = LoadingState.NOT_LOADED;
     }
 
-    @Override
-    public boolean isAudioItem() {
-        return false;
-    }
+//    @Override
+//    public boolean isAudioItem() {
+//        return false;
+//    }
 
     /**
      * Get the maximum number of possible children.
      * @return The maximum number of possible children.
      */
-    public abstract int getMaxChildrenCount();
+//    public abstract int getMaxChildrenCount();
 
     /**
      * Get the number of children node.
@@ -94,5 +97,14 @@ public abstract class NodeItem extends ChildItem {
      */
     public int getInvalidItemCount() {
         return invalidItemCount;
+    }
+
+    @Override
+    public boolean isAudioItem() {
+        return false;
+    }
+
+    public List<NodeItem> getNodeItems() {
+        return nodeItems;
     }
 }

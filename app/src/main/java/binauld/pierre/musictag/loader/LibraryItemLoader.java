@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.io;
+package binauld.pierre.musictag.loader;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,9 +14,10 @@ import java.util.Queue;
 
 import binauld.pierre.musictag.collection.MultipleBufferedList;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.LoadingState;
+import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.item.itemable.Folder;
 
 /**
  * Load all the audio files and directories from a folder to an adapter.
@@ -28,12 +29,12 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
     private boolean drillDown;
 
     //    private MultipleBufferedList<LibraryItem> items;
-//    private MultipleBufferedList<FolderItem> folderItems;
+//    private MultipleBufferedList<NodeItem> NodeItems;
     private LibraryItemFactory factory;
 //    private int invalidItemCount;
 
     //    private LibraryItemAdapter adapter;
-//    private FolderItem rootItem;
+//    private NodeItem rootItem;
     private Comparator<LibraryItem> comparator;
 
     private Callback callback;
@@ -55,14 +56,14 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
     @Override
     protected LibraryItemLoader.Result doInBackground(LibraryItem... params) {
 
-        List<FolderItem> items = new ArrayList<>();
+        List<NodeItem> items = new ArrayList<>();
         for (LibraryItem item : params) {
             if (!item.isAudioItem()) {
-                items.add((FolderItem) item);
+                items.add((NodeItem) item);
             }
         }
 
-        for (FolderItem item : items) {
+        for (NodeItem item : items) {
             loadItemTree(item);
         }
 
@@ -75,7 +76,7 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
     protected void onProgressUpdate(Progress... progresses) {
         for (Progress progress : progresses) {
             progress.childItems.pull();
-//            progress.folderItems.pull();
+//            progress.NodeItems.pull();
             progress.currentItem.setInvalidItemCount(progress.invalidItemCount);
             progress.currentItem.setState(progress.state);
             callback.onProgressUpdate(progress.rootItem);
@@ -86,41 +87,41 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
     @Override
     protected void onPostExecute(Result result) {
 //        items.pull();
-//        folderItems.pull();
+//        NodeItems.pull();
 //        rootItem.setState(LoadingState.LOADED);
         callback.onPostExecute(result.foldersItems);
 //        adapter.notifyDataSetChanged();
     }
 
-    public void loadItemTree(FolderItem rootItem) {
-        Queue<FolderItem> queue = new LinkedList<>();
+    public void loadItemTree(NodeItem rootItem) {
+        Queue<NodeItem> queue = new LinkedList<>();
         queue.add(rootItem);
 
         do {
-            FolderItem currentFolderItem = queue.poll();
+            NodeItem currentNodeItem = queue.poll();
 
 //            int invalidItemCount = 0;
-            if (currentFolderItem.getState() == LoadingState.LOADING) {
-                queue.add(currentFolderItem);
+            if (currentNodeItem.getState() == LoadingState.LOADING) {
+                queue.add(currentNodeItem);
             } else {
-                if (currentFolderItem.getState() == LoadingState.NOT_LOADED) {
-                    currentFolderItem.setState(LoadingState.LOADING);
+                if (currentNodeItem.getState() == LoadingState.NOT_LOADED) {
+                    currentNodeItem.setState(LoadingState.LOADING);
 
-                    loadItem(rootItem, currentFolderItem);
+                    loadItem(rootItem, currentNodeItem);
                 }
 
-                queue.addAll(currentFolderItem.getFolderItems());
+                queue.addAll(currentNodeItem.getNodeItems());
             }
         } while (!queue.isEmpty() && drillDown);
     }
 
-    private void loadItem(FolderItem rootItem, FolderItem currentFolderItem) {
+    private void loadItem(NodeItem rootItem, NodeItem currentNodeItem) {
 
         int invalidItemCount = 0;
 
-        MultipleBufferedList<LibraryItem> currentItems = currentFolderItem.getChildren();
-        List<FolderItem> currentFolderItems = currentFolderItem.getFolderItems();
-        File[] currentFiles = currentFolderItem.getFileList();
+        MultipleBufferedList<LibraryItem> currentItems = currentNodeItem.getChildren();
+        List<NodeItem> currentNodeItems = currentNodeItem.getNodeItems();
+        File[] currentFiles = ((Folder)currentNodeItem.getItemable()).getFileList();
 
         if (null != currentFiles) {
 
@@ -128,11 +129,11 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
             for (int i = 0; i < currentFiles.length; i++) {
 
                 try {
-                    LibraryItem item = factory.build(currentFiles[i], currentFolderItem);
+                    LibraryItem item = factory.build(currentFiles[i], currentNodeItem);
 
                     if (!item.isAudioItem()) {
-                        FolderItem folderItem = (FolderItem) item;
-                        currentFolderItems.add(folderItem);
+                        NodeItem NodeItem = (NodeItem) item;
+                        currentNodeItems.add(NodeItem);
                     }
                     currentItems.add(item);
 
@@ -145,12 +146,12 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
                 if (j == 0 || i == currentFiles.length - 1) {
                     Collections.sort(currentItems.getWorkingList(), comparator);
                     currentItems.push();
-//                    currentFolderItems.push();
+//                    currentNodeItems.push();
                     Progress progress = new Progress();
                     progress.rootItem = rootItem;
-                    progress.currentItem = currentFolderItem;
+                    progress.currentItem = currentNodeItem;
                     progress.childItems = currentItems;
-                    progress.folderItems = currentFolderItems;
+                    progress.NodeItems = currentNodeItems;
                     progress.invalidItemCount = invalidItemCount;
                     if (i == currentFiles.length - 1) {
                         progress.state = LoadingState.LOADED;
@@ -165,22 +166,22 @@ public class LibraryItemLoader extends AsyncTask<LibraryItem, LibraryItemLoader.
 
     static class Progress {
         private LoadingState state;
-        private FolderItem rootItem;
-        private FolderItem currentItem;
+        private NodeItem rootItem;
+        private NodeItem currentItem;
         private MultipleBufferedList<LibraryItem> childItems;
-        private List<FolderItem> folderItems;
+        private List<NodeItem> NodeItems;
         private int invalidItemCount;
 
     }
 
     static class Result {
-        List<FolderItem> foldersItems;
+        List<NodeItem> foldersItems;
     }
 
     public static interface Callback {
 
-        void onProgressUpdate(FolderItem item);
+        void onProgressUpdate(NodeItem item);
 
-        void onPostExecute(List<FolderItem> item);
+        void onPostExecute(List<NodeItem> item);
     }
 }

@@ -1,13 +1,13 @@
-package binauld.pierre.musictag.io;
+package binauld.pierre.musictag.loader;
 
 
 import android.os.AsyncTask;
 
 import java.util.Map;
 
-import binauld.pierre.musictag.item.AudioItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.item.itemable.AudioFile;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
@@ -35,8 +35,7 @@ public class TagFormLoader extends AsyncTask<LibraryItem, Void, MultipleId3Tag> 
 
     public void updateMultipleId3Tag(MultipleId3Tag multipleId3Tag, LibraryItem item) {
         if (item.isAudioItem()) {
-            AudioItem audioItem = (AudioItem) item;
-            Id3Tag id3Tag = audioItem.getAudioFile().getId3Tag();
+            Id3Tag id3Tag = ((AudioFile)item.getItemable()).getId3Tag();
 
 //                result.tags.put(audioItem, id3Tag);
             multipleId3Tag.put(id3Tag);

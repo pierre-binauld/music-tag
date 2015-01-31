@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.io;
+package binauld.pierre.musictag.loader;
 
 
 import android.content.res.Resources;

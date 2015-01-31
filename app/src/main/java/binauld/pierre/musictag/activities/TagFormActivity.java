@@ -26,15 +26,14 @@ import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.io.AsyncTaskExecutor;
-import binauld.pierre.musictag.io.LibraryItemLoader;
-import binauld.pierre.musictag.io.LibraryItemLoaderManager;
-import binauld.pierre.musictag.io.TagFormLoader;
-import binauld.pierre.musictag.io.TagSaver;
-import binauld.pierre.musictag.item.AudioItem;
-import binauld.pierre.musictag.item.FolderItem;
 import binauld.pierre.musictag.item.LibraryItem;
 import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.item.itemable.AudioFile;
+import binauld.pierre.musictag.loader.AsyncTaskExecutor;
+import binauld.pierre.musictag.loader.LibraryItemLoader;
+import binauld.pierre.musictag.loader.LibraryItemLoaderManager;
+import binauld.pierre.musictag.loader.TagFormLoader;
+import binauld.pierre.musictag.loader.TagSaver;
 import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.Id3TagParcelable;
@@ -255,7 +254,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
     private void buildFilenameString(StringBuilder filenames, LibraryItem item) {
         if (item.isAudioItem()) {
-            filenames.append(((AudioItem) item).getAudioFile().getFile().getAbsolutePath());
+            filenames.append(((AudioFile) item.getItemable()).getFile().getAbsolutePath());
             filenames.append("\n");
         } else {
             NodeItem node = (NodeItem) item;
@@ -384,12 +383,12 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         LibraryItemLoader.Callback tagFormLoaderLauncher = new LibraryItemLoader.Callback() {
 
             @Override
-            public void onProgressUpdate(FolderItem item) {
+            public void onProgressUpdate(NodeItem item) {
 
             }
 
             @Override
-            public void onPostExecute(List<FolderItem> results) {
+            public void onPostExecute(List<NodeItem> results) {
                 TagFormLoader.Callback callback = new TagFormLoader.Callback() {
                     @Override
                     public void onPostExecute(MultipleId3Tag multipleId3Tag) {

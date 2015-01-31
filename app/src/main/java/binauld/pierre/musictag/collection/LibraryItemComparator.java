@@ -18,8 +18,8 @@ public class LibraryItemComparator implements Comparator<LibraryItem> {
         } else if (item1.isAudioItem() && !item2.isAudioItem()) {
             return 1;
         } else {
-            return item1.getPrimaryInformation().toLowerCase()
-                    .compareTo(item2.getPrimaryInformation().toLowerCase());
+            return item1.getItemable().getPrimaryInformation().toLowerCase()
+                    .compareTo(item2.getItemable().getPrimaryInformation().toLowerCase());
         }
     }
 }

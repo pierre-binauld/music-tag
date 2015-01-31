@@ -20,7 +20,7 @@ import com.melnykov.fab.FloatingActionButton;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
-import binauld.pierre.musictag.io.SuggestionLoader;
+import binauld.pierre.musictag.loader.SuggestionLoader;
 import binauld.pierre.musictag.item.SuggestionItem;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.Id3TagParcelable;

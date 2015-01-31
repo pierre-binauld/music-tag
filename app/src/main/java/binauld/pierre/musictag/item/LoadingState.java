@@ -6,5 +6,5 @@ package binauld.pierre.musictag.item;
 public enum LoadingState {
     NOT_LOADED,
     LOADING,
-    LOADED
+    LOADED;
 }

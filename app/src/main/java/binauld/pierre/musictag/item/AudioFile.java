@@ -8,5 +8,7 @@ public interface AudioFile extends Item {
 
     public Id3Tag getId3Tag();
 
+    public void setId3Tag(Id3Tag id3Tag);
+
     public File getFile();
 }

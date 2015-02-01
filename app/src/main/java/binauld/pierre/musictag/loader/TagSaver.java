@@ -9,6 +9,7 @@ import java.io.IOException;
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.item.AudioFile;
 import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
 import binauld.pierre.musictag.visitor.ItemVisitor;
 import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
@@ -49,9 +50,9 @@ public class TagSaver extends AsyncTask<LibraryComponent, Void, Void> implements
     @Override
     public void visit(AudioFile audioFile) {
         try {
-            multipleId3Tag.update(audioFile.getId3Tag());
-            //TODO: warn primary info not updated
-//                audioItem.setAudioFile(audioFile);
+            Id3Tag id3Tag = audioFile.getId3Tag();
+            multipleId3Tag.update(id3Tag);
+            audioFile.setId3Tag(id3Tag);
             fileWrapper.save(audioFile);
         } catch (IOException e) {
             Log.w(this.getClass().toString(), e.getMessage(), e);

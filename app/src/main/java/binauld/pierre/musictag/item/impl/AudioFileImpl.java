@@ -42,6 +42,7 @@ public class AudioFileImpl extends DecoderItem implements AudioFile {
         return id3Tag;
     }
 
+    @Override
     public void setId3Tag(Id3Tag id3Tag) {
         this.id3Tag = id3Tag;
 

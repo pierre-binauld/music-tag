@@ -74,7 +74,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private LibraryComponent[] componentArray;
     private MultipleId3Tag multipleId3Tag;
 
-    HashMap<SupportedTag, EditText> views = new HashMap<>();
+    private HashMap<SupportedTag, EditText> views = new HashMap<>();
 
     private ProgressDialog loadingDialog;
     private ProgressDialog savingDialog;
@@ -93,7 +93,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private EditText txt_track;
 
     private String multipleTagMessage;
-    FileWrapper wrapper = new JAudioTaggerWrapper();
+    private FileWrapper wrapper = new JAudioTaggerWrapper();
 
 
     @Override

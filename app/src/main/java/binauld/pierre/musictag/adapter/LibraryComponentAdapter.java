@@ -102,7 +102,7 @@ public class LibraryComponentAdapter extends BaseAdapter {
             convertView.setTag(viewHolder);
             if(listView.isItemChecked(position)) {
                 //TODO: Magic Color!
-                convertView.setBackgroundColor(Color.parseColor("#ffb74d"));
+                convertView.setBackgroundColor(Color.parseColor("#ffe0b2"));
             } else {
                 convertView.setBackground(background);
             }

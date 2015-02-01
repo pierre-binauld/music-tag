@@ -1,7 +1,10 @@
 package binauld.pierre.musictag.activities;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,6 +12,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.melnykov.fab.FloatingActionButton;
 
@@ -37,12 +41,27 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
     public static final int RELOAD_LIST = 10;
     private HashMap<SupportedTag, String> supportedPlaceholderMapping;
 
+    private Resources res;
+    private SharedPreferences sharedPrefs;
+    private String sourceFolder;
+    private String placeholderSetting;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_organisation);
         placeholder = (EditText) findViewById(R.id.edit_text_organisation);
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        res = getResources();
+        sourceFolder = sharedPrefs.getString(
+                res.getString(R.string.source_folder_preference_key),
+                res.getString(R.string.source_folder_preference_default));
+        placeholderSetting = sharedPrefs.getString(
+                res.getString(R.string.placeholder_preference_key),
+                res.getString(R.string.placeholder_preference_default));
+        placeholder.setText(placeholderSetting);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.organisation_valid);
         fab.setOnClickListener(this);
@@ -202,8 +221,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
                 placeholderContent = formatEndNameFile(placeholderContent, FilenameUtils.getExtension(file.getName()));
                 String filePath = file.getPath();
                 String oldPath = filePath.substring(0,filePath.lastIndexOf("/")) + "/" + file.getName();
-                // TODO changer pour mettre le truc automatique
-                placeholderContent = "/storage/emulated/0/Music/" + placeholderContent;
+                placeholderContent = sourceFolder + placeholderContent;
                 moveFile(oldPath, placeholderContent);
             }
             else {
@@ -211,10 +229,13 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
                 filesSelection(nodeItem.getChildren());
             }
         }
-        deleteEmptyFolders(new File("/storage/emulated/0/Music/"));
+        deleteEmptyFolders(new File(sourceFolder));
     }
 
     private void processOrganisation() {
+        ProgressBar spinner = (ProgressBar)findViewById(R.id.progressBar1);
+        spinner.setVisibility(View.VISIBLE);
+        Log.e("yolo", "ca passe");
         filesSelection(libraryItems);
     }
 

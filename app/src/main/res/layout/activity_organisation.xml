@@ -181,5 +181,13 @@
         android:src="@drawable/ic_action_done_24dp"
         fab:fab_colorNormal="@color/color_accent"
         fab:fab_colorPressed="@color/color_accent_pressed"
-        fab:fab_colorRipple="@color/color_accent_hover" />
+        fab:fab_colorRipple="@color/color_accent_hover"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone"/>
 </FrameLayout>

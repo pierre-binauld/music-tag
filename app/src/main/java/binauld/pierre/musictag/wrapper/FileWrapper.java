@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 
-import binauld.pierre.musictag.item.itemable.AudioFile;
+import binauld.pierre.musictag.item.AudioFile;
 
 public interface FileWrapper {
 

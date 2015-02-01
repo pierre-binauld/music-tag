@@ -1,8 +1,9 @@
-package binauld.pierre.musictag.item.itemable;
+package binauld.pierre.musictag.item;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.visitor.ItemVisitor;
 
-public interface Itemable {
+public interface Item {
 
     /**
      * Get the primary information of the item (Like list_item_placeholder title or folder name).
@@ -30,5 +31,8 @@ public interface Itemable {
      * @param bitmapDecoder The bitmap decoder.
      */
     void setBitmapDecoder(BitmapDecoder bitmapDecoder);
+
+
+    void accept(ItemVisitor visitor);
 
 }

@@ -5,58 +5,81 @@ import android.os.AsyncTask;
 
 import java.util.Map;
 
-import binauld.pierre.musictag.item.LibraryItem;
-import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.item.itemable.AudioFile;
+import binauld.pierre.musictag.composite.LibraryComponent;
+import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.visitor.ComponentVisitor;
+import binauld.pierre.musictag.visitor.ItemVisitor;
+import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
 
-public class TagFormLoader extends AsyncTask<LibraryItem, Void, MultipleId3Tag> {
+public class TagFormLoader extends AsyncTask<LibraryComponent, Void, MultipleId3Tag> implements ItemVisitor {
 
     private Callback callback;
+    private ComponentVisitor visitor;
+    private MultipleId3Tag multipleId3Tag;
 
     public TagFormLoader(Callback callback) {
         this.callback = callback;
+        this.visitor = ComponentVisitors.buildDrillDownComponentVisitor(this);
     }
 
     @Override
-    protected MultipleId3Tag doInBackground(LibraryItem... params) {
+    protected MultipleId3Tag doInBackground(LibraryComponent... params) {
 
 //        Result result = new Result();
-        MultipleId3Tag multipleId3Tag = new MultipleId3Tag();
+        multipleId3Tag = new MultipleId3Tag();
 
-        for (LibraryItem item : params) {
-            updateMultipleId3Tag(multipleId3Tag, item);
+        for (LibraryComponent item : params) {
+//            updateMultipleId3Tag(item);
+            item.accept(visitor);
         }
 
         return multipleId3Tag;
     }
 
-    public void updateMultipleId3Tag(MultipleId3Tag multipleId3Tag, LibraryItem item) {
-        if (item.isAudioItem()) {
-            Id3Tag id3Tag = ((AudioFile)item.getItemable()).getId3Tag();
-
-//                result.tags.put(audioItem, id3Tag);
-            multipleId3Tag.put(id3Tag);
-        } else {
-            NodeItem node = (NodeItem) item;
-            for(LibraryItem li : node.getChildren()) {
-                updateMultipleId3Tag(multipleId3Tag, li);
-            }
-        }
-    }
 
     @Override
     protected void onPostExecute(MultipleId3Tag multipleId3Tag) {
-        for(Map.Entry<SupportedTag, String> entry : multipleId3Tag.getId3Tag().entrySet()) {
-            String value = entry.getValue();
-            if(multipleId3Tag.isAMultipleTag(entry.getKey())) {
-                value = "multiple";
-            }
-        }
+//        for(Map.Entry<SupportedTag, String> entry : multipleId3Tag.getId3Tag().entrySet()) {
+//            String value = entry.getValue();
+//            if(multipleId3Tag.isAMultipleTag(entry.getKey())) {
+//                //TODO: wtf ?!?
+//                value = "multiple";
+//            }
+//        }
         callback.onPostExecute(multipleId3Tag);
     }
+
+    @Override
+    public void visit(AudioFile audioFile) {
+        Id3Tag id3Tag = audioFile.getId3Tag();
+
+//                result.tags.put(audioItem, id3Tag);
+        multipleId3Tag.put(id3Tag);
+    }
+
+    @Override
+    public void visit(Folder folder) {
+
+    }
+
+//    public void updateMultipleId3Tag(LibraryComponent item) {
+//
+//        if (item.isAudioItem()) {
+//            Id3Tag id3Tag = ((AudioFile)item.getItem()).getId3Tag();
+//
+////                result.tags.put(audioItem, id3Tag);
+//            multipleId3Tag.put(id3Tag);
+//        } else {
+//            LibraryComposite node = (LibraryComposite) item;
+//            for(LibraryComponent li : node.getChildren()) {
+//                updateMultipleId3Tag(li);
+//            }
+//        }
+//    }
 
     public static interface Callback {
         public void onPostExecute(MultipleId3Tag multipleId3Tag);

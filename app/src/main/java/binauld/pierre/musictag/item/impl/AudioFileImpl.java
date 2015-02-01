@@ -1,13 +1,15 @@
-package binauld.pierre.musictag.item.itemable;
+package binauld.pierre.musictag.item.impl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 
+import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.visitor.ItemVisitor;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
 
-public class AudioFileImpl extends DecoderItemable implements AudioFile {
+public class AudioFileImpl extends DecoderItem implements AudioFile {
 
     private Id3Tag id3Tag;
     private File file;
@@ -28,6 +30,11 @@ public class AudioFileImpl extends DecoderItemable implements AudioFile {
     @Override
     public String getSecondaryInformation() {
         return secondaryInformation;
+    }
+
+    @Override
+    public void accept(ItemVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

@@ -23,15 +23,19 @@ import java.util.List;
 import java.util.Map;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.factory.LibraryComponentFactory;
+import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.loader.LibraryComponentLoader;
+import binauld.pierre.musictag.loader.LibraryComponentLoaderManager;
+import binauld.pierre.musictag.visitor.ComponentVisitor;
+import binauld.pierre.musictag.visitor.ItemVisitor;
+import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
-import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.item.LibraryItem;
-import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.item.itemable.AudioFile;
+import binauld.pierre.musictag.composite.LibraryComponent;
+import binauld.pierre.musictag.composite.LibraryComposite;
+import binauld.pierre.musictag.item.AudioFile;
 import binauld.pierre.musictag.loader.AsyncTaskExecutor;
-import binauld.pierre.musictag.loader.LibraryItemLoader;
-import binauld.pierre.musictag.loader.LibraryItemLoaderManager;
 import binauld.pierre.musictag.loader.TagFormLoader;
 import binauld.pierre.musictag.loader.TagSaver;
 import binauld.pierre.musictag.service.ArtworkService;
@@ -47,15 +51,15 @@ import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
  */
 public class TagFormActivity extends Activity implements View.OnClickListener {
 
-    private static List<LibraryItem> providedItems;
-    private static LibraryItemFactory providedItemFactory;
+    private static List<LibraryComponent> providedComponents;
+    private static LibraryComponentFactory providedComponentFactory;
 
-    public static void provideItems(List<LibraryItem> items) {
-        TagFormActivity.providedItems = items;
+    public static void provideComponents(List<LibraryComponent> components) {
+        TagFormActivity.providedComponents = components;
     }
 
-    public static void provideItemFactory(LibraryItemFactory itemFactory) {
-        TagFormActivity.providedItemFactory = itemFactory;
+    public static void provideComponentFactory(LibraryComponentFactory componentFactory) {
+        TagFormActivity.providedComponentFactory = componentFactory;
     }
 
     public static final int SUGGESTION_REQUEST_CODE = 1;
@@ -63,11 +67,11 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private Resources res;
 
     private ArtworkService artworkService;
-    private LibraryItemFactory itemFactory;
+    private LibraryComponentFactory componentFactory;
 
-    private LibraryItemLoaderManager loaderManager;
-    private List<LibraryItem> items;
-    private LibraryItem[] itemArray;
+    private LibraryComponentLoaderManager loaderManager;
+    private List<LibraryComponent> components;
+    private LibraryComponent[] componentArray;
     private MultipleId3Tag multipleId3Tag;
 
     HashMap<SupportedTag, EditText> views = new HashMap<>();
@@ -98,7 +102,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
         // Init content
         if(initContent()) {
-            loaderManager = new LibraryItemLoaderManager(itemFactory, 200);
+            loaderManager = new LibraryComponentLoaderManager(componentFactory, 200);
 
             //Init layout
             this.setContentView(R.layout.activity_tag_form);
@@ -234,11 +238,16 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         views.put(SupportedTag.GENRE, txt_genre);
     }
 
-    public void fillViews(/*List<LibraryItem> items, MultipleId3Tag multipleId3Tag*/) {
-        StringBuilder builder = new StringBuilder();
-        for (LibraryItem item : items) {
-            buildFilenameString(builder, item);
+    public void fillViews(/*List<LibraryItem> components, MultipleId3Tag multipleId3Tag*/) {
+        FilenameBuilderVisitor builderVisitor = new FilenameBuilderVisitor();
+        ComponentVisitor componentVisitor = ComponentVisitors.buildDrillDownComponentVisitor(builderVisitor);
+
+        for (LibraryComponent component : components) {
+//            buildFilenameString(builder, item);
+            component.accept(componentVisitor);
         }
+
+        StringBuilder builder = builderVisitor.getBuilder();
         builder.deleteCharAt(builder.length() - 1);
         txt_filename.setText(builder.toString());
 
@@ -252,21 +261,22 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    private void buildFilenameString(StringBuilder filenames, LibraryItem item) {
-        if (item.isAudioItem()) {
-            filenames.append(((AudioFile) item.getItemable()).getFile().getAbsolutePath());
-            filenames.append("\n");
-        } else {
-            NodeItem node = (NodeItem) item;
-            for (LibraryItem child : node.getChildren()) {
-                buildFilenameString(filenames, child);
-            }
-        }
-    }
+//    private void buildFilenameString(StringBuilder filenames, LibraryComponent item) {
+//
+//        if (item.isAudioItem()) {
+//            filenames.append(((AudioFile) item.getItem()).getFile().getAbsolutePath());
+//            filenames.append("\n");
+//        } else {
+//            LibraryComposite node = (LibraryComposite) item;
+//            for (LibraryComponent child : node.getChildren()) {
+//                buildFilenameString(filenames, child);
+//            }
+//        }
+//    }
 
 //    public boolean areItemsLoaded() {
 //        boolean loaded = true;
-//        for(LibraryItem item : items) {
+//        for(LibraryItem item : components) {
 //            if(!item.isAudioItem()) {
 //                if(((NodeItem) item).getState() != LoadingState.LOADED) {
 //                    loaded = false;
@@ -358,18 +368,18 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
      * Initialize the audio item and finish if it is not possible.
      */
     public boolean initContent() {
-        if (null == providedItems) {
+        if (null == providedComponents) {
             Log.e(this.getClass().toString(), "No item has been provided.");
             finish();
             return false;
-        } else if (null == providedItemFactory) {
-            Log.e(this.getClass().toString(), "No item factory has been provided.");
+        } else if (null == providedComponentFactory) {
+            Log.e(this.getClass().toString(), "No component factory has been provided.");
             finish();
             return false;
         } else {
-            items = TagFormActivity.providedItems;
-            itemArray = items.toArray(new LibraryItem[items.size()]);
-            itemFactory =TagFormActivity.providedItemFactory;
+            components = TagFormActivity.providedComponents;
+            componentArray = components.toArray(new LibraryComponent[components.size()]);
+            componentFactory = TagFormActivity.providedComponentFactory;
             return true;
         }
     }
@@ -380,28 +390,28 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         loadingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.loading),
                 res.getString(R.string.please_wait), true);
 
-        LibraryItemLoader.Callback tagFormLoaderLauncher = new LibraryItemLoader.Callback() {
+        LibraryComponentLoader.Callback tagFormLoaderLauncher = new LibraryComponentLoader.Callback() {
 
             @Override
-            public void onProgressUpdate(NodeItem item) {
+            public void onProgressUpdate(LibraryComposite composite) {
 
             }
 
             @Override
-            public void onPostExecute(List<NodeItem> results) {
+            public void onPostExecute(/*List<LibraryComposite> results*/) {
                 TagFormLoader.Callback callback = new TagFormLoader.Callback() {
                     @Override
                     public void onPostExecute(MultipleId3Tag multipleId3Tag) {
                         TagFormActivity.this.multipleId3Tag = multipleId3Tag;
-                        fillViews(/*items, multipleId3Tag*/);
+                        fillViews(/*components, multipleId3Tag*/);
                         loadingDialog.dismiss();
                     }
                 };
-                AsyncTaskExecutor.execute(new TagFormLoader(callback), itemArray);
+                AsyncTaskExecutor.execute(new TagFormLoader(callback), componentArray);
             }
         };
 
-        AsyncTaskExecutor.execute(loaderManager.get(true, tagFormLoaderLauncher), itemArray);
+        AsyncTaskExecutor.execute(loaderManager.get(true, tagFormLoaderLauncher), componentArray);
     }
 
     public void saveContentAndFinish() {
@@ -425,103 +435,30 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             }
         });
 
-        AsyncTaskExecutor.execute(saver, itemArray);
+        AsyncTaskExecutor.execute(saver, componentArray);
     }
 
-//    public void attributeText(boolean boolTest, EditText txt_field, String currentText){
-//        if(boolTest && !currentText.equals("")) {
-//            txt_field.setText(currentText);
-//        }else{
-//            txt_field.setHint(txt_field.getHint() + alertMessage);
-//        }
-//    }
+    class FilenameBuilderVisitor implements ItemVisitor {
 
-//    public void saveOneFile(boolean writeIfBlank) throws FieldDataInvalidException, CannotWriteException {
-//        AudioFile audioFile = audioItems.getAudioFile();
-//        Tag tags = audioFile.getTag();
-////        setTagField(tags, FieldKey.TITLE, txt_title.getText().toString(), writeIfBlank);
-////        setTagField(tags, FieldKey.ARTIST, txt_artist.getText().toString(), writeIfBlank);
-////        setTagField(tags, FieldKey.ALBUM, txt_album.getText().toString(), writeIfBlank);
-////        setTagField(tags, FieldKey.ALBUM_ARTIST, txt_album_artist.getText().toString(), writeIfBlank);
-////        setTagField(tags, FieldKey.COMPOSER, txt_composer.getText().toString(), writeIfBlank);
-////        setTagField(tags, FieldKey.GROUPING, txt_grouping.getText().toString(), writeIfBlank);
-////        setTagField(tags, FieldKey.GENRE, txt_genre.getText().toString(), writeIfBlank);
-////        setNumericTagField(tags, FieldKey.YEAR, txt_year.getText().toString());
-////        setNumericTagField(tags, FieldKey.DISC_NO, txt_disk.getText().toString());
-////        setNumericTagField(tags, FieldKey.TRACK, txt_track.getText().toString());
-//        audioFile.setTag(tags);
-//
-//        AudioFileIO.write(audioFile);
-//    }
+        private StringBuilder builder;
 
-//    public void saveSomeFiles() throws FieldDataInvalidException, CannotWriteException {
-//
-//        for(AudioItem audioIt : providedItems) {
-//            audioItems = audioIt;
-//            saveOneFile(false);
-//        }
-//    }
+        FilenameBuilderVisitor() {
+            this.builder = new StringBuilder();
+        }
 
+        @Override
+        public void visit(AudioFile audioFile) {
+            builder.append(audioFile.getFile().getAbsolutePath());
+            builder.append("\n");
+        }
 
-//    public void fillTextForOneAudio(){
-//        audioItems = TagFormActivity.providedItems.get(0);
-//        id3Tags = jAudioTaggerWrapper.build(audioItems.getAudioFile());
-//    }
-//
-//    public void fillTextForSomeAudios(){
-//        audioItems = TagFormActivity.providedItems.get(0);
-//        id3Tags = jAudioTaggerWrapper.build(audioItems.getAudioFile());
-//
-//        boolean sameTitle = true, sameArtist = true, sameAlbum = true, sameYear = true,
-//                sameDisk = true, sameTrack = true, sameAlbum_Artist = true,
-//                sameComposer = true, sameGrouping = true, sameGenre = true;
-//
-//        String currentTitle = id3Tags.get(SupportedTag.TITLE);
-//        String currentArtist = id3Tags.get(SupportedTag.ARTIST);
-//        String currentAlbum = id3Tags.get(SupportedTag.ALBUM);
-//        String currentYear = id3Tags.get(SupportedTag.YEAR);
-//        String currentDisk = id3Tags.get(SupportedTag.DISC_NO);
-//        String currentTrack = id3Tags.get(SupportedTag.TRACK);
-//        String currentAlbum_Artist = id3Tags.get(SupportedTag.ALBUM_ARTIST);
-//        String currentComposer = id3Tags.get(SupportedTag.COMPOSER);
-//        String currentGrouping = id3Tags.get(SupportedTag.GROUPING);
-//        String currentGenre = id3Tags.get(SupportedTag.GENRE);
-//
-//        String pathOfAllFiles = "";
-//
-//        for(AudioItem audio : providedItems){
-//            pathOfAllFiles += audio.getAudioFile().getFile().getAbsolutePath() + " \n";
-//            if(sameTitle || sameArtist || sameAlbum || sameYear ||
-//                    sameDisk || sameTrack || sameAlbum_Artist ||
-//                    sameComposer || sameGrouping || sameGenre){
-//                id3Tags = jAudioTaggerWrapper.build(audio.getAudioFile());
-//
-//                if(sameTitle && !currentTitle.equals(id3Tags.get(SupportedTag.TITLE))){sameTitle = false;}
-//                if(sameArtist && !currentArtist.equals(id3Tags.get(SupportedTag.ARTIST))){sameArtist = false;}
-//                if(sameAlbum && !currentAlbum.equals(id3Tags.get(SupportedTag.ALBUM))){sameAlbum = false;}
-//                if(sameYear && !currentYear.equals(id3Tags.get(SupportedTag.YEAR))){sameYear = false;}
-//                if(sameDisk && !currentDisk.equals(id3Tags.get(SupportedTag.DISC_NO))){sameDisk = false;}
-//                if(sameTrack && !currentTrack.equals(id3Tags.get(SupportedTag.TRACK))){sameTrack = false;}
-//                if(sameAlbum_Artist && !currentAlbum_Artist.equals(id3Tags.get(SupportedTag.ALBUM_ARTIST))){sameAlbum_Artist = false;}
-//                if(sameComposer && !currentComposer.equals(id3Tags.get(SupportedTag.COMPOSER))){sameComposer = false;}
-//                if(sameGrouping && !currentGrouping.equals(id3Tags.get(SupportedTag.GROUPING))){sameGrouping = false;}
-//                if(sameGenre && !currentGenre.equals(id3Tags.get(SupportedTag.GENRE))){sameGenre = false;}
-//
-//            }
-//        }
-//
-//        txt_filename.setText(pathOfAllFiles.substring(0, pathOfAllFiles.length() - 2));
-//
-//        attributeText(sameTitle, txt_title, currentTitle);
-//        attributeText(sameArtist, txt_artist, currentArtist);
-//        attributeText(sameAlbum, txt_album, currentAlbum);
-//        attributeText(sameYear, txt_year, currentYear);
-//        attributeText(sameDisk, txt_disc, currentDisk);
-//        attributeText(sameTrack, txt_track, currentTrack);
-//        attributeText(sameAlbum_Artist, txt_album_artist, currentAlbum_Artist);
-//        attributeText(sameComposer, txt_composer, currentComposer);
-//        attributeText(sameGrouping, txt_grouping, currentGrouping);
-//        attributeText(sameGenre, txt_genre, currentGenre);
-//
-//    }
+        @Override
+        public void visit(Folder folder) {
+
+        }
+
+        public StringBuilder getBuilder() {
+            return builder;
+        }
+    }
 }

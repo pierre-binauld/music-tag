@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import binauld.pierre.musictag.decoder.AudioFileBitmapDecoder;
-import binauld.pierre.musictag.item.itemable.AudioFile;
-import binauld.pierre.musictag.item.itemable.AudioFileImpl;
+import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.item.impl.AudioFileImpl;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
 import binauld.pierre.musictag.wrapper.FileWrapper;

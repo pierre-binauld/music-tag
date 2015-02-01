@@ -8,18 +8,18 @@ import java.io.FileFilter;
 import java.io.IOException;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.item.ChildItem;
-import binauld.pierre.musictag.item.LibraryItem;
-import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.item.itemable.AudioFile;
-import binauld.pierre.musictag.item.itemable.Folder;
+import binauld.pierre.musictag.composite.LibraryLeaf;
+import binauld.pierre.musictag.composite.LibraryComponent;
+import binauld.pierre.musictag.composite.LibraryComposite;
+import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.item.impl.FolderImpl;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 
 /**
  * Build a library item from a source file.
  * Allows activity to use item as folder or audio file.
  */
-public class LibraryItemFactory {
+public class LibraryComponentFactory {
 
     private FileWrapper wrapper;
     private BitmapDecoder folderBitmapDecoder;
@@ -27,7 +27,7 @@ public class LibraryItemFactory {
     private FileFilter filter;
     private Resources res;
 
-    public LibraryItemFactory(FileWrapper wrapper, BitmapDecoder defaultArtworkDecoder, BitmapDecoder folderBitmapDecoder, Resources res) {
+    public LibraryComponentFactory(FileWrapper wrapper, BitmapDecoder defaultArtworkDecoder, BitmapDecoder folderBitmapDecoder, Resources res) {
         this.wrapper = wrapper;
         this.folderBitmapDecoder = folderBitmapDecoder;
         this.defaultArtworkDecoder = defaultArtworkDecoder;
@@ -43,15 +43,15 @@ public class LibraryItemFactory {
      * @return A library item
      * @throws IOException Exception is thrown when a problem occurs with the reading, tags or the format.
      */
-    public LibraryItem build(File file, NodeItem parent) throws IOException {
+    public LibraryComponent build(File file, LibraryComposite parent) throws IOException {
         if (file.isDirectory()) {
-            return buildNodeItem(file, parent);
+            return buildComposite(file, parent);
         } else {
-            return buildItem(file, parent);
+            return buildLeaf(file, parent);
         }
     }
 
-    public ChildItem buildItem(File file, NodeItem parent) throws IOException {
+    public LibraryLeaf buildLeaf(File file, LibraryComposite parent) throws IOException {
         AudioFile audioFile = wrapper.build(file);
         BitmapDecoder decoder = audioFile.getBitmapDecoder();
         if(null == decoder) {
@@ -59,7 +59,7 @@ public class LibraryItemFactory {
         }
         audioFile.setBitmapDecoder(decoder);
 
-        ChildItem audioItem = new ChildItem(audioFile);
+        LibraryLeaf audioItem = new LibraryLeaf(audioFile);
         audioItem.setParent(parent);
 //        audioItem.setAudioFile(audioFile);
 //        audioItem.setBitmapDecoder(decoder);
@@ -67,10 +67,10 @@ public class LibraryItemFactory {
         return audioItem;
     }
 
-    public NodeItem buildNodeItem(File file, NodeItem parent) {
-        Folder folder = new Folder(file, filter, res);
+    public LibraryComposite buildComposite(File file, LibraryComposite parent) {
+        FolderImpl folder = new FolderImpl(file, filter, res);
         folder.setBitmapDecoder(folderBitmapDecoder);
-        NodeItem node = new NodeItem(folder, parent);
-        return node;
+        LibraryComposite composite = new LibraryComposite(folder, parent);
+        return composite;
     }
 }

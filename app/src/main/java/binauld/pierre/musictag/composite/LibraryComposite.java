@@ -1,31 +1,32 @@
-package binauld.pierre.musictag.item;
+package binauld.pierre.musictag.composite;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 import binauld.pierre.musictag.collection.MultipleBufferedList;
-import binauld.pierre.musictag.item.itemable.Itemable;
+import binauld.pierre.musictag.item.Item;
+import binauld.pierre.musictag.visitor.ComponentVisitor;
 
 /**
  * Represent a folder in a library.
  */
-public class NodeItem extends ChildItem {
+public class LibraryComposite extends LibraryLeaf {
 
-    private MultipleBufferedList<LibraryItem> children;
+    private MultipleBufferedList<LibraryComponent> children;
     private LoadingState state;
-    private int invalidItemCount;
-    private List<NodeItem> nodeItems = new ArrayList<>();
+    private int invalidComponentCount;
+//    private List<LibraryComposite> nodeItems = new ArrayList<>();
 
-    public NodeItem(Itemable itemable) {
-        this(itemable, null);
+    public LibraryComposite(Item item) {
+        this(item, null);
     }
 
-    public NodeItem(Itemable itemable, NodeItem parent) {
-        super(itemable);
+    public LibraryComposite(Item item, LibraryComposite parent) {
+        super(item);
         this.parent = parent;
-        this.children = new MultipleBufferedList<>(new MultipleBufferedList.ListFactory<LibraryItem>() {
-            public List<LibraryItem> buildEmptyList() {
+        this.children = new MultipleBufferedList<>(new MultipleBufferedList.ListFactory<LibraryComponent>() {
+            public List<LibraryComponent> buildEmptyList() {
                 return new ArrayList<>();
             }
         });
@@ -56,7 +57,7 @@ public class NodeItem extends ChildItem {
      * @param i Index of the child.
      * @return A child.
      */
-    public LibraryItem getChild(int i) {
+    public LibraryComponent getChild(int i) {
         return children.get(i);
     }
 
@@ -80,7 +81,7 @@ public class NodeItem extends ChildItem {
      * Get the list of children for modification.
      * @return The list of children
      */
-    public MultipleBufferedList<LibraryItem> getChildren() {
+    public MultipleBufferedList<LibraryComponent> getChildren() {
         return children;
     }
 
@@ -88,23 +89,28 @@ public class NodeItem extends ChildItem {
      * Set the count of invalid item found by a loader.
      * @param invalidItemCount The count of invalid item found.
      */
-    public void setInvalidItemCount(int invalidItemCount) {
-        this.invalidItemCount = invalidItemCount;
+    public void setInvalidComponentCount(int invalidItemCount) {
+        this.invalidComponentCount = invalidItemCount;
     }
     /**
      * Get the count of invalid item found by a loader.
      * @return The count of invalid item found.
      */
-    public int getInvalidItemCount() {
-        return invalidItemCount;
+    public int getInvalidComponentCount() {
+        return invalidComponentCount;
     }
+
+//    @Override
+//    public boolean isAudioItem() {
+//        return false;
+//    }
+
+//    public List<LibraryComposite> getNodeItems() {
+//        return nodeItems;
+//    }
 
     @Override
-    public boolean isAudioItem() {
-        return false;
-    }
-
-    public List<NodeItem> getNodeItems() {
-        return nodeItems;
+    public void accept(ComponentVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.item.itemable;
+package binauld.pierre.musictag.item.impl;
 
 import android.content.res.Resources;
 
@@ -6,15 +6,17 @@ import java.io.File;
 import java.io.FileFilter;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.visitor.ItemVisitor;
+import binauld.pierre.musictag.item.Folder;
 
-public class Folder extends DecoderItemable {
+public class FolderImpl extends DecoderItem implements Folder {
 
     private File file;
     private File[] fileList;
 
     private String secondaryInformation;
 
-    public Folder(File file, FileFilter fileFilter, Resources res) {
+    public FolderImpl(File file, FileFilter fileFilter, Resources res) {
         this.file = file;
         this.fileList = file.listFiles(fileFilter);
 
@@ -37,15 +39,22 @@ public class Folder extends DecoderItemable {
         return this.secondaryInformation;
     }
 
+    @Override
+    public void accept(ItemVisitor visitor) {
+        visitor.visit(this);
+    }
 
+    @Override
     public File getFile() {
         return file;
     }
 
+    @Override
     public File[] getFileList() {
         return fileList;
     }
 
+    @Override
     public int getMaxChildrenCount() {
         if (null != fileList) {
             return fileList.length;

@@ -1,8 +1,9 @@
-package binauld.pierre.musictag.item.itemable;
+package binauld.pierre.musictag.item.impl;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.item.Item;
 
-public abstract class DecoderItemable implements Itemable {
+public abstract class DecoderItem implements Item {
 
     private BitmapDecoder decoder;
 

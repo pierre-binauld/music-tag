@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.item.itemable.Itemable;
+import binauld.pierre.musictag.item.Item;
 import binauld.pierre.musictag.loader.ArtworkLoader;
 import binauld.pierre.musictag.loader.AsyncDrawable;
 import binauld.pierre.musictag.loader.DefaultArtworkLoader;
@@ -36,7 +36,7 @@ public class ArtworkService {
      * @param item      Current item.
      * @param imageView Associated image view.
      */
-    public void setArtwork(Itemable item, ImageView imageView, int artworkSize) {
+    public void setArtwork(Item item, ImageView imageView, int artworkSize) {
 
         final String key = item.getBitmapDecoder().getKey(artworkSize, artworkSize);
 
@@ -61,11 +61,11 @@ public class ArtworkService {
      * @param imageView The image view which has to display artwork thumbnail.
      * @return False if the same work is in progress.
      */
-    private boolean cancelPotentialWork(Itemable item, ImageView imageView) {
+    private boolean cancelPotentialWork(Item item, ImageView imageView) {
         final ArtworkLoader artworkLoader = AsyncDrawable.retrieveBitmapLoader(imageView);
 
         if (artworkLoader != null) {
-            final Itemable taskItem = artworkLoader.getWorkingItem();
+            final Item taskItem = artworkLoader.getWorkingItem();
             // If bitmapData is not yet set or it differs from the new data
             if (taskItem == null || taskItem != item) {
                 // Cancel previous task

@@ -1,6 +1,5 @@
 package binauld.pierre.musictag.listener;
 
-import android.content.res.Resources;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -14,20 +13,20 @@ import java.util.List;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.activities.MainActivity;
-import binauld.pierre.musictag.adapter.LibraryItemAdapter;
-import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.adapter.LibraryComponentAdapter;
+import binauld.pierre.musictag.composite.LibraryComponent;
 
 
-public class LibraryItemMultiChoiceMode implements AbsListView.MultiChoiceModeListener {
-    private LibraryItemAdapter adapter;
+public class ItemMultiChoiceMode implements AbsListView.MultiChoiceModeListener {
+    private LibraryComponentAdapter adapter;
     private ListView listView;
     private MainActivity activity;
-    private SparseArray<LibraryItem> selectedItems;
+    private SparseArray<LibraryComponent> selectedItems;
 
     private String selectedItemString;
     private String selectedItemsString;
 
-    public LibraryItemMultiChoiceMode(LibraryItemAdapter adapter, ListView listView, MainActivity activity) {
+    public ItemMultiChoiceMode(LibraryComponentAdapter adapter, ListView listView, MainActivity activity) {
         this.adapter = adapter;
         this.listView = listView;
         this.activity = activity;
@@ -82,15 +81,15 @@ public class LibraryItemMultiChoiceMode implements AbsListView.MultiChoiceModeLi
 
     public void toggleSelection(int position, boolean checked) {
         if (checked) {
-            LibraryItem item = (LibraryItem) adapter.getItem(position);
+            LibraryComponent item = (LibraryComponent) adapter.getItem(position);
             selectedItems.put(position, item);
         } else {
             selectedItems.remove(position);
         }
     }
 
-    private List<LibraryItem> getLibraryItems() {
-        List<LibraryItem> items = new ArrayList<>();
+    private List<LibraryComponent> getLibraryItems() {
+        List<LibraryComponent> items = new ArrayList<>();
         SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
 
         int size = checkedItemPositions.size();
@@ -98,7 +97,7 @@ public class LibraryItemMultiChoiceMode implements AbsListView.MultiChoiceModeLi
             int position = checkedItemPositions.keyAt(i);
             boolean isChecked = checkedItemPositions.get(position);
             if(isChecked) {
-                items.add((LibraryItem) adapter.getItem(position));
+                items.add((LibraryComponent) adapter.getItem(position));
             }
         }
 

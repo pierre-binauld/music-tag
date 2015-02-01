@@ -13,15 +13,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.item.itemable.Folder;
-import binauld.pierre.musictag.item.itemable.Itemable;
+import binauld.pierre.musictag.composite.LibraryComposite;
+import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.item.Item;
 import binauld.pierre.musictag.service.ArtworkService;
+import binauld.pierre.musictag.visitor.ItemVisitor;
 
 /**
  * Adapt a list of library item for a list view.
  */
-public class LibraryItemAdapter extends BaseAdapter {
+public class LibraryComponentAdapter extends BaseAdapter {
     private Drawable background;
 
 
@@ -72,7 +74,7 @@ public class LibraryItemAdapter extends BaseAdapter {
 
 //    public Intent sendSelection(Activity activity) {
 //        Intent intent = new Intent(activity, TagFormActivity.class);
-//        TagFormActivity.provideItems(audios);
+//        TagFormActivity.provideComponents(audios);
 //        return intent;
 //    }
 
@@ -82,12 +84,12 @@ public class LibraryItemAdapter extends BaseAdapter {
         ImageView thumbnail;
     }
 
-    private NodeItem currentNode;
+    private LibraryComposite currentComposite;
     private final ArtworkService artworkService;
     private int artworkSize;
     private ProgressBar progressBar;
 
-    public LibraryItemAdapter(ArtworkService artworkService, int artworkSize) {
+    public LibraryComponentAdapter(ArtworkService artworkService, int artworkSize) {
         this.artworkService = artworkService;
         this.artworkSize = artworkSize;
     }
@@ -100,12 +102,12 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return currentNode.size();
+        return currentComposite.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return currentNode.getChild(i);
+        return currentComposite.getChild(i);
     }
 
     @Override
@@ -142,7 +144,7 @@ public class LibraryItemAdapter extends BaseAdapter {
         }
 
         // object item based on the position
-        Itemable item = currentNode.getChild(position).getItemable();
+        Item item = currentComposite.getChild(position).getItem();
 
         // assign values if the object is not null
         if (item != null) {
@@ -201,11 +203,21 @@ public class LibraryItemAdapter extends BaseAdapter {
      */
     private void setUpProgressBar() {
         if (null != progressBar) {
-            if (null == currentNode) {
+            if (null == currentComposite) {
                 progressBar.setVisibility(View.GONE);
             } else {
                 progressBar.setVisibility(View.VISIBLE);
-                progressBar.setMax(((Folder)currentNode.getItemable()).getMaxChildrenCount());
+                currentComposite.getItem().accept(new ItemVisitor() {
+                    @Override
+                    public void visit(AudioFile audioFile) {
+
+                    }
+
+                    @Override
+                    public void visit(Folder folder) {
+                        progressBar.setMax(folder.getMaxChildrenCount());
+                    }
+                });
                 updateProgressBar();
             }
         }
@@ -216,9 +228,9 @@ public class LibraryItemAdapter extends BaseAdapter {
      */
     private void updateProgressBar() {
         if (null != progressBar) {
-            switch (currentNode.getState()) {
+            switch (currentComposite.getState()) {
                 case LOADING:
-                    progressBar.setProgress(currentNode.size() + currentNode.getInvalidItemCount());
+                    progressBar.setProgress(currentComposite.size() + currentComposite.getInvalidComponentCount());
                     break;
                 case LOADED:
                     progressBar.setVisibility(View.GONE);
@@ -234,10 +246,10 @@ public class LibraryItemAdapter extends BaseAdapter {
     /**
      * Set the current node of the library tree list.
      *
-     * @param currentNode The current node to set.
+     * @param currentComposite The current node to set.
      */
-    public void setCurrentNode(NodeItem currentNode) {
-        this.currentNode = currentNode;
+    public void setCurrentComposite(LibraryComposite currentComposite) {
+        this.currentComposite = currentComposite;
         setUpProgressBar();
     }
 
@@ -246,8 +258,8 @@ public class LibraryItemAdapter extends BaseAdapter {
      *
      * @return The current node to get.
      */
-    public NodeItem getCurrentNode() {
-        return currentNode;
+    public LibraryComposite getCurrentComposite() {
+        return currentComposite;
     }
 
 }

@@ -7,22 +7,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 import binauld.pierre.musictag.collection.LibraryItemComparator;
-import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.factory.LibraryComponentFactory;
+import binauld.pierre.musictag.composite.LibraryComponent;
 
 /**
  * A manager to handle all loader.
  * Enable to cancel loading when app is closed.
  */
-public class LibraryItemLoaderManager {
+public class LibraryComponentLoaderManager {
 
-    private Set<WeakReference<LibraryItemLoader>> loaders = new HashSet<>();
+    private Set<WeakReference<LibraryComponentLoader>> loaders = new HashSet<>();
 
     //    private LibraryItemAdapter adapter;
-    private LibraryItemFactory itemFactory;
+    private LibraryComponentFactory itemFactory;
     private int updateStep;
 
-    public LibraryItemLoaderManager(LibraryItemFactory itemFactory, int updateStep) {
+    public LibraryComponentLoaderManager(LibraryComponentFactory itemFactory, int updateStep) {
 //        this.adapter = adapter;
         this.itemFactory = itemFactory;
         this.updateStep = updateStep;
@@ -34,8 +34,8 @@ public class LibraryItemLoaderManager {
      * @param mayInterruptIfRunning true if the thread executing this task should be interrupted; otherwise, in-progress tasks are allowed to complete.
      */
     public void cancelAll(boolean mayInterruptIfRunning) {
-        for (WeakReference<LibraryItemLoader> ref : loaders) {
-            LibraryItemLoader loader = ref.get();
+        for (WeakReference<LibraryComponentLoader> ref : loaders) {
+            LibraryComponentLoader loader = ref.get();
             if (null != loader) {
                 loader.cancel(mayInterruptIfRunning);
             }
@@ -48,10 +48,10 @@ public class LibraryItemLoaderManager {
      *
      * @return The created loader.
      */
-    public LibraryItemLoader get(boolean drillDown, LibraryItemLoader.Callback callback) {
-        Comparator<LibraryItem> comparator = new LibraryItemComparator();
+    public LibraryComponentLoader get(boolean drillDown, LibraryComponentLoader.Callback callback) {
+        Comparator<LibraryComponent> comparator = new LibraryItemComparator();
 
-        LibraryItemLoader loader = new LibraryItemLoader(itemFactory, comparator, updateStep, drillDown, callback);
+        LibraryComponentLoader loader = new LibraryComponentLoader(itemFactory, comparator, updateStep, drillDown, callback);
 
         loaders.add(new WeakReference<>(loader));
         return loader;

@@ -26,18 +26,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.adapter.LibraryItemAdapter;
+import binauld.pierre.musictag.adapter.LibraryComponentAdapter;
+import binauld.pierre.musictag.composite.LibraryLeaf;
+import binauld.pierre.musictag.factory.LibraryComponentFactory;
+import binauld.pierre.musictag.helper.LibraryComponentFactoryHelper;
+import binauld.pierre.musictag.listener.ItemMultiChoiceMode;
+import binauld.pierre.musictag.loader.LibraryComponentLoader;
+import binauld.pierre.musictag.loader.LibraryComponentLoaderManager;
+import binauld.pierre.musictag.visitor.ComponentVisitor;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
-import binauld.pierre.musictag.factory.LibraryItemFactory;
-import binauld.pierre.musictag.helper.LibraryItemFactoryHelper;
-import binauld.pierre.musictag.item.LibraryItem;
-import binauld.pierre.musictag.item.LoadingState;
-import binauld.pierre.musictag.item.NodeItem;
-import binauld.pierre.musictag.listener.LibraryItemMultiChoiceMode;
+import binauld.pierre.musictag.composite.LibraryComponent;
+import binauld.pierre.musictag.composite.LibraryComposite;
+import binauld.pierre.musictag.composite.LoadingState;
 import binauld.pierre.musictag.loader.AsyncTaskExecutor;
-import binauld.pierre.musictag.loader.LibraryItemLoader;
-import binauld.pierre.musictag.loader.LibraryItemLoaderManager;
 import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.service.Locator;
@@ -52,19 +54,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     private static final int TAG_UPDATE_REQUEST = 1;
 
-    private LibraryItemLoaderManager manager;
-    private LibraryItemAdapter adapter;
+    private LibraryComponentLoaderManager manager;
+    private LibraryComponentAdapter adapter;
 
     private ObservableListView listView;
 
     private FileWrapper wrapper;
 
+    private OnItemClickVisitor onItemClickVisitor;
+
     private Resources res;
     private SharedPreferences sharedPrefs;
 
-    private LibraryItemFactory itemFactory;
+    private LibraryComponentFactory componentFactory;
 
-    private LibraryItemMultiChoiceMode libraryItemMultiChoiceMode;
+    private ItemMultiChoiceMode ItemMultiChoiceMode;
 //    private List<LibraryItem> updating;
 
     @Override
@@ -96,23 +100,27 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         ArtworkService artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
         artworkService.initDefaultArtwork(artworkSize);
 
+        // Init Wrapper
         wrapper = new JAudioTaggerWrapper();
 
+        // Init visitor
+        onItemClickVisitor = new OnItemClickVisitor();
+
         // Init factory
-        itemFactory = LibraryItemFactoryHelper.buildFactory(res, wrapper, defaultArtworkBitmapDecoder);
+        componentFactory = LibraryComponentFactoryHelper.buildFactory(res, wrapper, defaultArtworkBitmapDecoder);
 
         // Init progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         // Init adapter
-        adapter = new LibraryItemAdapter(artworkService, artworkSize);
+        adapter = new LibraryComponentAdapter(artworkService, artworkSize);
         adapter.setProgressBar(progressBar);
 
         // Init manager(s)
-        manager = new LibraryItemLoaderManager(itemFactory, res.getInteger(R.integer.artwork_loader_update_step));
+        manager = new LibraryComponentLoaderManager(componentFactory, res.getInteger(R.integer.artwork_loader_update_step));
 
         // Load items
-        switchNode(getSourceNode());
+        switchComposite(getSourceComposite());
 
         // Init view
         listView = (ObservableListView) findViewById(R.id.list_library_item);
@@ -121,9 +129,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         listView.setAdapter(adapter);
 
         // Init multi choice mode listener
-        libraryItemMultiChoiceMode = new LibraryItemMultiChoiceMode(adapter, listView, this);
+        ItemMultiChoiceMode = new ItemMultiChoiceMode(adapter, listView, this);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        listView.setMultiChoiceModeListener(libraryItemMultiChoiceMode);
+        listView.setMultiChoiceModeListener(ItemMultiChoiceMode);
     }
 
     @Override
@@ -172,16 +180,17 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        LibraryItem item = (LibraryItem) adapterView.getItemAtPosition(i);
-        if (!item.isAudioItem()) {
-            NodeItem node = (NodeItem) item;
-            switchNode(node);
-            adapter.notifyDataSetChanged();
-        } else {
-            List<LibraryItem> items = new ArrayList<>();
-            items.add(item);
-            callTagFormActivity(items);
-        }
+        LibraryComponent component = (LibraryComponent) adapterView.getItemAtPosition(i);
+        component.accept(onItemClickVisitor);
+//        if (!item.isAudioItem()) {
+//            LibraryComposite node = (LibraryComposite) item;
+//            switchComposite(node);
+//            adapter.notifyDataSetChanged();
+//        } else {
+//            List<LibraryComponent> items = new ArrayList<>();
+//            items.add(item);
+//            callTagFormActivity(items);
+//        }
     }
 
     @Override
@@ -193,7 +202,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 case RESULT_OK:
                     listView.clearChoices();
                     listView.setItemChecked(-1, false);
-                    libraryItemMultiChoiceMode.clearSelection();
+                    ItemMultiChoiceMode.clearSelection();
                     adapter.notifyDataSetChanged();
                     break;
                 default:
@@ -214,7 +223,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(res.getString(R.string.source_folder_preference_key))) {
-            switchNode(getSourceNode());
+            switchComposite(getSourceComposite());
         }
     }
 
@@ -244,10 +253,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 //        }
     }
 
-    public void callTagFormActivity(List<LibraryItem> items) {
+    public void callTagFormActivity(List<LibraryComponent> components) {
         Intent intent = new Intent(this, TagFormActivity.class);
-        TagFormActivity.provideItems(items);
-        TagFormActivity.provideItemFactory(itemFactory);
+        TagFormActivity.provideComponents(components);
+        TagFormActivity.provideComponentFactory(componentFactory);
         startActivityForResult(intent, TAG_UPDATE_REQUEST);
     }
 
@@ -256,45 +265,45 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      *
      * @return The source folder item.
      */
-    public NodeItem getSourceNode() {
+    public LibraryComposite getSourceComposite() {
         String sourceFolder = sharedPrefs.getString(
                 res.getString(R.string.source_folder_preference_key),
                 res.getString(R.string.source_folder_preference_default));
 
-        return itemFactory.buildNodeItem(new File(sourceFolder), null);
+        return componentFactory.buildComposite(new File(sourceFolder), null);
     }
 
     /**
      * Switch the view to the specified node.
      * If the node has not been loaded yet, then it is loaded.
      *
-     * @param node The node to switch to.
+     * @param composite The composite to switch to.
      */
-    private void switchNode(NodeItem node) {
-        adapter.setCurrentNode(node);
+    private void switchComposite(LibraryComposite composite) {
+        adapter.setCurrentComposite(composite);
         adapter.notifyDataSetChanged();
-        if (null == node.getParent()) {
+        if (null == composite.getParent()) {
             setTitle(res.getString(R.string.app_name));
         } else {
-            setTitle(node.getItemable().getPrimaryInformation());
+            setTitle(composite.getItem().getPrimaryInformation());
         }
 
-        if (node.getState() == LoadingState.NOT_LOADED) {
-            LibraryItemLoader loader = manager.get(false, new LibraryItemLoader.Callback() {
+        if (composite.getState() == LoadingState.NOT_LOADED) {
+            LibraryComponentLoader loader = manager.get(false, new LibraryComponentLoader.Callback() {
 
                 @Override
-                public void onProgressUpdate(NodeItem item) {
-                    if (adapter.getCurrentNode().equals(item)) {
+                public void onProgressUpdate(LibraryComposite libraryComposite) {
+                    if (adapter.getCurrentComposite().equals(libraryComposite)) {
                         adapter.notifyDataSetChanged();
                     }
                 }
 
                 @Override
-                public void onPostExecute(List<NodeItem> items) {
+                public void onPostExecute(/*List<LibraryComposite> items*/) {
                 }
             });
 
-            AsyncTaskExecutor.execute(loader, node);
+            AsyncTaskExecutor.execute(loader, composite);
         }
     }
 
@@ -304,12 +313,28 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      * @return True if the adapter has switch to the parent node.
      */
     public boolean backToParent() {
-        NodeItem parent = adapter.getCurrentNode().getParent();
+        LibraryComposite parent = adapter.getCurrentComposite().getParent();
         if (parent == null) {
             return false;
         } else {
-            switchNode((NodeItem) parent);
+            switchComposite( parent);
             return true;
+        }
+    }
+
+    class OnItemClickVisitor implements ComponentVisitor {
+
+        @Override
+        public void visit(LibraryLeaf leaf) {
+            List<LibraryComponent> leaves = new ArrayList<>();
+            leaves.add(leaf);
+            callTagFormActivity(leaves);
+        }
+
+        @Override
+        public void visit(LibraryComposite composite) {
+            switchComposite(composite);
+            adapter.notifyDataSetChanged();
         }
     }
 }

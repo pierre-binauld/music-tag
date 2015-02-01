@@ -13,7 +13,7 @@
     </style>
 
     <style name="SettingsTheme" parent="android:Theme.Material">
-        <item name="android:colorAccent">@color/color_primary</item>
+        <item name="android:colorAccent">@color/color_accent</item>
     </style>
 
     <!--Progress bar style.-->

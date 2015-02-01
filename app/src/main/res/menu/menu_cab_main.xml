@@ -2,13 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_save"
-        android:icon="@android:drawable/ic_menu_save"
+        android:icon="@drawable/ic_action_content_create"
         android:title="Valid!"
         android:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_settings_white_48dp"
-        android:showAsAction="never" />
 </menu>

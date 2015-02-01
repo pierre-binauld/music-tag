@@ -44,23 +44,6 @@ public class TagSaver extends AsyncTask<LibraryComponent, Void, Void> implements
 
     public void save(LibraryComponent item) {
         item.accept(visitor);
-//        if (item.isAudioItem()) {
-//            try {
-////                AudioItem audioItem = (AudioItem) item;
-//                AudioFile audioFile = (AudioFile) item.getItem();
-//                multipleId3Tag.update(audioFile.getId3Tag());
-//                //TODO: warn primary info not updated
-////                audioItem.setAudioFile(audioFile);
-//                fileWrapper.save(audioFile);
-//            } catch (IOException e) {
-//                Log.w(this.getClass().toString(), e.getMessage(), e);
-//            }
-//        } else {
-//            LibraryComposite nodeItem = (LibraryComposite) item;
-//            for (LibraryComponent li : nodeItem.getChildren()) {
-//                save(li);
-//            }
-//        }
     }
 
     @Override

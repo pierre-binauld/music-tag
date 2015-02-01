@@ -182,15 +182,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         LibraryComponent component = (LibraryComponent) adapterView.getItemAtPosition(i);
         component.accept(onItemClickVisitor);
-//        if (!item.isAudioItem()) {
-//            LibraryComposite node = (LibraryComposite) item;
-//            switchComposite(node);
-//            adapter.notifyDataSetChanged();
-//        } else {
-//            List<LibraryComponent> items = new ArrayList<>();
-//            items.add(item);
-//            callTagFormActivity(items);
-//        }
     }
 
     @Override

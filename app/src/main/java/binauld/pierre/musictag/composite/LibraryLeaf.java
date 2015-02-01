@@ -15,8 +15,6 @@ public class LibraryLeaf implements LibraryComponent {
         this.item = item;
     }
 
-
-
     @Override
     public LibraryComposite getParent() {
         return parent;
@@ -41,13 +39,4 @@ public class LibraryLeaf implements LibraryComponent {
         visitor.visit(this);
     }
 
-//    @Override
-//    public boolean isAudioItem() {
-//        return true;
-//    }
-//
-//    @Override
-//    public void setBitmapDecoder(BitmapDecoder decoder) {
-//        this.decoder = decoder;
-//    }
 }

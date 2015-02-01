@@ -12,6 +12,7 @@ import binauld.pierre.musictag.composite.LibraryLeaf;
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.composite.LibraryComposite;
 import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.item.Folder;
 import binauld.pierre.musictag.item.impl.FolderImpl;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 
@@ -61,14 +62,11 @@ public class LibraryComponentFactory {
 
         LibraryLeaf audioItem = new LibraryLeaf(audioFile);
         audioItem.setParent(parent);
-//        audioItem.setAudioFile(audioFile);
-//        audioItem.setBitmapDecoder(decoder);
-
         return audioItem;
     }
 
     public LibraryComposite buildComposite(File file, LibraryComposite parent) {
-        FolderImpl folder = new FolderImpl(file, filter, res);
+        Folder folder = new FolderImpl(file, filter, res);
         folder.setBitmapDecoder(folderBitmapDecoder);
         LibraryComposite composite = new LibraryComposite(folder, parent);
         return composite;

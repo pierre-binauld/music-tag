@@ -248,77 +248,15 @@ public class LibraryComponentLoader extends AsyncTask<LibraryComponent, LibraryC
             }
         }
 
-//        private void loadComposite(LibraryComposite composite) {
-//
-//            int invalidComponentCount = 0;
-//
-//            MultipleBufferedList<LibraryComponent> children = composite.getChildren();
-////            List<LibraryComposite> currentNodeItems = composite.getNodeItems();
-//            File[] currentFiles = ((Folder) composite.getItem()).getFileList();
-//
-//            if (null != currentFiles) {
-//
-//                int j = 0;
-//                for (int i = 0; i < currentFiles.length; i++) {
-//
-//                    try {
-//                        LibraryComponent component = factory.build(currentFiles[i], composite);
-//
-//                        component.accept(compositeFilterVisitor);
-////                        if (!item.isAudioItem()) {
-////                            LibraryComposite NodeItem = (LibraryComposite) item;
-////                            currentNodeItems.add(NodeItem);
-////                        }
-//                        children.add(component);
-//
-//                    } catch (IOException e) {
-//                        invalidComponentCount++;
-//                        Log.w(this.getClass().toString(), e.getMessage());
-//                    }
-//
-//                    if (i == currentFiles.length - 1) {
-//                        composite.setState(LoadingState.LOADED);
-//                    }
-//
-//                    j = ++j % updateStep;
-//                    if (j == 0 || i == currentFiles.length - 1) {
-//                        publishProgress(composite, invalidComponentCount);
-////                        Collections.sort(currentItems.getWorkingList(), comparator);
-////                        currentItems.push();
-//////                    currentNodeItems.push();
-////                        Progress progress = new Progress();
-////                        progress.rootComposite = rootComposite;
-////                        progress.composite = currentNodeItem;
-////                        progress.children = currentItems;
-//////                        progress.NodeItems = currentNodeItems;
-////                        progress.invalidItemCount = invalidItemCount;
-//////                        if (i == currentFiles.length - 1) {
-//////                            progress.state = LoadingState.LOADED;
-//////                        } else {
-//////                            progress.state = LoadingState.LOADING;
-//////                        }
-////                        publishProgress(progress);
-//                    }
-//                }
-//            }
-//        }
 
         private void publishProgress(LibraryComposite composite, int invalidComponentCount) {
             Collections.sort(composite.getChildren().getWorkingList(), comparator);
             composite.getChildren().push();
-//                    currentNodeItems.push();
 
             Progress progress = new Progress();
             progress.rootComposite = rootComposite;
             progress.composite = composite;
             progress.invalidComponentCount = invalidComponentCount;
-//            progress.children = currentItems;
-//                        progress.NodeItems = currentNodeItems;
-//                        if (i == currentFiles.length - 1) {
-//                            progress.state = LoadingState.LOADED;
-//                        } else {
-//                            progress.state = LoadingState.LOADING;
-//                        }
 
             LibraryComponentLoader.this.publishProgress(progress);
         }
@@ -344,23 +282,15 @@ public class LibraryComponentLoader extends AsyncTask<LibraryComponent, LibraryC
     }
 
     static class Progress {
-        //        private LoadingState state;
         private LibraryComposite rootComposite;
         private LibraryComposite composite;
-        //        private MultipleBufferedList<LibraryComponent> children;
-//        private List<LibraryUComposite> NodeItems;
         private int invalidComponentCount;
-
     }
-
-//    static class Result {
-//        List<LibraryComposite> foldersItems;
-//    }
 
     public static interface Callback {
 
         void onProgressUpdate(LibraryComposite composite);
 
-        void onPostExecute(/*List<LibraryComposite> item*/);
+        void onPostExecute();
     }
 }

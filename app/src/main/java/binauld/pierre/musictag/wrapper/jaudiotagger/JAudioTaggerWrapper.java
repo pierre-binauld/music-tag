@@ -85,7 +85,7 @@ public class JAudioTaggerWrapper implements FileWrapper {
             id3Tag.put(entry.getKey(), jAudioTaggerTags.getFirst(entry.getValue()));
         }
 
-        AudioFileImpl result = new AudioFileImpl(file, id3Tag);
+        AudioFile result = new AudioFileImpl(file, id3Tag);
         result.setBitmapDecoder(new AudioFileBitmapDecoder(jAudioTaggerFile));
         return result;
     }

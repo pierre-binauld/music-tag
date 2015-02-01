@@ -30,9 +30,7 @@ public class LibraryItemComparator implements Comparator<LibraryComponent> {
 
         if(0 != comparison) {
             return comparison;
-        } /*else if (item1.isAudioItem() && !item2.isAudioItem()) {
-            return 1;
-        } */else {
+        } else {
             String string1 = StringUtils.stripAccents(component1.getItem().getPrimaryInformation()).toLowerCase();
             String string2 = StringUtils.stripAccents(component2.getItem().getPrimaryInformation()).toLowerCase();
             return string1.compareTo(string2);

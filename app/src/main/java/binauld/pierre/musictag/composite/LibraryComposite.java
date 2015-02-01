@@ -16,7 +16,6 @@ public class LibraryComposite extends LibraryLeaf {
     private MultipleBufferedList<LibraryComponent> children;
     private LoadingState state;
     private int invalidComponentCount;
-//    private List<LibraryComposite> nodeItems = new ArrayList<>();
 
     public LibraryComposite(Item item) {
         this(item, null);
@@ -32,17 +31,6 @@ public class LibraryComposite extends LibraryLeaf {
         });
         this.state = LoadingState.NOT_LOADED;
     }
-
-//    @Override
-//    public boolean isAudioItem() {
-//        return false;
-//    }
-
-    /**
-     * Get the maximum number of possible children.
-     * @return The maximum number of possible children.
-     */
-//    public abstract int getMaxChildrenCount();
 
     /**
      * Get the number of children node.
@@ -99,15 +87,6 @@ public class LibraryComposite extends LibraryLeaf {
     public int getInvalidComponentCount() {
         return invalidComponentCount;
     }
-
-//    @Override
-//    public boolean isAudioItem() {
-//        return false;
-//    }
-
-//    public List<LibraryComposite> getNodeItems() {
-//        return nodeItems;
-//    }
 
     @Override
     public void accept(ComponentVisitor visitor) {

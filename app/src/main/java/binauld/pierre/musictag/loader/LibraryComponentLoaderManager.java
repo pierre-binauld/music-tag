@@ -18,12 +18,10 @@ public class LibraryComponentLoaderManager {
 
     private Set<WeakReference<LibraryComponentLoader>> loaders = new HashSet<>();
 
-    //    private LibraryItemAdapter adapter;
     private LibraryComponentFactory itemFactory;
     private int updateStep;
 
     public LibraryComponentLoaderManager(LibraryComponentFactory itemFactory, int updateStep) {
-//        this.adapter = adapter;
         this.itemFactory = itemFactory;
         this.updateStep = updateStep;
     }

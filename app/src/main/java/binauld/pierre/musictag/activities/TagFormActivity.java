@@ -131,9 +131,6 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
             // Load content
             loadContent();
-
-//        // Fill views
-//        fillViews(id3Tags);
         }
     }
 
@@ -243,7 +240,6 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         ComponentVisitor componentVisitor = ComponentVisitors.buildDrillDownComponentVisitor(builderVisitor);
 
         for (LibraryComponent component : components) {
-//            buildFilenameString(builder, item);
             component.accept(componentVisitor);
         }
 
@@ -260,109 +256,6 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-
-//    private void buildFilenameString(StringBuilder filenames, LibraryComponent item) {
-//
-//        if (item.isAudioItem()) {
-//            filenames.append(((AudioFile) item.getItem()).getFile().getAbsolutePath());
-//            filenames.append("\n");
-//        } else {
-//            LibraryComposite node = (LibraryComposite) item;
-//            for (LibraryComponent child : node.getChildren()) {
-//                buildFilenameString(filenames, child);
-//            }
-//        }
-//    }
-
-//    public boolean areItemsLoaded() {
-//        boolean loaded = true;
-//        for(LibraryItem item : components) {
-//            if(!item.isAudioItem()) {
-//                if(((NodeItem) item).getState() != LoadingState.LOADED) {
-//                    loaded = false;
-//                    break;
-//                }
-//            }
-//        }
-//
-//        return loaded;
-//    }
-
-//    /**
-//     * Fill views.
-//     */
-//    private void fillViews() {
-//
-//        boolean loaded = true;
-//        String filenames = "";
-//        for(LibraryItem item : audioItems) {
-//            if(item.isAudioItem()) {
-//                AudioItem audioItem = (AudioItem) item;
-//                filenames += audioItem.getAudioFile().getFile().getAbsolutePath() + "\n";
-//
-//            } else if (loaded) {
-//                NodeItem nodeItem = (NodeItem) item;
-//
-//                if(nodeItem.getState() != LoadingState.LOADED) {
-//                    loaded = false;
-//                }
-//            }
-//        }
-//
-//        txt_filename.setText(filenames.substring(0, filenames.length() - 2));
-//
-//        AudioFile audioFile = audioItems.getAudioFile();
-//        Tag tags = audioFile.getTag();
-//
-//        Artwork artwork = tags.getFirstArtwork();
-//        if (null != artwork) {
-//            artworkService.setArtwork(audioItems, img_artwork, 200);
-//        }
-//
-//        txt_filename.setText(audioFile.getFile().getAbsolutePath());
-//        txt_title.setText(id3Tag.get(SupportedTag.TITLE));
-//        txt_artist.setText(id3Tag.get(SupportedTag.ARTIST));
-//        txt_album.setText(id3Tag.get(SupportedTag.ALBUM));
-//        txt_year.setText(id3Tag.get(SupportedTag.YEAR));
-//        txt_disc.setText(id3Tag.get(SupportedTag.DISC_NO));
-//        txt_track.setText(id3Tag.get(SupportedTag.TRACK));
-//        txt_album_artist.setText(id3Tag.get(SupportedTag.ALBUM_ARTIST));
-//        txt_composer.setText(id3Tag.get(SupportedTag.COMPOSER));
-//        txt_grouping.setText(id3Tag.get(SupportedTag.GROUPING));
-//        txt_genre.setText(id3Tag.get(SupportedTag.GENRE));
-//    }
-
-//    private void updateId3TagFromViews() {
-//        id3Tags.put(SupportedTag.TITLE, txt_title.getText().toString());
-//        id3Tags.put(SupportedTag.ARTIST, txt_artist.getText().toString());
-//        id3Tags.put(SupportedTag.ALBUM, txt_album.getText().toString());
-//        id3Tags.put(SupportedTag.ALBUM_ARTIST, txt_album_artist.getText().toString());
-//        id3Tags.put(SupportedTag.COMPOSER, txt_composer.getText().toString());
-//        id3Tags.put(SupportedTag.GROUPING, txt_grouping.getText().toString());
-//        id3Tags.put(SupportedTag.GENRE, txt_genre.getText().toString());
-//        id3Tags.put(SupportedTag.YEAR, txt_year.getText().toString());
-//        id3Tags.put(SupportedTag.DISC_NO, txt_disc.getText().toString());
-//        id3Tags.put(SupportedTag.TRACK, txt_track.getText().toString());
-//    }
-
-    /**
-     * Save the modification into the audio file and finish the activity.
-     */
-//    private void saveChangeAndFinish() {
-//        Intent intent = new Intent();
-//        try {
-//            AudioFile audioFile = audioItems.getAudioFile();
-//            updateId3TagFromViews();
-//            jAudioTaggerWrapper.save(id3Tags, audioFile);
-//
-//            setResult(RESULT_OK, intent);
-//        } catch (IOException e) {
-//            Log.e(this.getClass().toString(), e.getMessage(), e);
-//            setResult(RESULT_CANCELED, intent);
-//        }
-//
-//        finish();
-//    }
 
     /**
      * Initialize the audio item and finish if it is not possible.

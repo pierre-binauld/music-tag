@@ -12,7 +12,9 @@
         <item name="android:colorAccent">@color/color_accent</item>
     </style>
 
-    <style name="SettingsTheme" parent="android:Theme.Material"/>
+    <style name="SettingsTheme" parent="android:Theme.Material">
+        <item name="android:colorAccent">@color/color_primary</item>
+    </style>
 
     <!--Progress bar style.-->
     <style name="HorizontalProgressBar" parent="android:Widget.Material.ProgressBar.Horizontal">

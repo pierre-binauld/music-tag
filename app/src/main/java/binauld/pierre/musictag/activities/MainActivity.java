@@ -171,9 +171,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 return true;
             case R.id.action_organisation:
                 Intent intent2 = new Intent(this, OrganisationActivity.class);
-                List<LibraryItem> folder = new ArrayList<>();
-                folder.add(adapter.getCurrentNode());
-                OrganisationActivity.libraryItems = folder;
+                List<LibraryComponent> components = new ArrayList<>();
+                components.add(adapter.getCurrentComposite());
+                OrganisationActivity.libraryComponents = components;
                 startActivityForResult(intent2, ORGANISATION_REQUEST);
                 return true;
             default:
@@ -297,7 +297,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         }
 
         if (composite.getState() == LoadingState.NOT_LOADED) {
-            LibraryComponentLoader loader = manager.get(false, new LibraryComponentLoader.Callback() {
+            LibraryComponentLoader loader = manager.get(true, new LibraryComponentLoader.Callback() {
 
                 @Override
                 public void onProgressUpdate(LibraryComposite libraryComposite) {
@@ -325,7 +325,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         if (parent == null) {
             return false;
         } else {
-            switchComposite( parent);
+            switchComposite(parent);
             return true;
         }
     }

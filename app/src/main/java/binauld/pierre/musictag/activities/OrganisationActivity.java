@@ -24,26 +24,33 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.item.AudioItem;
-import binauld.pierre.musictag.item.LibraryItem;
-import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.composite.LibraryComponent;
+import binauld.pierre.musictag.composite.LibraryComposite;
+import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.item.Item;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
+import binauld.pierre.musictag.visitor.ComponentVisitor;
+import binauld.pierre.musictag.visitor.ItemVisitor;
+import binauld.pierre.musictag.visitor.impl.DrillDownComponentVisitor;
 
-public class OrganisationActivity extends Activity implements View.OnClickListener {
+public class OrganisationActivity extends Activity implements View.OnClickListener, ItemVisitor {
     private EditText placeholder;
-    public static List<LibraryItem> libraryItems;
+    public static List<LibraryComponent> libraryComponents;
     private HashMap<SupportedTag, String> supportedPlaceholderMapping;
 
     private Resources res;
     private SharedPreferences sharedPrefs;
     private String sourceFolder;
     private String placeholderSetting;
+    private String placeholderContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,36 +210,16 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         supportedPlaceholderMapping.put(SupportedTag.GENRE, "\\[genre\\]");
     }
 
-    private void filesSelection(List<LibraryItem> libItems){
-        for(LibraryItem libraryItem: libItems){
-            String placeholderContent = placeholder.getText().toString();
-            if(libraryItem.isAudioItem()){
-                AudioItem audioItem = (AudioItem) libraryItem;
-                binauld.pierre.musictag.wrapper.AudioFile audioFile = audioItem.getAudioFile();
-                File file = audioFile.getFile();
-                Id3Tag id3Tag = audioFile.getId3Tag();
-                for(Map.Entry<SupportedTag, String> entry : supportedPlaceholderMapping.entrySet()){
-                    String tag;
-                    if(id3Tag.containsKey(entry.getKey()) && !id3Tag.get(entry.getKey()).equals("")){
-                        tag = id3Tag.get(entry.getKey());
-                    }
-                    else{
-                        tag = getString(R.string.unknown);
-                    }
-                    placeholderContent = placeholderContent.replaceAll(entry.getValue(), tag);
-                }
-                placeholderContent = formatEndNameFile(placeholderContent, FilenameUtils.getExtension(file.getName()));
-                String filePath = file.getPath();
-                String oldPath = filePath.substring(0,filePath.lastIndexOf("/")) + "/" + file.getName();
-                placeholderContent = sourceFolder + "/" + placeholderContent;
-                moveFile(oldPath, placeholderContent);
-            }
-            else {
-                NodeItem nodeItem = (NodeItem) libraryItem;
-                filesSelection(nodeItem.getChildren());
-            }
+    private void filesSelection(List<LibraryComponent> components){
+        CustomDrillDownComponentVisitor visitor = new CustomDrillDownComponentVisitor(this);
+        for(LibraryComponent component: components){
+            component.accept(visitor);
         }
-        deleteEmptyFolders(new File(sourceFolder));
+
+        for(Item item : visitor.getFolders()){
+            Log.e("deleteFolder", item.getPrimaryInformation());
+            item.accept(this);
+        }
     }
 
     private void processOrganisation() {
@@ -243,7 +230,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         editor.putString("pref_placeholder", placeholder.getText().toString());
         editor.commit();
 
-        filesSelection(libraryItems);
+        filesSelection(libraryComponents);
     }
 
     private String formatEndNameFile(String path, String extension){
@@ -310,29 +297,53 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
 
     }
 
-    private boolean deleteEmptyFolders(File file){
-        if (file.isDirectory()) {
-            String[] children = file.list();
-            if(children.length == 0){
-                Log.e("To Delete", file.getName());
-                file.delete();
-                return true;
+    @Override
+    public void visit(AudioFile audioFile) {
+        placeholderContent = placeholder.getText().toString();
+        File file = audioFile.getFile();
+        Id3Tag id3Tag = audioFile.getId3Tag();
+        for(Map.Entry<SupportedTag, String> entry : supportedPlaceholderMapping.entrySet()){
+            String tag;
+            if(id3Tag.containsKey(entry.getKey()) && !id3Tag.get(entry.getKey()).equals("")){
+                tag = id3Tag.get(entry.getKey());
             }
-            else {
-                boolean test = false;
-                for (int i = 0; i < children.length; i++) {
-                    if(deleteEmptyFolders(new File(file, children[i]))){
-                        test = true;
-                    }
-                }
-                if(test) {
-                    return deleteEmptyFolders(file);
-                }
-                else{
-                    return false;
-                }
+            else{
+                tag = getString(R.string.unknown);
             }
+            placeholderContent = placeholderContent.replaceAll(entry.getValue(), tag);
         }
-        return false;
+        placeholderContent = formatEndNameFile(placeholderContent, FilenameUtils.getExtension(file.getName()));
+        String filePath = file.getPath();
+        String oldPath = filePath.substring(0,filePath.lastIndexOf("/")) + "/" + file.getName();
+        placeholderContent = sourceFolder + "/" + placeholderContent;
+        moveFile(oldPath, placeholderContent);
+    }
+
+    @Override
+    public void visit(Folder folder) {
+        File[] children = folder.getFile().listFiles();
+        if(children.length == 0){
+            folder.getFile().delete();
+        }
+    }
+
+    class CustomDrillDownComponentVisitor extends DrillDownComponentVisitor {
+        private List<Item> folders = new ArrayList<>();
+
+        public CustomDrillDownComponentVisitor(ItemVisitor itemVisitor) {
+            super(itemVisitor);
+        }
+
+
+        @Override
+        public void visit(LibraryComposite composite) {
+            Log.e("visit nb", composite.getItem().getPrimaryInformation() + " - " + composite.getChildren().size() + "");
+            super.visit(composite);
+            folders.add(composite.getItem());
+        }
+
+        public List<Item> getFolders() {
+            return folders;
+        }
     }
 }

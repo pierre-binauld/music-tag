@@ -59,23 +59,12 @@ public class LibraryComponentLoader extends AsyncTask<LibraryComponent, LibraryC
 
     @Override
     protected Void doInBackground(LibraryComponent... params) {
-
-//        List<LibraryComposite> items = new ArrayList<>();
-//        for (LibraryComponent item : params) {
-//            if (!item.isAudioItem()) {
-//                items.add((LibraryComposite) item);
-//            }
-//        }
-//
         for (LibraryComponent component : params) {
-//            loadItemTree(item);
             LoadComponentVisitor loadComponentVisitor = new LoadComponentVisitor();
-            component.accept(loadComponentVisitor);
+            loadComponentVisitor.load(component);
+//            component.accept(loadComponentVisitor);
         }
 
-//        Result result = new Result();
-//        result.foldersItems = items;
-//        return result;
         return null;
     }
 
@@ -83,94 +72,15 @@ public class LibraryComponentLoader extends AsyncTask<LibraryComponent, LibraryC
     protected void onProgressUpdate(Progress... progresses) {
         for (Progress progress : progresses) {
             progress.composite.getChildren().pull();
-//            progress.NodeItems.pull();
             progress.composite.setInvalidComponentCount(progress.invalidComponentCount);
-//            progress.currentItem.setState(progress.state);
             callback.onProgressUpdate(progress.rootComposite);
         }
-//        adapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onPostExecute(Void result) {
-//        items.pull();
-//        NodeItems.pull();
-//        rootComposite.setState(LoadingState.LOADED);
         callback.onPostExecute();
-//        adapter.notifyDataSetChanged();
     }
-
-
-//    public void loadItemTree(LibraryComposite rootItem) {
-//        Queue<LibraryComposite> queue = new LinkedList<>();
-//        queue.add(rootItem);
-//
-//        do {
-//            LibraryComposite currentNodeItem = queue.poll();
-//
-////            int invalidItemCount = 0;
-//            if (currentNodeItem.getState() == LoadingState.LOADING) {
-//                queue.add(currentNodeItem);
-//            } else {
-//                if (currentNodeItem.getState() == LoadingState.NOT_LOADED) {
-//                    currentNodeItem.setState(LoadingState.LOADING);
-//
-//                    loadComposite(rootItem, currentNodeItem);
-//                }
-//
-//                queue.addAll(currentNodeItem.getNodeItems());
-//            }
-//        } while (!queue.isEmpty() && drillDown);
-//    }
-
-//    private void loadComposite(LibraryComposite rootComposite, LibraryComposite currentNodeItem) {
-//
-//        int invalidItemCount = 0;
-//
-//        MultipleBufferedList<LibraryComponent> currentItems = currentNodeItem.getChildren();
-//        List<LibraryComposite> currentNodeItems = currentNodeItem.getNodeItems();
-//        File[] currentFiles = ((FolderImpl) currentNodeItem.getItem()).getFileList();
-//
-//        if (null != currentFiles) {
-//
-//            int j = 0;
-//            for (int i = 0; i < currentFiles.length; i++) {
-//
-//                try {
-//                    LibraryComponent item = factory.build(currentFiles[i], currentNodeItem);
-//
-//                    if (!item.isAudioItem()) {
-//                        LibraryComposite NodeItem = (LibraryComposite) item;
-//                        currentNodeItems.add(NodeItem);
-//                    }
-//                    currentItems.add(item);
-//
-//                } catch (IOException e) {
-//                    invalidItemCount++;
-//                    Log.w(this.getClass().toString(), e.getMessage());
-//                }
-//
-//                j = ++j % updateStep;
-//                if (j == 0 || i == currentFiles.length - 1) {
-//                    Collections.sort(currentItems.getWorkingList(), comparator);
-//                    currentItems.push();
-////                    currentNodeItems.push();
-//                    Progress progress = new Progress();
-//                    progress.rootComposite = rootComposite;
-//                    progress.currentItem = currentNodeItem;
-//                    progress.childItems = currentItems;
-//                    progress.NodeItems = currentNodeItems;
-//                    progress.invalidItemCount = invalidItemCount;
-//                    if (i == currentFiles.length - 1) {
-//                        progress.state = LoadingState.LOADED;
-//                    } else {
-//                        progress.state = LoadingState.LOADING;
-//                    }
-//                    publishProgress(progress);
-//                }
-//            }
-//        }
-//    }
 
     class LoadComponentVisitor implements ComponentVisitor, ItemVisitor {
 
@@ -183,13 +93,22 @@ public class LibraryComponentLoader extends AsyncTask<LibraryComponent, LibraryC
             this.compositeFilterVisitor = new CompositeFilterVisitor(queue);
         }
 
+        public void load(LibraryComponent component) {
+            queue.add(component);
+
+            while (!queue.isEmpty()) {
+                component = queue.poll();
+                component.accept(this);
+            }
+        }
+
         @Override
         public void visit(LibraryLeaf leaf) {
-
         }
 
         @Override
         public void visit(LibraryComposite composite) {
+            //TODO find another way to do this !
             if (null == rootComposite) {
                 rootComposite = composite;
             }
@@ -228,7 +147,9 @@ public class LibraryComponentLoader extends AsyncTask<LibraryComponent, LibraryC
                     try {
                         LibraryComponent component = factory.build(currentFiles[i], currentComposite);
 
-                        component.accept(compositeFilterVisitor);
+                        if(drillDown) {
+                            component.accept(compositeFilterVisitor);
+                        }
                         children.add(component);
 
                     } catch (IOException e) {

@@ -212,8 +212,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         else{
             if (requestCode == ORGANISATION_REQUEST) {
                 // Make sure the request was successful
-                if (resultCode == RESULT_OK) {
-                    Log.e("organisation", "work finished");
+                switch (resultCode) {
+                    case RESULT_OK:
+                        LibraryComposite composite = getSourceComposite();
+                        switchComposite(composite);
+                        break;
+                    default:
+                        break;
                 }
             }
         }

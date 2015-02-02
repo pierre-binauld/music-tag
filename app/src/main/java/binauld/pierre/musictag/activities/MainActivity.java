@@ -214,9 +214,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         else{
             if (requestCode == ORGANISATION_REQUEST) {
                 // Make sure the request was successful
-                if (resultCode == OrganisationActivity.RELOAD_LIST) {
+                if (resultCode == RESULT_OK) {
                     Log.e("organisation", "work finished");
-                    adapter.notifyDataSetChanged();
                 }
             }
         }

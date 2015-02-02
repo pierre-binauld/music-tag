@@ -38,7 +38,6 @@ import binauld.pierre.musictag.tag.SupportedTag;
 public class OrganisationActivity extends Activity implements View.OnClickListener {
     private EditText placeholder;
     public static List<LibraryItem> libraryItems;
-    public static final int RELOAD_LIST = 10;
     private HashMap<SupportedTag, String> supportedPlaceholderMapping;
 
     private Resources res;
@@ -58,9 +57,13 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         sourceFolder = sharedPrefs.getString(
                 res.getString(R.string.source_folder_preference_key),
                 res.getString(R.string.source_folder_preference_default));
-        placeholderSetting = sharedPrefs.getString(
-                res.getString(R.string.placeholder_preference_key),
-                res.getString(R.string.placeholder_preference_default));
+        if(sharedPrefs.contains("pref_placeholder")){
+            placeholderSetting = sharedPrefs.getString("pref_placeholder", "");
+        }else {
+            placeholderSetting = sharedPrefs.getString(
+                    res.getString(R.string.placeholder_preference_key),
+                    res.getString(R.string.placeholder_preference_default));
+        }
         placeholder.setText(placeholderSetting);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.organisation_valid);
@@ -126,7 +129,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.organisation_valid:
                 processOrganisation();
-                setResult(RELOAD_LIST);
+                setResult(RESULT_OK);
                 finish();
                 break;
             case R.id.btn_title:
@@ -221,7 +224,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
                 placeholderContent = formatEndNameFile(placeholderContent, FilenameUtils.getExtension(file.getName()));
                 String filePath = file.getPath();
                 String oldPath = filePath.substring(0,filePath.lastIndexOf("/")) + "/" + file.getName();
-                placeholderContent = sourceFolder + placeholderContent;
+                placeholderContent = sourceFolder + "/" + placeholderContent;
                 moveFile(oldPath, placeholderContent);
             }
             else {
@@ -235,7 +238,11 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
     private void processOrganisation() {
         ProgressBar spinner = (ProgressBar)findViewById(R.id.progressBar1);
         spinner.setVisibility(View.VISIBLE);
-        Log.e("yolo", "ca passe");
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString("pref_placeholder", placeholder.getText().toString());
+        editor.commit();
+
         filesSelection(libraryItems);
     }
 

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 
+import binauld.pierre.musictag.item.AudioFile;
+
 public interface FileWrapper {
 
     public AudioFile build(File file) throws IOException;

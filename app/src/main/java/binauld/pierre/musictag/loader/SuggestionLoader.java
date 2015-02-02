@@ -1,9 +1,8 @@
-package binauld.pierre.musictag.io;
+package binauld.pierre.musictag.loader;
 
 import android.os.AsyncTask;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;

@@ -2,6 +2,7 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,67 +13,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.item.LibraryItem;
-import binauld.pierre.musictag.item.NodeItem;
+import binauld.pierre.musictag.composite.LibraryComposite;
+import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.item.Item;
 import binauld.pierre.musictag.service.ArtworkService;
+import binauld.pierre.musictag.visitor.ItemVisitor;
 
 /**
  * Adapt a list of library item for a list view.
  */
-public class LibraryItemAdapter extends BaseAdapter {
-
-
-
-//    public void toggleAudio(AudioItem audio){
-//        if(audios.contains(audio)){
-//            audios.remove(audio);
-//        }else{
-//            audios.add(audio);
-//        }
-//    }
-
-//    /**
-//     * Check if the folder is already selected and then delete audioitem in the list.
-//     * @param folder the checked folder item
-//     * @return a boolean to know if the folder was selected before the check.
-//     */
-//    public boolean alreadySelected(FolderItem folder){
-//        boolean alreadySelected = false;
-//        List<AudioItem> audiosToDelete = new ArrayList<>();
-//        for(AudioItem audio : audios){
-//            if(audio.getParent() == folder){
-//                alreadySelected = true;
-//                audiosToDelete.add(audio);
-//            }
-//        }
-//        for(AudioItem audio : audiosToDelete){
-//            audios.remove(audio);
-//        }
-//        return alreadySelected;
-//    }
-
-//    public List<File> recursiveDirectoryContent(FolderItem folder){
-//        File[] filesInFolder = folder.getFileList();
-//        List<File> files = new ArrayList<>();
-//        for(File f : filesInFolder){
-//            if (f.isDirectory()){
-//                List<File> filesInSubFolder = recursiveDirectoryContent(new FolderItem(f, folder.getFilter(), folder.getResources()));
-//                for(File file : filesInSubFolder) {
-//                    files.add(file);
-//                }
-//            }
-//            else{
-//                files.add(f);
-//            }
-//        }
-//        return files;
-//    }
-
-//    public Intent sendSelection(Activity activity) {
-//        Intent intent = new Intent(activity, TagFormActivity.class);
-//        TagFormActivity.provideItems(audios);
-//        return intent;
-//    }
+public class LibraryComponentAdapter extends BaseAdapter {
+    private Drawable background;
 
     static class ViewHolder {
         TextView firstLine;
@@ -80,12 +32,12 @@ public class LibraryItemAdapter extends BaseAdapter {
         ImageView thumbnail;
     }
 
-    private NodeItem currentNode;
+    private LibraryComposite currentComposite;
     private final ArtworkService artworkService;
     private int artworkSize;
     private ProgressBar progressBar;
 
-    public LibraryItemAdapter(ArtworkService artworkService, int artworkSize) {
+    public LibraryComponentAdapter(ArtworkService artworkService, int artworkSize) {
         this.artworkService = artworkService;
         this.artworkSize = artworkSize;
     }
@@ -98,12 +50,12 @@ public class LibraryItemAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return currentNode.size();
+        return currentComposite.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return currentNode.getChild(i);
+        return currentComposite.getChild(i);
     }
 
     @Override
@@ -131,13 +83,16 @@ public class LibraryItemAdapter extends BaseAdapter {
             // store the holder with the view.
             convertView.setTag(viewHolder);
 
+            if(null == background) {
+                background = convertView.getBackground();
+            }
         } else {
             // just use the viewHolder
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         // object item based on the position
-        LibraryItem item = currentNode.getChild(position);
+        Item item = currentComposite.getChild(position).getItem();
 
         // assign values if the object is not null
         if (item != null) {
@@ -147,41 +102,14 @@ public class LibraryItemAdapter extends BaseAdapter {
             convertView.setTag(viewHolder);
             if(listView.isItemChecked(position)) {
                 //TODO: Magic Color!
-                convertView.setBackgroundColor(Color.parseColor("#ffb74d"));
+                convertView.setBackgroundColor(Color.parseColor("#ffe0b2"));
             } else {
-//                convertView.setBackgroundColor(Color.parseColor("#fafafa"));
+                convertView.setBackground(background);
             }
         }
 
         return convertView;
     }
-
-
-
-//        if (item.isAudioItem()) {
-//            AudioItem audio = (AudioItem) item;
-//            toggleAudio(audio);
-//        }
-//        else{
-//            FolderItem folder = (FolderItem) item;
-//            if(!alreadySelected(folder)) {
-//                List<File> files = recursiveDirectoryContent(folder);
-//                LibraryItemFactory factory = LibraryItemFactoryHelper.buildFactory(folder.getResources(), folder.getFilter(), new ResourceBitmapDecoder(folder.getResources(), R.drawable.list_item_placeholder));
-//
-//
-//                for (File f : files) {
-//                    AudioItem audioItem = new AudioItem();
-//                    audioItem.setParent(folder);
-//                    try {
-//                        factory.put(audioItem, f);
-//                    } catch (IOException e) {
-//                        Log.e(this.getClass().toString(), e.getMessage(), e);
-//                    }
-//                    audios.add(audioItem);
-//                }
-//            }
-//        }
-//    }
 
     /**
      * Set the progress bar.
@@ -196,11 +124,21 @@ public class LibraryItemAdapter extends BaseAdapter {
      */
     private void setUpProgressBar() {
         if (null != progressBar) {
-            if (null == currentNode) {
+            if (null == currentComposite) {
                 progressBar.setVisibility(View.GONE);
             } else {
                 progressBar.setVisibility(View.VISIBLE);
-                progressBar.setMax(currentNode.getMaxChildrenCount());
+                currentComposite.getItem().accept(new ItemVisitor() {
+                    @Override
+                    public void visit(AudioFile audioFile) {
+
+                    }
+
+                    @Override
+                    public void visit(Folder folder) {
+                        progressBar.setMax(folder.getMaxChildrenCount());
+                    }
+                });
                 updateProgressBar();
             }
         }
@@ -211,9 +149,9 @@ public class LibraryItemAdapter extends BaseAdapter {
      */
     private void updateProgressBar() {
         if (null != progressBar) {
-            switch (currentNode.getState()) {
+            switch (currentComposite.getState()) {
                 case LOADING:
-                    progressBar.setProgress(currentNode.size() + currentNode.getInvalidItemCount());
+                    progressBar.setProgress(currentComposite.size() + currentComposite.getInvalidComponentCount());
                     break;
                 case LOADED:
                     progressBar.setVisibility(View.GONE);
@@ -229,10 +167,10 @@ public class LibraryItemAdapter extends BaseAdapter {
     /**
      * Set the current node of the library tree list.
      *
-     * @param currentNode The current node to set.
+     * @param currentComposite The current node to set.
      */
-    public void setCurrentNode(NodeItem currentNode) {
-        this.currentNode = currentNode;
+    public void setCurrentComposite(LibraryComposite currentComposite) {
+        this.currentComposite = currentComposite;
         setUpProgressBar();
     }
 
@@ -241,8 +179,8 @@ public class LibraryItemAdapter extends BaseAdapter {
      *
      * @return The current node to get.
      */
-    public NodeItem getCurrentNode() {
-        return currentNode;
+    public LibraryComposite getCurrentComposite() {
+        return currentComposite;
     }
 
 }

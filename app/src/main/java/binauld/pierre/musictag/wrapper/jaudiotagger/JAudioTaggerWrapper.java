@@ -20,9 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import binauld.pierre.musictag.decoder.AudioFileBitmapDecoder;
+import binauld.pierre.musictag.item.AudioFile;
+import binauld.pierre.musictag.item.impl.AudioFileImpl;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
-import binauld.pierre.musictag.wrapper.AudioFile;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 
 /**
@@ -84,9 +85,7 @@ public class JAudioTaggerWrapper implements FileWrapper {
             id3Tag.put(entry.getKey(), jAudioTaggerTags.getFirst(entry.getValue()));
         }
 
-        JAudioTaggerFile result = new JAudioTaggerFile();
-        result.setId3Tag(id3Tag);
-        result.setFile(file);
+        AudioFile result = new AudioFileImpl(file, id3Tag);
         result.setBitmapDecoder(new AudioFileBitmapDecoder(jAudioTaggerFile));
         return result;
     }
@@ -110,7 +109,7 @@ public class JAudioTaggerWrapper implements FileWrapper {
      * @param audioFile The audio file to save the tag in.
      */
     @Override
-    public void save(binauld.pierre.musictag.wrapper.AudioFile audioFile) throws IOException {
+    public void save(AudioFile audioFile) throws IOException {
 
         try {
             org.jaudiotagger.audio.AudioFile jAudioTaggerFile = AudioFileIO.read(audioFile.getFile());

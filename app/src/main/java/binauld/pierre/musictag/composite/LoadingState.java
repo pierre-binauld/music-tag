@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.item;
+package binauld.pierre.musictag.composite;
 
 /**
  * Define the state of a loading.
@@ -6,5 +6,5 @@ package binauld.pierre.musictag.item;
 public enum LoadingState {
     NOT_LOADED,
     LOADING,
-    LOADED
+    LOADED;
 }

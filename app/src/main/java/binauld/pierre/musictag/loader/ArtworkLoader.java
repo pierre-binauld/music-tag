@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.io;
+package binauld.pierre.musictag.loader;
 
 
 import android.graphics.Bitmap;
@@ -8,17 +8,17 @@ import android.widget.ImageView;
 import java.lang.ref.WeakReference;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.item.LibraryItem;
+import binauld.pierre.musictag.item.Item;
 import binauld.pierre.musictag.service.CacheService;
 
 /**
  * Load an artwork in background.
  */
-public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
+public class ArtworkLoader extends AsyncTask<Item, Void, Bitmap> {
 
     private final WeakReference<ImageView> imageViewReference;
     private final BitmapDecoder defaultArtworkDecoder;
-    private LibraryItem item;
+    private Item item;
     private CacheService<Bitmap> cacheService;
     private int artworkSize;
 
@@ -31,16 +31,16 @@ public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
     }
 
     @Override
-    protected Bitmap doInBackground(LibraryItem... items) {
+    protected Bitmap doInBackground(Item... items) {
         item = items[0];
-        BitmapDecoder decoder = item.getDecoder();
+        BitmapDecoder decoder = item.getBitmapDecoder();
 
         String key = decoder.getKey(artworkSize, artworkSize);
         Bitmap bitmap = decoder.decode(artworkSize, artworkSize);
         if (null != bitmap) {
             cacheService.put(key, bitmap);
         } else if (decoder != defaultArtworkDecoder) {
-            item.setDecoder(defaultArtworkDecoder);
+            item.setBitmapDecoder(defaultArtworkDecoder);
             bitmap = this.doInBackground(item);
         }
 
@@ -66,7 +66,7 @@ public class ArtworkLoader extends AsyncTask<LibraryItem, Void, Bitmap> {
      * Get the item which loader working on.
      * @return The item.
      */
-    public LibraryItem getWorkingItem() {
+    public Item getWorkingItem() {
         return item;
     }
 

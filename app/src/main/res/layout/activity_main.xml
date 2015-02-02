@@ -12,7 +12,9 @@
         android:dividerHeight="0px"
         android:footerDividersEnabled="false"
         android:headerDividersEnabled="false"
-        android:choiceMode="multipleChoiceModal">
+        android:choiceMode="multipleChoiceModal"
+        android:listSelector="@drawable/ripple_drawable"
+        android:drawSelectorOnTop="true">
 
     </com.github.ksoichiro.android.observablescrollview.ObservableListView>
 

@@ -10,6 +10,13 @@
         <item name="android:colorPrimaryDark">@color/color_primary_dark</item>
         <!--   theme UI controls like checkboxes and text fields -->
         <item name="android:colorAccent">@color/color_accent</item>
+
+
+        <item name="android:actionModeStyle">@style/ActionModeStyle</item>
+    </style>
+
+    <style name="ActionModeStyle" parent="android:Theme.Material.Light.DarkActionBar">
+        <item name="android:colorAccent">@color/color_accent</item>
     </style>
 
     <style name="SettingsTheme" parent="android:Theme.Material">

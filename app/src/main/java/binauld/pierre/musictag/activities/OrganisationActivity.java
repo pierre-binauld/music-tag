@@ -1,56 +1,36 @@
 package binauld.pierre.musictag.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 
 import com.melnykov.fab.FloatingActionButton;
 
-import org.apache.commons.io.FilenameUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.composite.LibraryComponent;
-import binauld.pierre.musictag.composite.LibraryComposite;
-import binauld.pierre.musictag.item.AudioFile;
-import binauld.pierre.musictag.item.Folder;
-import binauld.pierre.musictag.item.Item;
-import binauld.pierre.musictag.tag.Id3Tag;
-import binauld.pierre.musictag.tag.SupportedTag;
-import binauld.pierre.musictag.visitor.ComponentVisitor;
-import binauld.pierre.musictag.visitor.ItemVisitor;
-import binauld.pierre.musictag.visitor.impl.DrillDownComponentVisitor;
+import binauld.pierre.musictag.loader.AsyncTaskExecutor;
+import binauld.pierre.musictag.loader.OrganisationTask;
 
-public class OrganisationActivity extends Activity implements View.OnClickListener, ItemVisitor {
+public class OrganisationActivity extends Activity implements View.OnClickListener, OrganisationTask.CallBack {
     private EditText placeholder;
     public static List<LibraryComponent> libraryComponents;
-    private HashMap<SupportedTag, String> supportedPlaceholderMapping;
 
     private Resources res;
     private SharedPreferences sharedPrefs;
     private String sourceFolder;
     private String placeholderSetting;
-    private String placeholderContent;
+    private ProgressDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +55,6 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.organisation_valid);
         fab.setOnClickListener(this);
-        initPlaceholderMap();
 
         Button btn_title = (Button) findViewById(R.id.btn_title);
         btn_title.setOnClickListener(this);
@@ -136,8 +115,6 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.organisation_valid:
                 processOrganisation();
-                setResult(RESULT_OK);
-                finish();
                 break;
             case R.id.btn_title:
                 addContentToPlaceHolder("[title]");
@@ -193,157 +170,32 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         newText += s;
         newText += initText.substring(cursorPosition);
         placeholder.setText(newText);
-        placeholder.setSelection(cursorPosition+s.length());
-    }
-
-    private void initPlaceholderMap(){
-        supportedPlaceholderMapping = new HashMap<>();
-        supportedPlaceholderMapping.put(SupportedTag.TITLE, "\\[title\\]");
-        supportedPlaceholderMapping.put(SupportedTag.ARTIST, "\\[artist\\]");
-        supportedPlaceholderMapping.put(SupportedTag.ALBUM, "\\[album\\]");
-        supportedPlaceholderMapping.put(SupportedTag.YEAR, "\\[year\\]");
-        supportedPlaceholderMapping.put(SupportedTag.DISC_NO, "\\[disc\\]");
-        supportedPlaceholderMapping.put(SupportedTag.TRACK, "\\[track\\]");
-        supportedPlaceholderMapping.put(SupportedTag.ALBUM_ARTIST, "\\[album_artist\\]");
-        supportedPlaceholderMapping.put(SupportedTag.COMPOSER, "\\[composer\\]");
-        supportedPlaceholderMapping.put(SupportedTag.GROUPING, "\\[grouping\\]");
-        supportedPlaceholderMapping.put(SupportedTag.GENRE, "\\[genre\\]");
-    }
-
-    private void filesSelection(List<LibraryComponent> components){
-        CustomDrillDownComponentVisitor visitor = new CustomDrillDownComponentVisitor(this);
-        for(LibraryComponent component: components){
-            component.accept(visitor);
-        }
-
-        for(Item item : visitor.getFolders()){
-            Log.e("deleteFolder", item.getPrimaryInformation());
-            item.accept(this);
-        }
+        placeholder.setSelection(cursorPosition + s.length());
     }
 
     private void processOrganisation() {
-        ProgressBar spinner = (ProgressBar)findViewById(R.id.progressBar1);
-        spinner.setVisibility(View.VISIBLE);
-
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString("pref_placeholder", placeholder.getText().toString());
         editor.commit();
 
-        filesSelection(libraryComponents);
-    }
-
-    private String formatEndNameFile(String path, String extension){
-        File f = new File(path + "." + extension);
-        int i = 1;
-        do{
-            if(f.exists()) {
-                f = new File(path + " (" + i + ")." + extension);
-                i++;
-            }
-        }while (f.exists());
-
-        return f.getPath();
-    }
-
-    private void moveFile(String inputPath, String outputPath) {
-        InputStream in;
-        OutputStream out;
-        try {
-            int indexOfSlash = outputPath.lastIndexOf("/");
-            String outputDir = outputPath.substring(0, indexOfSlash);
-            //create output directory if it doesn't exist
-            File dir = new File (outputDir);
-            if (!dir.exists())
-            {
-                dir.mkdirs();
-            }
-            File f = new File(outputPath);
-            int i = 1;
-            do{
-                if(f.exists()) {
-                    int indexOfPoint = outputPath.lastIndexOf(".");
-                    String outputBegin = outputPath.substring(0, indexOfPoint);
-                    String outputEnd = outputPath.substring(indexOfPoint, outputPath.length());
-                    f = new File(outputBegin + " (" + i + ")" + outputEnd);
-                    i++;
-                }
-            }while (f.exists());
-
-            in = new FileInputStream(inputPath);
-            out = new FileOutputStream(f.getPath());
-
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            in.close();
-
-            // write the output file
-            out.flush();
-            out.close();
-
-            // delete the original file
-            new File(inputPath).delete();
-        }
-
-        catch (FileNotFoundException e) {
-            Log.e("File not found : Error during moveFile", e.getMessage());
-        }
-        catch (Exception e) {
-            Log.e("Error during moveFile", e.getMessage());
-        }
-
+        OrganisationTask organisationTask = new OrganisationTask(placeholder.getText().toString(), sourceFolder, getString(R.string.unknown), this);
+        LibraryComponent[] libraryComponentArray = libraryComponents.toArray(new LibraryComponent[libraryComponents.size()]);
+        AsyncTaskExecutor.execute(organisationTask, libraryComponentArray);
+        loadingDialog = ProgressDialog.show(OrganisationActivity.this, res.getString(R.string.saving),
+                res.getString(R.string.please_wait), true);
     }
 
     @Override
-    public void visit(AudioFile audioFile) {
-        placeholderContent = placeholder.getText().toString();
-        File file = audioFile.getFile();
-        Id3Tag id3Tag = audioFile.getId3Tag();
-        for(Map.Entry<SupportedTag, String> entry : supportedPlaceholderMapping.entrySet()){
-            String tag;
-            if(id3Tag.containsKey(entry.getKey()) && !id3Tag.get(entry.getKey()).equals("")){
-                tag = id3Tag.get(entry.getKey());
-            }
-            else{
-                tag = getString(R.string.unknown);
-            }
-            placeholderContent = placeholderContent.replaceAll(entry.getValue(), tag);
+    protected void onPause() {
+        super.onPause();
+        if (null != loadingDialog) {
+            loadingDialog.dismiss();
         }
-        placeholderContent = formatEndNameFile(placeholderContent, FilenameUtils.getExtension(file.getName()));
-        String filePath = file.getPath();
-        String oldPath = filePath.substring(0,filePath.lastIndexOf("/")) + "/" + file.getName();
-        placeholderContent = sourceFolder + "/" + placeholderContent;
-        moveFile(oldPath, placeholderContent);
     }
 
     @Override
-    public void visit(Folder folder) {
-        File[] children = folder.getFile().listFiles();
-        if(children.length == 0){
-            folder.getFile().delete();
-        }
-    }
-
-    class CustomDrillDownComponentVisitor extends DrillDownComponentVisitor {
-        private List<Item> folders = new ArrayList<>();
-
-        public CustomDrillDownComponentVisitor(ItemVisitor itemVisitor) {
-            super(itemVisitor);
-        }
-
-
-        @Override
-        public void visit(LibraryComposite composite) {
-            Log.e("visit nb", composite.getItem().getPrimaryInformation() + " - " + composite.getChildren().size() + "");
-            super.visit(composite);
-            folders.add(composite.getItem());
-        }
-
-        public List<Item> getFolders() {
-            return folders;
-        }
+    public void onPostExecute() {
+        setResult(RESULT_OK);
+        finish();
     }
 }

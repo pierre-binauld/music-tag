@@ -184,11 +184,4 @@
         fab:fab_colorPressed="@color/color_accent_pressed"
         fab:fab_colorRipple="@color/color_accent_hover"/>
 
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
 </FrameLayout>

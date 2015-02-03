@@ -47,42 +47,43 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tag_suggestion);
-
-        // Init action bar
-        ActionBar actionBar = getActionBar();
-        if (null != actionBar) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
-        // Init resources
-        Resources res = getResources();
-
-        // Init title
-        setTitle(res.getString(R.string.title_activity_tag_suggestion));
 
         // Init content
-        this.initContent();
+        if (this.initContent()) {
 
-        // Init adapter
-        adapter = new SuggestionItemAdapter(localSuggestion, res);
+            setContentView(R.layout.activity_tag_suggestion);
 
-        // Init footer
-        waitingFooter = LayoutInflater.from(this).inflate(R.layout.suggestion_list_waiting_footer_view, listView, false);
-        reloadFooter = LayoutInflater.from(this).inflate(R.layout.suggestion_list_retry_footer_view, listView, false);
+            // Init action bar
+            ActionBar actionBar = getActionBar();
+            if (null != actionBar) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
 
-        // Init List View
-        listView = (ListView) findViewById(R.id.list_suggestion);
-        listView.setAdapter(adapter);
+            // Init resources
+            Resources res = getResources();
 
-        // Init Floating Action Button
-        fab = (FloatingActionButton) findViewById(R.id.fab_valid);
-        fab.setOnClickListener(this);
-
-        // Load content
-        this.loadContent();
+            // Init title
+            setTitle(res.getString(R.string.title_activity_tag_suggestion));
 
 
+            // Init adapter
+            adapter = new SuggestionItemAdapter(localSuggestion, res);
+
+            // Init footer
+            waitingFooter = LayoutInflater.from(this).inflate(R.layout.suggestion_list_waiting_footer_view, listView, false);
+            reloadFooter = LayoutInflater.from(this).inflate(R.layout.suggestion_list_retry_footer_view, listView, false);
+
+            // Init List View
+            listView = (ListView) findViewById(R.id.list_suggestion);
+            listView.setAdapter(adapter);
+
+            // Init Floating Action Button
+            fab = (FloatingActionButton) findViewById(R.id.fab_valid);
+            fab.setOnClickListener(this);
+
+            // Load content
+            this.loadContent();
+        }
     }
 
     @Override
@@ -116,7 +117,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
-        if(null != loader) {
+        if (null != loader) {
             loader.cancel(true);
         }
         super.onBackPressed();
@@ -150,9 +151,10 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
      * Initialize the first suggestion with the id3 tag passed by intent.
      * If it is null, then finish.
      */
-    private void initContent() {
+    private boolean initContent() {
         this.id3Tag = ((Id3TagParcelable) getIntent().getParcelableExtra(TAG_KEY)).getId3Tag();
         localSuggestion = new SuggestionItem(id3Tag, MAX_SCORE_PLUS_ONE);
+        return true;
     }
 
     /**
@@ -162,7 +164,7 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
         if (null == id3Tag) {
             Log.e(this.getClass().toString(), "No tags has been provided.");
             finishWithCanceledResult();
-        } else if(!isNetworkAvailable()) {
+        } else if (!isNetworkAvailable()) {
             //TODO: When retry, progress bar is weird.
             //TODO: Animation
             //TODO: Do not recreate page when conf change.
@@ -191,18 +193,20 @@ public class TagSuggestionActivity extends Activity implements View.OnClickListe
     /**
      * Change the list view footer.
      * If footer is null, then just remove the footer.
+     *
      * @param footer The footer.
      */
     private void changeFooter(View footer) {
         listView.removeFooterView(waitingFooter);
         listView.removeFooterView(reloadFooter);
-        if(null != footer) {
+        if (null != footer) {
             listView.addFooterView(footer);
         }
     }
 
     /**
      * Check the network is available.
+     *
      * @return A boolean.
      */
     private boolean isNetworkAvailable() {

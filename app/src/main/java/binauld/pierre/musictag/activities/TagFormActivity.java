@@ -27,6 +27,7 @@ import binauld.pierre.musictag.factory.LibraryComponentFactory;
 import binauld.pierre.musictag.item.Folder;
 import binauld.pierre.musictag.loader.LibraryComponentLoader;
 import binauld.pierre.musictag.loader.LibraryComponentLoaderManager;
+import binauld.pierre.musictag.util.SharedObject;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
 import binauld.pierre.musictag.visitor.ItemVisitor;
 import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
@@ -50,17 +51,6 @@ import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
  * Activity for editing audio tag of one or several track.
  */
 public class TagFormActivity extends Activity implements View.OnClickListener {
-
-    private static List<LibraryComponent> providedComponents;
-    private static LibraryComponentFactory providedComponentFactory;
-
-    public static void provideComponents(List<LibraryComponent> components) {
-        TagFormActivity.providedComponents = components;
-    }
-
-    public static void provideComponentFactory(LibraryComponentFactory componentFactory) {
-        TagFormActivity.providedComponentFactory = componentFactory;
-    }
 
     public static final int SUGGESTION_REQUEST_CODE = 1;
 
@@ -261,18 +251,18 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
      * Initialize the audio item and finish if it is not possible.
      */
     public boolean initContent() {
-        if (null == providedComponents) {
+        if (null == SharedObject.getComponents()) {
             Log.e(this.getClass().toString(), "No item has been provided.");
             finish();
             return false;
-        } else if (null == providedComponentFactory) {
+        } else if (null == SharedObject.getComponentFactory()) {
             Log.e(this.getClass().toString(), "No component factory has been provided.");
             finish();
             return false;
         } else {
-            components = TagFormActivity.providedComponents;
+            components = SharedObject.getComponents();
             componentArray = components.toArray(new LibraryComponent[components.size()]);
-            componentFactory = TagFormActivity.providedComponentFactory;
+            componentFactory = SharedObject.getComponentFactory();
             return true;
         }
     }

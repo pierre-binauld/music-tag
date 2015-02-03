@@ -33,6 +33,7 @@ import binauld.pierre.musictag.helper.LibraryComponentFactoryHelper;
 import binauld.pierre.musictag.listener.ItemMultiChoiceMode;
 import binauld.pierre.musictag.loader.LibraryComponentLoader;
 import binauld.pierre.musictag.loader.LibraryComponentLoaderManager;
+import binauld.pierre.musictag.util.SharedObject;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
@@ -164,8 +165,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+                callSettingsActivity();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -244,10 +244,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 //        }
     }
 
+
+    private void callSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
     public void callTagFormActivity(List<LibraryComponent> components) {
         Intent intent = new Intent(this, TagFormActivity.class);
-        TagFormActivity.provideComponents(components);
-        TagFormActivity.provideComponentFactory(componentFactory);
+        SharedObject.provideComponent(components);
+        SharedObject.provideComponentFactory(componentFactory);
         startActivityForResult(intent, TAG_UPDATE_REQUEST);
     }
 

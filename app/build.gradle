@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'lib', include: ['*.jar'])
     // Remote binary dependency
     compile 'org:jaudiotagger:2.0.3'
     compile 'commons-io:commons-io:2.4'

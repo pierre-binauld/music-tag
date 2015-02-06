@@ -2,4 +2,6 @@
 <resources>
     <string name="source_folder_preference_key" translatable="false">binauld.pierre.musictag.sourceFolder</string>
     <string name="source_folder_preference_default" translatable="false">/storage/emulated/0/Music</string>
+    <string name="placeholder_preference_key" translatable="false">binauld.pierre.musictag.placeholder</string>
+    <string name="placeholder_preference_default" translatable="false">[artist]/[title]</string>
 </resources>

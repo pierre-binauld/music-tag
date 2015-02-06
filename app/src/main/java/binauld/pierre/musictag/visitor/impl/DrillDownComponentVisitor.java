@@ -1,6 +1,8 @@
 package binauld.pierre.musictag.visitor.impl;
 
 
+import android.util.Log;
+
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.composite.LibraryComposite;
 import binauld.pierre.musictag.composite.LibraryLeaf;

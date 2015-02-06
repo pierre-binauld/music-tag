@@ -41,6 +41,10 @@
             android:label="@string/title_activity_suggestion"
             android:theme="@style/NavigationDrawerTheme">
         </activity>
+        <activity
+            android:name=".activities.OrganisationActivity"
+            android:label="@string/title_activity_organisation" >
+        </activity>
     </application>
 
 </manifest>

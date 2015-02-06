@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -54,6 +55,7 @@ import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, ObservableScrollViewCallbacks {
 
     private static final int TAG_UPDATE_REQUEST = 1;
+    private static final int ORGANISATION_REQUEST = 2;
 
     private LibraryComponentLoaderManager manager;
     private LibraryComponentAdapter adapter;
@@ -167,6 +169,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             case R.id.action_settings:
                 callSettingsActivity();
                 return true;
+            case R.id.action_organisation:
+                Intent intent2 = new Intent(this, OrganisationActivity.class);
+                List<LibraryComponent> components = new ArrayList<>();
+                components.add(adapter.getCurrentComposite());
+                OrganisationActivity.libraryComponents = components;
+                startActivityForResult(intent2, ORGANISATION_REQUEST);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -200,11 +209,24 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                     break;
             }
         }
+        else{
+            if (requestCode == ORGANISATION_REQUEST) {
+                // Make sure the request was successful
+                switch (resultCode) {
+                    case RESULT_OK:
+                        LibraryComposite composite = getSourceComposite();
+                        switchComposite(composite);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (backToParent()) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && backToParent()) {
             return true;
         }
 
@@ -286,7 +308,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         }
 
         if (composite.getState() == LoadingState.NOT_LOADED) {
-            LibraryComponentLoader loader = manager.get(false, new LibraryComponentLoader.Callback() {
+            LibraryComponentLoader loader = manager.get(true, new LibraryComponentLoader.Callback() {
 
                 @Override
                 public void onProgressUpdate(LibraryComposite libraryComposite) {
@@ -314,7 +336,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         if (parent == null) {
             return false;
         } else {
-            switchComposite( parent);
+            switchComposite(parent);
             return true;
         }
     }

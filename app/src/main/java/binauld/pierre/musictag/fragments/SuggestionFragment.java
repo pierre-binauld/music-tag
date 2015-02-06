@@ -37,6 +37,9 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
 
     public static final String TAG_KEY = "id3_tag";
 
+
+    private boolean isLastFragment = false;
+
     private Id3Tag id3Tag;
     private SuggestionItem localSuggestion;
     private SuggestionItemAdapter adapter;
@@ -140,6 +143,9 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
         // Init Floating Action Button
         fab = (FloatingActionButton) getView().findViewById(R.id.fab_next);
         fab.setOnClickListener(this);
+        if (isLastFragment) {
+            fab.setImageResource(R.drawable.ic_action_action_done_32dp);
+        }
 
 //        loadContent();
     }
@@ -171,7 +177,11 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
         switch (v.getId()) {
             case R.id.fab_next:
 //                returnSelectedTag();
-                callback.next();
+                if (isLastFragment) {
+                    callback.valid();
+                } else {
+                    callback.next();
+                }
                 break;
         }
     }
@@ -282,8 +292,18 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
             this.adapter = adapter;
     }
 
+
+    public boolean isLastFragment() {
+        return isLastFragment;
+    }
+
+    public void setLastFragment(boolean isLastFragment) {
+        this.isLastFragment = isLastFragment;
+    }
+
     public interface SuggestionInterface {
         void next();
 
+        void valid();
     }
 }

@@ -40,9 +40,11 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
         if(null == id3Tags) {
             finish();
         } else {
+            SuggestionFragment fragment = null;
             for (Map.Entry<AudioFile, Id3Tag> entry : id3Tags.entrySet()) {
-                initFragment(entry);
+                fragment = initFragment(entry);
             }
+            fragment.setLastFragment(true);
         }
     }
 
@@ -58,7 +60,9 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_suggestion, menu);
+        if (id3Tags.size() > 1) {
+            getMenuInflater().inflate(R.menu.menu_suggestion, menu);
+        }
         return true;
     }
 
@@ -77,7 +81,7 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
         }
     }
 
-    public void initFragment(Map.Entry<AudioFile, Id3Tag> entry) {
+    public SuggestionFragment initFragment(Map.Entry<AudioFile, Id3Tag> entry) {
 //        audioFiles.add(audioFile);
         AudioFile audioFile = entry.getKey();
         Id3Tag id3Tag = entry.getValue();
@@ -112,6 +116,8 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
 
         MaterialSection section = newSection(audioFile.getPrimaryInformation(), fragment);
         addSection(section);
+
+        return fragment;
     }
 
     @Override
@@ -123,6 +129,11 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
         }
 
         this.setSection(this.getSectionAtCurrentPosition(currentPosition));
+    }
+
+    @Override
+    public void valid() {
+        validAndFinish();
     }
 
     private void validAndFinish() {

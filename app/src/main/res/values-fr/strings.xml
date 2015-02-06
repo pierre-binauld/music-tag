@@ -30,4 +30,5 @@
     <string name="saving">Sauvegarde</string>
     <string name="selected_item">Item sélectionné</string>
     <string name="selected_items">Items sélectionnés</string>
+    <string name="action_done_all">Valider Tout</string>
 </resources>

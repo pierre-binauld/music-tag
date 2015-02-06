@@ -296,7 +296,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 }
 
                 @Override
-                public void onPostExecute(/*List<LibraryComposite> items*/) {
+                public void onPostExecute() {
                 }
             });
 

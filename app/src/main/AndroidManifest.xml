@@ -33,12 +33,13 @@
         </activity>
         <activity
             android:name=".activities.TagFormActivity"
-            android:windowSoftInputMode="stateUnchanged"
-            android:label="@string/title_activity_tag_form" >
+            android:label="@string/title_activity_tag_form"
+            android:windowSoftInputMode="stateUnchanged" >
         </activity>
         <activity
-            android:name=".activities.TagSuggestionActivity"
-            android:label="@string/title_activity_tag_suggestion" >
+            android:name=".activities.SuggestionActivity"
+            android:label="@string/title_activity_suggestion"
+            android:theme="@style/NavigationDrawerTheme">
         </activity>
     </application>
 

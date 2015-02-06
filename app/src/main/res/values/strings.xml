@@ -31,6 +31,7 @@
     <string name="saving">Saving</string>
     <string name="selected_item">Selected item</string>
     <string name="selected_items">Selected items</string>
-
+    <string name="title_activity_suggestion">SuggestionActivity</string>
+    <string name="action_done_all">Done All</string>
 
 </resources>

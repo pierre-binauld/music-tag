@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Map;
 
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.item.AudioFile;
@@ -16,7 +17,7 @@ import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 
-public class TagSaver extends AsyncTask<LibraryComponent, Void, Void> implements ItemVisitor {
+public class TagSaver extends AsyncTask<Map<AudioFile, Id3Tag>, Void, Void> implements ItemVisitor {
 
     private MultipleId3Tag multipleId3Tag;
     private FileWrapper fileWrapper;
@@ -31,9 +32,20 @@ public class TagSaver extends AsyncTask<LibraryComponent, Void, Void> implements
     }
 
     @Override
-    protected Void doInBackground(LibraryComponent... params) {
-        for (LibraryComponent item : params) {
-            save(item);
+    protected Void doInBackground(Map<AudioFile, Id3Tag>... params) {
+        for (Map<AudioFile, Id3Tag> map : params) {
+            for (Map.Entry<AudioFile, Id3Tag> entry : map.entrySet())
+            try {
+                AudioFile audioFile = entry.getKey();
+                Id3Tag id3Tag = entry.getValue();
+
+                multipleId3Tag.update(id3Tag);
+                audioFile.setId3Tag(id3Tag);
+                fileWrapper.save(audioFile);
+
+            } catch (IOException e) {
+                Log.w(this.getClass().toString(), e.getMessage(), e);
+            }
         }
         return null;
     }

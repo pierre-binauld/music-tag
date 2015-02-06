@@ -24,7 +24,9 @@ import java.util.Map;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.factory.LibraryComponentFactory;
+import binauld.pierre.musictag.fragments.SuggestionFragment;
 import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.loader.AudioFileFilter;
 import binauld.pierre.musictag.loader.LibraryComponentLoader;
 import binauld.pierre.musictag.loader.LibraryComponentLoaderManager;
 import binauld.pierre.musictag.util.SharedObject;
@@ -61,8 +63,8 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
     private LibraryComponentLoaderManager loaderManager;
     private List<LibraryComponent> components;
-    private LibraryComponent[] componentArray;
     private MultipleId3Tag multipleId3Tag;
+    private Map<AudioFile, Id3Tag> id3Tags;
 
     private HashMap<SupportedTag, EditText> views = new HashMap<>();
 
@@ -174,9 +176,8 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         if (requestCode == SUGGESTION_REQUEST_CODE) {
             switch (resultCode) {
                 case RESULT_OK:
-                    Id3TagParcelable id3TagParcelable = data.getParcelableExtra(TagSuggestionActivity.TAG_KEY);
-//                    id3Tags.put(id3TagParcelable.getId3Tag());
-//                    fillViews(id3Tags);
+                    id3Tags = SharedObject.getId3Tags();
+                    loadContent(id3Tags);
                     break;
                 case RESULT_CANCELED:
                 default:
@@ -190,8 +191,9 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
      */
     private void callSuggestionActivity() {
 //        updateId3TagFromViews();
-        Intent intent = new Intent(this, TagSuggestionActivity.class);
+        Intent intent = new Intent(this, SuggestionActivity.class);
 //        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(id3Tags));
+        SharedObject.provideId3Tags(id3Tags);
         startActivityForResult(intent, SUGGESTION_REQUEST_CODE);
     }
 
@@ -261,7 +263,6 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             return false;
         } else {
             components = SharedObject.getComponents();
-            componentArray = components.toArray(new LibraryComponent[components.size()]);
             componentFactory = SharedObject.getComponentFactory();
             return true;
         }
@@ -273,7 +274,29 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         loadingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.loading),
                 res.getString(R.string.please_wait), true);
 
-        LibraryComponentLoader.Callback tagFormLoaderLauncher = new LibraryComponentLoader.Callback() {
+
+//        final TagFormLoader.Callback finishLoading = new TagFormLoader.Callback() {
+//            @Override
+//            public void onPostExecute(MultipleId3Tag multipleId3Tag) {
+//                TagFormActivity.this.multipleId3Tag = multipleId3Tag;
+//                fillViews();
+//                loadingDialog.dismiss();
+//            }
+//        };
+
+        final AudioFileFilter.Callback tagFormLoaderLauncher = new AudioFileFilter.Callback() {
+            @Override
+            public void onPostExecute(Map<AudioFile, Id3Tag> audioFileId3TagMap) {
+//                TagFormActivity.this.id3Tags = audioFileId3TagMap;
+//                Id3Tag[] id3TagArray = TagFormActivity.this.id3Tags.values().toArray(new Id3Tag[id3Tags.size()]);
+//                AsyncTaskExecutor.execute(new TagFormLoader(finishLoading), id3TagArray);
+                loadContent(audioFileId3TagMap);
+            }
+        };
+
+        final LibraryComponent[] componentArray = components.toArray(new LibraryComponent[components.size()]);
+
+        LibraryComponentLoader.Callback filterLauncher = new LibraryComponentLoader.Callback() {
 
             @Override
             public void onProgressUpdate(LibraryComposite composite) {
@@ -282,19 +305,27 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onPostExecute(/*List<LibraryComposite> results*/) {
-                TagFormLoader.Callback callback = new TagFormLoader.Callback() {
-                    @Override
-                    public void onPostExecute(MultipleId3Tag multipleId3Tag) {
-                        TagFormActivity.this.multipleId3Tag = multipleId3Tag;
-                        fillViews(/*components, multipleId3Tag*/);
-                        loadingDialog.dismiss();
-                    }
-                };
-                AsyncTaskExecutor.execute(new TagFormLoader(callback), componentArray);
+                AsyncTaskExecutor.execute(new AudioFileFilter(tagFormLoaderLauncher), componentArray);
             }
         };
 
-        AsyncTaskExecutor.execute(loaderManager.get(true, tagFormLoaderLauncher), componentArray);
+        AsyncTaskExecutor.execute(loaderManager.get(true, filterLauncher), componentArray);
+    }
+
+    private void loadContent(Map<AudioFile, Id3Tag> audioFileId3TagMap) {
+        loadingDialog.show();
+        final TagFormLoader.Callback finishLoading = new TagFormLoader.Callback() {
+            @Override
+            public void onPostExecute(MultipleId3Tag multipleId3Tag) {
+                TagFormActivity.this.multipleId3Tag = multipleId3Tag;
+                fillViews();
+                loadingDialog.dismiss();
+            }
+        };
+
+        TagFormActivity.this.id3Tags = audioFileId3TagMap;
+        Id3Tag[] id3TagArray = TagFormActivity.this.id3Tags.values().toArray(new Id3Tag[id3Tags.size()]);
+        AsyncTaskExecutor.execute(new TagFormLoader(finishLoading), id3TagArray);
     }
 
     public void saveContentAndFinish() {
@@ -318,7 +349,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             }
         });
 
-        AsyncTaskExecutor.execute(saver, componentArray);
+        AsyncTaskExecutor.execute(saver, id3Tags);
     }
 
     class FilenameBuilderVisitor implements ItemVisitor {

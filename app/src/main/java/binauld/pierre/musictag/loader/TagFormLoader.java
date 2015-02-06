@@ -15,24 +15,20 @@ import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
 
-public class TagFormLoader extends AsyncTask<LibraryComponent, Void, MultipleId3Tag> implements ItemVisitor {
+public class TagFormLoader extends AsyncTask<Id3Tag, Void, MultipleId3Tag> {
 
     private Callback callback;
-    private ComponentVisitor visitor;
-    private MultipleId3Tag multipleId3Tag;
 
     public TagFormLoader(Callback callback) {
         this.callback = callback;
-        this.visitor = ComponentVisitors.buildDrillDownComponentVisitor(this);
     }
 
     @Override
-    protected MultipleId3Tag doInBackground(LibraryComponent... params) {
+    protected MultipleId3Tag doInBackground(Id3Tag... params) {
+        MultipleId3Tag multipleId3Tag = new MultipleId3Tag();
 
-        multipleId3Tag = new MultipleId3Tag();
-
-        for (LibraryComponent item : params) {
-            item.accept(visitor);
+        for (Id3Tag id3Tag : params) {
+            multipleId3Tag.put(id3Tag);
         }
 
         return multipleId3Tag;
@@ -42,18 +38,6 @@ public class TagFormLoader extends AsyncTask<LibraryComponent, Void, MultipleId3
     @Override
     protected void onPostExecute(MultipleId3Tag multipleId3Tag) {
         callback.onPostExecute(multipleId3Tag);
-    }
-
-    @Override
-    public void visit(AudioFile audioFile) {
-        Id3Tag id3Tag = audioFile.getId3Tag();
-
-        multipleId3Tag.put(id3Tag);
-    }
-
-    @Override
-    public void visit(Folder folder) {
-
     }
 
     public static interface Callback {

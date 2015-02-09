@@ -1,11 +1,20 @@
 <resources>
+
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
+        <item name="android:actionModeStyle">@style/ActionModeStyle</item>
     </style>
 
     <style name="ActionBarStyle" parent="@android:style/Widget.Holo.ActionBar">
         <item name="android:background">@color/color_primary</item>
+        <item name="android:titleTextStyle">@android:style/TextAppearance.Holo.Widget.ActionBar.Title.Inverse</item>
     </style>
+
+    <style name="ActionModeStyle" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="android:height">?android:attr/actionBarSize</item>
+        <item name="android:titleTextStyle">@android:style/TextAppearance.Holo.Widget.ActionBar.Title.Inverse</item>
+    </style>
+
 
     <style name="SettingsTheme" parent="android:Theme.Holo" />
 

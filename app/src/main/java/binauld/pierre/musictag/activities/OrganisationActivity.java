@@ -21,10 +21,11 @@ import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.loader.AsyncTaskExecutor;
 import binauld.pierre.musictag.loader.OrganisationTask;
+import binauld.pierre.musictag.util.SharedObject;
 
 public class OrganisationActivity extends Activity implements View.OnClickListener, OrganisationTask.CallBack {
     private EditText placeholder;
-    public static List<LibraryComponent> libraryComponents;
+    public List<LibraryComponent> libraryComponents;
 
     private Resources res;
     private SharedPreferences sharedPrefs;
@@ -35,56 +36,60 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setContentView(R.layout.activity_organisation);
-        placeholder = (EditText) findViewById(R.id.edit_text_organisation);
 
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        res = getResources();
-        sourceFolder = sharedPrefs.getString(
-                res.getString(R.string.source_folder_preference_key),
-                res.getString(R.string.source_folder_preference_default));
-        if(sharedPrefs.contains("pref_placeholder")){
-            placeholderSetting = sharedPrefs.getString("pref_placeholder", "");
-        }else {
-            placeholderSetting = sharedPrefs.getString(
-                    res.getString(R.string.placeholder_preference_key),
-                    res.getString(R.string.placeholder_preference_default));
+        if (!initContent()) {
+            finish();
+        } else {
+            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+            setContentView(R.layout.activity_organisation);
+            placeholder = (EditText) findViewById(R.id.edit_text_organisation);
+
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            res = getResources();
+            sourceFolder = sharedPrefs.getString(
+                    res.getString(R.string.source_folder_preference_key),
+                    res.getString(R.string.source_folder_preference_default));
+            if (sharedPrefs.contains("pref_placeholder")) {
+                placeholderSetting = sharedPrefs.getString("pref_placeholder", "");
+            } else {
+                placeholderSetting = sharedPrefs.getString(
+                        res.getString(R.string.placeholder_preference_key),
+                        res.getString(R.string.placeholder_preference_default));
+            }
+            placeholder.setText(placeholderSetting);
+
+            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.organisation_valid);
+            fab.setOnClickListener(this);
+
+            Button btn_title = (Button) findViewById(R.id.btn_title);
+            btn_title.setOnClickListener(this);
+            Button btn_artist = (Button) findViewById(R.id.btn_artist);
+            btn_artist.setOnClickListener(this);
+            Button btn_album = (Button) findViewById(R.id.btn_album);
+            btn_album.setOnClickListener(this);
+            Button btn_year = (Button) findViewById(R.id.btn_year);
+            btn_year.setOnClickListener(this);
+            Button btn_disc = (Button) findViewById(R.id.btn_disc);
+            btn_disc.setOnClickListener(this);
+            Button btn_track = (Button) findViewById(R.id.btn_track);
+            btn_track.setOnClickListener(this);
+            Button btn_album_artist = (Button) findViewById(R.id.btn_album_artist);
+            btn_album_artist.setOnClickListener(this);
+            Button btn_composer = (Button) findViewById(R.id.btn_composer);
+            btn_composer.setOnClickListener(this);
+            Button btn_grouping = (Button) findViewById(R.id.btn_grouping);
+            btn_grouping.setOnClickListener(this);
+            Button btn_genre = (Button) findViewById(R.id.btn_genre);
+            btn_genre.setOnClickListener(this);
+            Button btn_space = (Button) findViewById(R.id.btn_space);
+            btn_space.setOnClickListener(this);
+            Button btn_hyphen = (Button) findViewById(R.id.btn_hyphen);
+            btn_hyphen.setOnClickListener(this);
+            Button btn_underscore = (Button) findViewById(R.id.btn_underscore);
+            btn_underscore.setOnClickListener(this);
+            Button btn_slash = (Button) findViewById(R.id.btn_slash);
+            btn_slash.setOnClickListener(this);
         }
-        placeholder.setText(placeholderSetting);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.organisation_valid);
-        fab.setOnClickListener(this);
-
-        Button btn_title = (Button) findViewById(R.id.btn_title);
-        btn_title.setOnClickListener(this);
-        Button btn_artist = (Button) findViewById(R.id.btn_artist);
-        btn_artist.setOnClickListener(this);
-        Button btn_album = (Button) findViewById(R.id.btn_album);
-        btn_album.setOnClickListener(this);
-        Button btn_year = (Button) findViewById(R.id.btn_year);
-        btn_year.setOnClickListener(this);
-        Button btn_disc = (Button) findViewById(R.id.btn_disc);
-        btn_disc.setOnClickListener(this);
-        Button btn_track = (Button) findViewById(R.id.btn_track);
-        btn_track.setOnClickListener(this);
-        Button btn_album_artist = (Button) findViewById(R.id.btn_album_artist);
-        btn_album_artist.setOnClickListener(this);
-        Button btn_composer = (Button) findViewById(R.id.btn_composer);
-        btn_composer.setOnClickListener(this);
-        Button btn_grouping = (Button) findViewById(R.id.btn_grouping);
-        btn_grouping.setOnClickListener(this);
-        Button btn_genre = (Button) findViewById(R.id.btn_genre);
-        btn_genre.setOnClickListener(this);
-        Button btn_space = (Button) findViewById(R.id.btn_space);
-        btn_space.setOnClickListener(this);
-        Button btn_hyphen = (Button) findViewById(R.id.btn_hyphen);
-        btn_hyphen.setOnClickListener(this);
-        Button btn_underscore = (Button) findViewById(R.id.btn_underscore);
-        btn_underscore.setOnClickListener(this);
-        Button btn_slash = (Button) findViewById(R.id.btn_slash);
-        btn_slash.setOnClickListener(this);
-
     }
 
 
@@ -161,6 +166,11 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             default:
                 break;
         }
+    }
+
+    private boolean initContent() {
+        libraryComponents = SharedObject.getComponents();
+        return null != libraryComponents;
     }
 
     private void addContentToPlaceHolder(String s) {

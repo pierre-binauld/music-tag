@@ -14,7 +14,7 @@ public abstract class SharedObject {
     private static LibraryComponentFactory componentFactory;
     private static Map<AudioFile, Id3Tag> id3Tags;
 
-    public static void provideComponent(List<LibraryComponent> components) {
+    public static void provideComponents(List<LibraryComponent> components) {
         SharedObject.components = components;
     }
 

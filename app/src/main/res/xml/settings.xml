@@ -8,6 +8,8 @@
             android:defaultValue="@string/source_folder_preference_default" />
         <EditTextPreference
             android:key="@string/placeholder_preference_key"
-            android:defaultValue="@string/placeholder_preference_default" />
+            android:defaultValue="@string/placeholder_preference_default"
+            android:title="@string/placeholder_title"
+            android:summary="@string/placeholder_summary" />
     </PreferenceCategory>
 </PreferenceScreen>

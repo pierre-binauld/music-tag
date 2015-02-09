@@ -16,6 +16,8 @@
 
     <style name="ActionModeStyle" parent="android:Theme.Material.Light.DarkActionBar">
         <item name="android:colorAccent">@color/color_accent</item>
+        <item name="android:height">?android:attr/actionBarSize</item>
+        <item name="android:titleTextStyle">@android:style/TextAppearance.Material.Title</item>
     </style>
 
     <style name="SettingsTheme" parent="android:Theme.Material">

@@ -67,6 +67,9 @@ public class ItemMultiChoiceMode implements AbsListView.MultiChoiceModeListener 
             case R.id.action_save:
                 activity.callTagFormActivity(getLibraryItems());
                 break;
+            case R.id.action_organisation:
+                activity.callOrganisationActivity(getLibraryItems());
+                return true;
             default:
                 break;
         }

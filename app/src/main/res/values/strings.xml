@@ -7,7 +7,7 @@
     <string name="thumbnail">Thumbnail of the album artwork.</string>
     <string name="setting_preference_activity">Settings</string>
     <string name="source_folder_title">Source Folder</string>
-    <string name="source_folder_summary">Choose the source folder where the file will be retrieve.</string>
+    <string name="source_folder_summary">Choose the source folder where the file will be retrieved.</string>
     <string name="file">file</string>
     <string name="files">files</string>
     <string name="title">Title</string>
@@ -20,7 +20,6 @@
     <string name="genre">Genre</string>
     <string name="disc">Disc No</string>
     <string name="track">Track</string>
-    <string name="title_activity_tag_suggestion">Suggestions</string>
     <string name="title_activity_organisation">Organisation</string>
     <string name="action_organisation">Organisation</string>
     <string name="action_download_suggestion">Suggestions</string>
@@ -38,7 +37,10 @@
     <string name="saving">Saving</string>
     <string name="selected_item">Selected item</string>
     <string name="selected_items">Selected items</string>
-    <string name="title_activity_suggestion">SuggestionActivity</string>
+    <string name="title_activity_suggestion">Suggestions</string>
     <string name="action_done_all">Done All</string>
+    <string name="placeholder_title">Organisation File Path</string>
+    <string name="placeholder_summary">Choose the file path where the file will be moved.</string>
+
 
 </resources>

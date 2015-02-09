@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
@@ -27,7 +28,7 @@ import binauld.pierre.musictag.tag.SupportedTag;
 import binauld.pierre.musictag.visitor.ItemVisitor;
 import binauld.pierre.musictag.visitor.impl.DrillDownComponentVisitor;
 
-public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> implements ItemVisitor{
+public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> implements ItemVisitor {
     private String pattern;
     private String sourceFolder;
     private String unknown;
@@ -45,11 +46,11 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
     @Override
     protected Void doInBackground(LibraryComponent... components) {
         CustomDrillDownComponentVisitor visitor = new CustomDrillDownComponentVisitor(this);
-        for(LibraryComponent component: components){
+        for (LibraryComponent component : components) {
             component.accept(visitor);
         }
 
-        for(Item item : visitor.getFolders()){
+        for (Item item : visitor.getFolders()) {
             item.accept(this);
         }
         return null;
@@ -57,25 +58,25 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        if(null != callBack.get()) {
+        if (null != callBack.get()) {
             callBack.get().onPostExecute();
         }
     }
 
-    private String formatEndNameFile(String path, String extension){
+    private String formatEndNameFile(String path, String extension) {
         File f = new File(path + "." + extension);
         int i = 1;
-        do{
-            if(f.exists()) {
+        do {
+            if (f.exists()) {
                 f = new File(path + " (" + i + ")." + extension);
                 i++;
             }
-        }while (f.exists());
+        } while (f.exists());
 
         return f.getPath();
     }
 
-    private void initPlaceholderMap(){
+    private void initPlaceholderMap() {
         supportedPlaceholderMapping = new HashMap<>();
         supportedPlaceholderMapping.put(SupportedTag.TITLE, "\\[title\\]");
         supportedPlaceholderMapping.put(SupportedTag.ARTIST, "\\[artist\\]");
@@ -96,22 +97,21 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
             int indexOfSlash = outputPath.lastIndexOf("/");
             String outputDir = outputPath.substring(0, indexOfSlash);
             //create output directory if it doesn't exist
-            File dir = new File (outputDir);
-            if (!dir.exists())
-            {
+            File dir = new File(outputDir);
+            if (!dir.exists()) {
                 dir.mkdirs();
             }
             File f = new File(outputPath);
             int i = 1;
-            do{
-                if(f.exists()) {
+            do {
+                if (f.exists()) {
                     int indexOfPoint = outputPath.lastIndexOf(".");
                     String outputBegin = outputPath.substring(0, indexOfPoint);
                     String outputEnd = outputPath.substring(indexOfPoint, outputPath.length());
                     f = new File(outputBegin + " (" + i + ")" + outputEnd);
                     i++;
                 }
-            }while (f.exists());
+            } while (f.exists());
 
             in = new FileInputStream(inputPath);
             out = new FileOutputStream(f.getPath());
@@ -129,13 +129,8 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
 
             // delete the original file
             new File(inputPath).delete();
-        }
-
-        catch (FileNotFoundException e) {
-            Log.e("File not found : Error during moveFile", e.getMessage());
-        }
-        catch (Exception e) {
-            Log.e("Error during moveFile", e.getMessage());
+        } catch (IOException e) {
+            Log.e(this.getClass().toString(), e.getMessage());
         }
 
     }
@@ -145,19 +140,18 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
         String placeholderContent = new String(pattern);
         File file = audioFile.getFile();
         Id3Tag id3Tag = audioFile.getId3Tag();
-        for(Map.Entry<SupportedTag, String> entry : supportedPlaceholderMapping.entrySet()){
+        for (Map.Entry<SupportedTag, String> entry : supportedPlaceholderMapping.entrySet()) {
             String tag;
-            if(id3Tag.containsKey(entry.getKey()) && !id3Tag.get(entry.getKey()).equals("")){
+            if (id3Tag.containsKey(entry.getKey()) && !id3Tag.get(entry.getKey()).equals("")) {
                 tag = id3Tag.get(entry.getKey());
-            }
-            else{
+            } else {
                 tag = unknown;
             }
             placeholderContent = placeholderContent.replaceAll(entry.getValue(), tag);
         }
         placeholderContent = formatEndNameFile(placeholderContent, FilenameUtils.getExtension(file.getName()));
         String filePath = file.getPath();
-        String oldPath = filePath.substring(0,filePath.lastIndexOf("/")) + "/" + file.getName();
+        String oldPath = filePath.substring(0, filePath.lastIndexOf("/")) + "/" + file.getName();
         placeholderContent = sourceFolder + "/" + placeholderContent;
         moveFile(oldPath, placeholderContent);
     }
@@ -165,7 +159,7 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
     @Override
     public void visit(Folder folder) {
         File[] children = folder.getFile().listFiles();
-        if(children.length == 0){
+        if (children.length == 0) {
             folder.getFile().delete();
         }
     }
@@ -180,7 +174,6 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
 
         @Override
         public void visit(LibraryComposite composite) {
-            Log.e("visit nb", composite.getItem().getPrimaryInformation() + " - " + composite.getChildren().size() + "");
             super.visit(composite);
             folders.add(composite.getItem());
         }
@@ -190,7 +183,7 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
         }
     }
 
-    public static interface CallBack{
+    public static interface CallBack {
         public void onPostExecute();
     }
 }

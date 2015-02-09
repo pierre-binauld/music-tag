@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -170,11 +169,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 callSettingsActivity();
                 return true;
             case R.id.action_organisation:
-                Intent intent2 = new Intent(this, OrganisationActivity.class);
-                List<LibraryComponent> components = new ArrayList<>();
-                components.add(adapter.getCurrentComposite());
-                OrganisationActivity.libraryComponents = components;
-                startActivityForResult(intent2, ORGANISATION_REQUEST);
+                callOrganisationActivity(adapter.getCurrentComposite());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -274,10 +269,23 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     public void callTagFormActivity(List<LibraryComponent> components) {
         Intent intent = new Intent(this, TagFormActivity.class);
-        SharedObject.provideComponent(components);
+        SharedObject.provideComponents(components);
         SharedObject.provideComponentFactory(componentFactory);
         startActivityForResult(intent, TAG_UPDATE_REQUEST);
     }
+
+    public void callOrganisationActivity(LibraryComponent component) {
+        List<LibraryComponent> components = new ArrayList<>();
+        components.add(component);
+        callOrganisationActivity(components);
+    }
+
+    public void callOrganisationActivity(List<LibraryComponent> components) {
+        Intent intent = new Intent(this, OrganisationActivity.class);
+        SharedObject.provideComponents(components);
+        startActivityForResult(intent, ORGANISATION_REQUEST);
+    }
+
 
     /**
      * Get the source folder item from shared preferences.

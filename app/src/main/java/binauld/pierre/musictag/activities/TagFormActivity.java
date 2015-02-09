@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -69,18 +70,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
     private ProgressDialog loadingDialog;
     private ProgressDialog savingDialog;
 
-    private ImageView img_artwork;
     private TextView txt_filename;
-    private EditText txt_title;
-    private EditText txt_artist;
-    private EditText txt_album;
-    private EditText txt_year;
-    private EditText txt_album_artist;
-    private EditText txt_composer;
-    private EditText txt_grouping;
-    private EditText txt_genre;
-    private EditText txt_disc;
-    private EditText txt_track;
 
     private String multipleTagMessage;
     private FileWrapper wrapper = new JAudioTaggerWrapper();
@@ -200,29 +190,33 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
      * Initialize views.
      */
     private void initViews() {
-        img_artwork = (ImageView) findViewById(R.id.img_artwork);
+        ImageView img_artwork = (ImageView) findViewById(R.id.img_artwork);
         txt_filename = (TextView) findViewById(R.id.txt_filename);
-        txt_title = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
-        txt_artist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
-        txt_album = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
-        txt_year = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
-        txt_disc = ((FloatLabel) findViewById(R.id.txt_disc)).getEditText();
-        txt_track = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
-        txt_album_artist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
-        txt_composer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
-        txt_grouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
-        txt_genre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
+        EditText txtTitle = ((FloatLabel) findViewById(R.id.txt_title)).getEditText();
+        EditText txtArtist = ((FloatLabel) findViewById(R.id.txt_artist)).getEditText();
+        EditText txtAlbum = ((FloatLabel) findViewById(R.id.txt_album)).getEditText();
+        EditText txtYear = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
+        EditText txtDisc = ((FloatLabel) findViewById(R.id.txt_disc)).getEditText();
+        EditText txtTrack = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
+        EditText txtAlbumArtist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
+        EditText txtComposer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
+        EditText txtGrouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
+        EditText txtDenre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
 
-        views.put(SupportedTag.TITLE, txt_title);
-        views.put(SupportedTag.ARTIST, txt_artist);
-        views.put(SupportedTag.ALBUM, txt_album);
-        views.put(SupportedTag.YEAR, txt_year);
-        views.put(SupportedTag.DISC_NO, txt_disc);
-        views.put(SupportedTag.TRACK, txt_track);
-        views.put(SupportedTag.ALBUM_ARTIST, txt_album_artist);
-        views.put(SupportedTag.COMPOSER, txt_composer);
-        views.put(SupportedTag.GROUPING, txt_grouping);
-        views.put(SupportedTag.GENRE, txt_genre);
+        views.put(SupportedTag.TITLE, txtTitle);
+        views.put(SupportedTag.ARTIST, txtArtist);
+        views.put(SupportedTag.ALBUM, txtAlbum);
+        views.put(SupportedTag.YEAR, txtYear);
+        views.put(SupportedTag.DISC_NO, txtDisc);
+        views.put(SupportedTag.TRACK, txtTrack);
+        views.put(SupportedTag.ALBUM_ARTIST, txtAlbumArtist);
+        views.put(SupportedTag.COMPOSER, txtComposer);
+        views.put(SupportedTag.GROUPING, txtGrouping);
+        views.put(SupportedTag.GENRE, txtDenre);
+
+        //TODO: Workaround
+        CardView cardArtwork = (CardView) findViewById(R.id.card_artwork);
+        cardArtwork.setVisibility(View.GONE);
     }
 
     public void fillViews(/*List<LibraryItem> components, MultipleId3Tag multipleId3Tag*/) {

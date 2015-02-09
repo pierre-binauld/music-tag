@@ -83,6 +83,7 @@ public class LibraryComponentAdapter extends BaseAdapter {
             // store the holder with the view.
             convertView.setTag(viewHolder);
 
+            //TODO: Workaround
             if(null == background) {
                 background = convertView.getBackground();
             }

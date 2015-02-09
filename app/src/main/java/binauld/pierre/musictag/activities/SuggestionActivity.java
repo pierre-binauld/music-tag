@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +16,8 @@ import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
 import binauld.pierre.musictag.fragments.SuggestionFragment;
 import binauld.pierre.musictag.item.AudioFile;
 import binauld.pierre.musictag.item.SuggestionItem;
-import binauld.pierre.musictag.loader.AsyncTaskExecutor;
-import binauld.pierre.musictag.loader.SuggestionLoader;
+import binauld.pierre.musictag.task.AsyncTaskExecutor;
+import binauld.pierre.musictag.task.SuggestionLoader;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.util.SharedObject;
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
@@ -93,7 +92,7 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
         final SuggestionItemAdapter adapter = new SuggestionItemAdapter(suggestionItem, getResources());
         adapters.put(entry.getKey(), adapter);
 
-        SuggestionFragment fragment = new SuggestionFragment();
+        final SuggestionFragment fragment = new SuggestionFragment();
         fragment.setAdapter(adapter);
 //        fragment.setArguments(bundle);
 
@@ -108,7 +107,7 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
 
             @Override
             public void onPostExecute(Integer count) {
-
+                fragment.setLoadingFinished(true);
             }
         });
         AsyncTaskExecutor.execute(suggestionLoader);

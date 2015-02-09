@@ -19,8 +19,8 @@ import java.util.List;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.composite.LibraryComponent;
-import binauld.pierre.musictag.loader.AsyncTaskExecutor;
-import binauld.pierre.musictag.loader.OrganisationTask;
+import binauld.pierre.musictag.task.AsyncTaskExecutor;
+import binauld.pierre.musictag.task.OrganisationTask;
 import binauld.pierre.musictag.util.SharedObject;
 
 public class OrganisationActivity extends Activity implements View.OnClickListener, OrganisationTask.CallBack {

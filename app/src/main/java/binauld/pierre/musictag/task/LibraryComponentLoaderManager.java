@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.loader;
+package binauld.pierre.musictag.task;
 
 
 import java.lang.ref.WeakReference;

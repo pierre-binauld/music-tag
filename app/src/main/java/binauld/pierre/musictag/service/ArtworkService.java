@@ -6,9 +6,9 @@ import android.widget.ImageView;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.item.Item;
-import binauld.pierre.musictag.loader.ArtworkLoader;
-import binauld.pierre.musictag.loader.AsyncDrawable;
-import binauld.pierre.musictag.loader.DefaultArtworkLoader;
+import binauld.pierre.musictag.task.ArtworkLoader;
+import binauld.pierre.musictag.task.AsyncDrawable;
+import binauld.pierre.musictag.task.DefaultArtworkLoader;
 
 /**
  * Help to build artwork from audio file.

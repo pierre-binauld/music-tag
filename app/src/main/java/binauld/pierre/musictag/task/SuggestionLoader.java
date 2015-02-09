@@ -1,11 +1,10 @@
-package binauld.pierre.musictag.loader;
+package binauld.pierre.musictag.task;
 
 import android.os.AsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
 import binauld.pierre.musictag.item.SuggestionItem;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.ScoredId3Tag;

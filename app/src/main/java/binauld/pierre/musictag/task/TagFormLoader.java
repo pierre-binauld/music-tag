@@ -1,19 +1,10 @@
-package binauld.pierre.musictag.loader;
+package binauld.pierre.musictag.task;
 
 
 import android.os.AsyncTask;
 
-import java.util.Map;
-
-import binauld.pierre.musictag.composite.LibraryComponent;
-import binauld.pierre.musictag.item.AudioFile;
-import binauld.pierre.musictag.item.Folder;
-import binauld.pierre.musictag.visitor.ComponentVisitor;
-import binauld.pierre.musictag.visitor.ItemVisitor;
-import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
-import binauld.pierre.musictag.tag.SupportedTag;
 
 public class TagFormLoader extends AsyncTask<Id3Tag, Void, MultipleId3Tag> {
 

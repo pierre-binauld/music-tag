@@ -1,34 +1,21 @@
 package binauld.pierre.musictag.fragments;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.melnykov.fab.FloatingActionButton;
 
-import java.util.List;
-
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.SuggestionItemAdapter;
-import binauld.pierre.musictag.loader.SuggestionLoader;
+import binauld.pierre.musictag.task.SuggestionLoader;
 import binauld.pierre.musictag.item.SuggestionItem;
 import binauld.pierre.musictag.tag.Id3Tag;
-import binauld.pierre.musictag.tag.Id3TagParcelable;
 
 /**
  * Activity for retrieve and choose tag suggestions from MusicBrainz.
@@ -52,6 +39,7 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
     private FloatingActionButton fab;
 
     private SuggestionInterface callback;
+    private boolean isLoadingFinished;
 
     @Override
     public void onAttach(Activity activity) {
@@ -78,6 +66,10 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
 ////            setContentView(R.layout.activity_tag_suggestion);
         View view = inflater.inflate(R.layout.activity_tag_suggestion, container, false);
 
+
+        // Init List View
+        listView = (ListView) view.findViewById(R.id.list_suggestion);
+        listView.setAdapter(adapter);
 //            // Init action bar
 //            ActionBar actionBar = getActionBar();
 //            if (null != actionBar) {
@@ -96,9 +88,12 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
 //        // Init adapter
 //        adapter = new SuggestionItemAdapter(localSuggestion, res);
 //
-//        // Init footer
-////            waitingFooter = inflater.inflate(R.layout.suggestion_list_waiting_footer_view, listView, false);
+        // Init footer
+        if(!isLoadingFinished) {
+            waitingFooter = inflater.inflate(R.layout.suggestion_list_waiting_footer_view, listView, false);
 ////            reloadFooter = inflater.inflate(R.layout.suggestion_list_retry_footer_view, listView, false);
+            listView.addFooterView(waitingFooter);
+        }
 //
 //        // Init List View
 //        listView = (ListView) getView().findViewById(R.id.list_suggestion);
@@ -136,9 +131,6 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
 //            waitingFooter = inflater.inflate(R.layout.suggestion_list_waiting_footer_view, listView, false);
 //            reloadFooter = inflater.inflate(R.layout.suggestion_list_retry_footer_view, listView, false);
 
-        // Init List View
-        listView = (ListView) getView().findViewById(R.id.list_suggestion);
-        listView.setAdapter(adapter);
 
         // Init Floating Action Button
         fab = (FloatingActionButton) getView().findViewById(R.id.fab_next);
@@ -288,8 +280,15 @@ public class SuggestionFragment extends Fragment implements View.OnClickListener
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 //    }
 
+    public void setLoadingFinished(boolean isLoadingFinished) {
+        this.isLoadingFinished = isLoadingFinished;
+        if(null != listView) {
+            listView.removeFooterView(waitingFooter);
+        }
+    }
+
     public void setAdapter(SuggestionItemAdapter adapter) {
-            this.adapter = adapter;
+        this.adapter = adapter;
     }
 
 

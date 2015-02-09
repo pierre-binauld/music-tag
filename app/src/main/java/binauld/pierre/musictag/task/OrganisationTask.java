@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.loader;
+package binauld.pierre.musictag.task;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -7,7 +7,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

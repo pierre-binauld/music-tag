@@ -2,6 +2,7 @@ package binauld.pierre.musictag.adapter;
 
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,7 @@ import binauld.pierre.musictag.visitor.ItemVisitor;
  * Adapt a list of library item for a list view.
  */
 public class LibraryComponentAdapter extends BaseAdapter {
-//    private Drawable background;
+    private Drawable background;
 
     static class ViewHolder {
         TextView firstLine;
@@ -82,9 +83,9 @@ public class LibraryComponentAdapter extends BaseAdapter {
             // store the holder with the view.
             convertView.setTag(viewHolder);
 
-//            if(null == background) {
-//                background = convertView.getBackground();
-//            }
+            if(null == background) {
+                background = convertView.getBackground();
+            }
         } else {
             // just use the viewHolder
             viewHolder = (ViewHolder) convertView.getTag();
@@ -103,7 +104,7 @@ public class LibraryComponentAdapter extends BaseAdapter {
                 //TODO: Magic Color!
                 convertView.setBackgroundColor(Color.parseColor("#ffe0b2"));
             } else {
-                convertView.setBackgroundColor(Color.parseColor("#fafafa"));
+                convertView.setBackground(background);
             }
         }
 

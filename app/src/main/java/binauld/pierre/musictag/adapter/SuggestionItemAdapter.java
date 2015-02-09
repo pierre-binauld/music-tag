@@ -1,6 +1,7 @@
 package binauld.pierre.musictag.adapter;
 
 import android.content.res.Resources;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,10 +81,12 @@ public class SuggestionItemAdapter extends BaseAdapter {
 
         // assign values if the object is not null
         if (item != null) {
-            if(0 == position) {
-                viewHolder.card.setBackgroundColor(localBackgroundColor);
-            } else {
-                viewHolder.card.setBackgroundColor(defaultBackgroundColor);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (0 == position) {
+                    viewHolder.card.setBackgroundColor(localBackgroundColor);
+                } else {
+                    viewHolder.card.setBackgroundColor(defaultBackgroundColor);
+                }
             }
             viewHolder.txtTrack.setText(item.getTrack());
             viewHolder.txtTitle.setText(item.getTitle());
@@ -92,16 +95,19 @@ public class SuggestionItemAdapter extends BaseAdapter {
             viewHolder.txtYear.setText(item.getYear());
 
             viewHolder.rbItem.setChecked(position == selectedPosition);
-            if(viewHolder.rbItem.isChecked()) {
-                viewHolder.card.setCardElevation(selectedCardElevation);
-            } else {
-                viewHolder.card.setCardElevation(cardElevation);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (viewHolder.rbItem.isChecked()) {
+                    viewHolder.card.setCardElevation(selectedCardElevation);
+                } else {
+                    viewHolder.card.setCardElevation(cardElevation);
+                }
             }
             viewHolder.card.setTag(position);
             viewHolder.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    selectedPosition = (Integer)view.getTag();
+                    selectedPosition = (Integer) view.getTag();
                     notifyDataSetChanged();
                 }
             });
@@ -114,10 +120,11 @@ public class SuggestionItemAdapter extends BaseAdapter {
 
     /**
      * Check if the first item is selected.
+     *
      * @return True if it is, else false.
      */
     public boolean isLocalSuggestionSelected() {
-        if(0 == selectedPosition) {
+        if (0 == selectedPosition) {
             return true;
         } else {
             return false;
@@ -126,6 +133,7 @@ public class SuggestionItemAdapter extends BaseAdapter {
 
     /**
      * Return the current selected suggestion item.
+     *
      * @return the current selected suggestion item.
      */
     public SuggestionItem getSelectedSuggestion() {

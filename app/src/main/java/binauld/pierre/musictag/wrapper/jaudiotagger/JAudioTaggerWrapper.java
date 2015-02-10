@@ -62,14 +62,14 @@ public class JAudioTaggerWrapper implements FileWrapper {
         fieldKeys.put(SupportedTag.TRACK, FieldKey.TRACK);
         setters.put(SupportedTag.TRACK, numericTagSetter);
 
-        fieldKeys.put(SupportedTag.ALBUM_ARTIST, FieldKey.ALBUM_ARTIST);
-        setters.put(SupportedTag.ALBUM_ARTIST, stringTagSetter);
-
-        fieldKeys.put(SupportedTag.COMPOSER, FieldKey.COMPOSER);
-        setters.put(SupportedTag.COMPOSER, stringTagSetter);
-
-        fieldKeys.put(SupportedTag.GROUPING, FieldKey.GROUPING);
-        setters.put(SupportedTag.GROUPING, stringTagSetter);
+//        fieldKeys.put(SupportedTag.ALBUM_ARTIST, FieldKey.ALBUM_ARTIST);
+//        setters.put(SupportedTag.ALBUM_ARTIST, stringTagSetter);
+//
+//        fieldKeys.put(SupportedTag.COMPOSER, FieldKey.COMPOSER);
+//        setters.put(SupportedTag.COMPOSER, stringTagSetter);
+//
+//        fieldKeys.put(SupportedTag.GROUPING, FieldKey.GROUPING);
+//        setters.put(SupportedTag.GROUPING, stringTagSetter);
 
         fieldKeys.put(SupportedTag.GENRE, FieldKey.GENRE);
         setters.put(SupportedTag.GENRE, stringTagSetter);

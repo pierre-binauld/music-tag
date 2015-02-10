@@ -15,8 +15,8 @@ public enum SupportedTag {
     YEAR,
     DISC_NO,
     TRACK,
-    ALBUM_ARTIST,
-    COMPOSER,
-    GROUPING,
+//    ALBUM_ARTIST,
+//    COMPOSER,
+//    GROUPING,
     GENRE;
 }

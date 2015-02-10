@@ -10,12 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:layout_height="wrap_content"
-            android:focusable="true" android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_marginTop="@dimen/activity_vertical_margin">
+
             <android.support.v7.widget.CardView
                 android:id="@+id/card_text_organisation"
                 android:layout_width="match_parent"
@@ -27,12 +30,13 @@
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 card_view:cardCornerRadius="@dimen/card_corner_radius"
                 card_view:contentPadding="@dimen/activity_horizontal_margin"
-                card_view:cardElevation="@dimen/card_elevation">
+                card_view:cardElevation="10dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <EditText
                         android:id="@+id/edit_text_organisation"
                         android:layout_width="match_parent"
@@ -41,6 +45,8 @@
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
+
+
             <android.support.v7.widget.CardView
                 android:id="@+id/card_tags_organisation"
                 android:layout_width="match_parent"
@@ -52,77 +58,93 @@
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 card_view:cardCornerRadius="@dimen/card_corner_radius"
                 card_view:contentPadding="@dimen/activity_horizontal_margin"
-                card_view:cardElevation="@dimen/card_elevation">
+                card_view:cardElevation="1dp">
 
                 <LinearLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/btn_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title"
+                        style="?android:attr/borderlessButtonStyle" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
-                        <Button
-                            android:id="@+id/btn_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/title"/>
-                        <Button
-                            android:id="@+id/btn_album"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/album"/>
-                        <Button
-                            android:id="@+id/btn_disc"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/disc"/>
-                        <Button
-                            android:id="@+id/btn_album_artist"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/album_artist"/>
-                        <Button
-                            android:id="@+id/btn_grouping"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/grouping"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:layout_weight="1">
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
                         <Button
                             android:id="@+id/btn_artist"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/artist"/>
-                        <Button
-                            android:id="@+id/btn_year"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/year"/>
+                            android:text="@string/artist"
+                            android:layout_weight="1"
+                            style="?android:attr/borderlessButtonStyle" />
+
                         <Button
                             android:id="@+id/btn_track"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/track"/>
+                            android:text="@string/track"
+                            android:layout_weight="1"
+                            style="?android:attr/borderlessButtonStyle" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
                         <Button
-                            android:id="@+id/btn_composer"
+                            android:id="@+id/btn_album"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/composer"/>
+                            android:text="@string/album"
+                            android:layout_weight="1"
+                            style="?android:attr/borderlessButtonStyle" />
+
+                        <Button
+                            android:id="@+id/btn_disc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/disc"
+                            android:layout_weight="1"
+                            style="?android:attr/borderlessButtonStyle" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
                         <Button
                             android:id="@+id/btn_genre"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/genre"/>
+                            android:text="@string/genre"
+                            android:layout_weight="1"
+                            style="?android:attr/borderlessButtonStyle" />
+
+                        <Button
+                            android:id="@+id/btn_year"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/year"
+                            android:layout_weight="1"
+                            style="?android:attr/borderlessButtonStyle" />
+
                     </LinearLayout>
+
                 </LinearLayout>
+
             </android.support.v7.widget.CardView>
+
             <android.support.v7.widget.CardView
                 android:id="@+id/card_tags_symboles"
                 android:layout_width="match_parent"
@@ -134,37 +156,44 @@
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
                 card_view:cardCornerRadius="@dimen/card_corner_radius"
                 card_view:contentPadding="@dimen/activity_horizontal_margin"
-                card_view:cardElevation="@dimen/card_elevation">
+                card_view:cardElevation="1dp">
 
-                <LinearLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
+
                     <Button
                         android:id="@+id/btn_slash"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/slash"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        style="?android:attr/borderlessButtonStyle" />
+
                     <Button
                         android:id="@+id/btn_underscore"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/underscore"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        style="?android:attr/borderlessButtonStyle" />
+
                     <Button
                         android:id="@+id/btn_hyphen"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/hyphen"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        style="?android:attr/borderlessButtonStyle" />
+
                     <Button
                         android:id="@+id/btn_space"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/space"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        style="?android:attr/borderlessButtonStyle" />
 
                 </LinearLayout>
 
@@ -182,6 +211,6 @@
         android:src="@drawable/ic_action_done_24dp"
         fab:fab_colorNormal="@color/color_accent"
         fab:fab_colorPressed="@color/color_accent_pressed"
-        fab:fab_colorRipple="@color/color_accent_hover"/>
+        fab:fab_colorRipple="@color/color_accent_hover" />
 
 </FrameLayout>

@@ -15,10 +15,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="icon_4.6.svg"
-   inkscape:export-filename="/home/pierre/Git/music-tag/graphism/res/hdpi/ic_launcher.png"
-   inkscape:export-xdpi="33.75"
-   inkscape:export-ydpi="33.75">
+   sodipodi:docname="ic_launcher.png"
+   inkscape:export-filename="/home/pierre/Git/music-tag/graphism/res/drawable-xxhdpi/ic_launcher.png"
+   inkscape:export-xdpi="67.5"
+   inkscape:export-ydpi="67.5">
   <defs
      id="defs4">
     <linearGradient
@@ -73,14 +73,6 @@
          x="0.90511823"
          y="0.90509295" />
     </mask>
-    <filter
-       inkscape:collect="always"
-       id="filter3850">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="4.9006261"
-         id="feGaussianBlur3852" />
-    </filter>
     <filter
        inkscape:collect="always"
        id="filter3882">
@@ -142,18 +134,21 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.9798989"
-     inkscape:cx="-37.991244"
-     inkscape:cy="117.91131"
+     inkscape:cx="117.06178"
+     inkscape:cy="77.656257"
      inkscape:document-units="px"
-     inkscape:current-layer="layer5"
-     showgrid="false"
+     inkscape:current-layer="layer3"
+     showgrid="true"
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:window-width="1600"
      inkscape:window-height="850"
      inkscape:window-x="0"
      inkscape:window-y="149"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     borderlayer="false"
+     showborder="true"
+     inkscape:showpageshadow="false" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -192,11 +187,6 @@
      style="display:inline"
      sodipodi:insensitive="true">
     <path
-       inkscape:connector-curvature="0"
-       d="M 40.696236,22.856849 C 39.2618,29.32717 32.853729,33.409561 26.383408,31.975126 19.913087,30.54069 15.830695,24.132619 17.265131,17.662298 18.699566,11.191978 25.107638,7.109586 31.577959,8.544022 38.04828,9.978458 42.130671,16.386529 40.696236,22.856849 z M 81.88466,-33.565788 c -6.134044,-1.35906 -12.789728,-0.184219 -18.088365,3.191873 L 16.08687,0.02034101 C 10.789259,3.396834 6.9138133,8.932768 5.5541072,15.066006 4.1943988,21.199254 5.3671652,27.854319 8.7414573,33.153357 L 39.135713,80.86278 c 3.37539,5.29908 8.911055,9.17632 15.044671,10.53734 l 85.914046,19.04669 c 6.13417,1.3595 12.79017,0.18529 18.0892,-3.19051 5.29905,-3.3759 9.17595,-8.91211 10.53646,-15.04605 l 17.31517,-78.103695 c 1.35923,-6.134224 0.18531,-12.79017 -3.19055,-18.089208 -3.37586,-5.2990384 -8.91206,-9.17594 -15.046,-10.536449 z"
-       style="opacity:0.2;fill:#3e2723;fill-opacity:1;stroke:none;filter:url(#filter3850)"
-       id="path3820" />
-    <path
        id="path3796"
        style="fill:#f44336;fill-opacity:1;stroke:none"
        d="M 40.696236,16.856355 C 39.2618,23.326676 32.853729,27.409067 26.383408,25.974632 19.913087,24.540196 15.830695,18.132125 17.265131,11.661804 18.699566,5.1914844 25.107638,1.1090924 31.577959,2.5435284 38.04828,3.9779644 42.130671,10.386035 40.696236,16.856355 z M 81.88466,-39.566282 c -6.134044,-1.35906 -12.789728,-0.184219 -18.088365,3.191873 L 16.08687,-5.9801526 C 10.789259,-2.6036596 6.9138133,2.9322744 5.5541072,9.0655124 4.1943988,15.19876 5.3671652,21.853825 8.7414573,27.152863 L 39.135713,74.862286 c 3.37539,5.29908 8.911055,9.17632 15.044671,10.53734 l 85.914046,19.046694 c 6.13417,1.3595 12.79017,0.18529 18.0892,-3.19051 5.29905,-3.375904 9.17595,-8.912114 10.53646,-15.046054 L 186.03526,8.1060614 c 1.35923,-6.134224 0.18531,-12.79017 -3.19055,-18.089208 -3.37586,-5.2990384 -8.91206,-9.1759404 -15.046,-10.5364494 z"
@@ -219,8 +209,7 @@
      id="layer3"
      inkscape:label="score"
      transform="translate(0,64)"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <path
        style="fill:#fafafa;fill-opacity:1;fill-rule:evenodd;stroke:none"
        d="m 56.316972,20.319389 -8.657585,39.05184 c -0.679638,3.067102 -0.110627,6.406517 1.577299,9.056057 1.687927,2.64954 4.474002,4.57653 7.540978,5.25677 l 85.914046,19.04669 c 3.06711,0.67965 6.40653,0.11065 9.05606,-1.5773 2.64952,-1.68795 4.57652,-4.47401 5.25677,-7.54098 L 165.66212,44.560625 56.316972,20.319389 z"
@@ -258,7 +247,7 @@
        style="fill:#fafafa;fill-opacity:1;fill-rule:evenodd;stroke:none"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:#3e2723;fill-opacity:0.2;fill-rule:evenodd;stroke:none"
+       style="fill:#9e9e9e;fill-opacity:0.2;fill-rule:evenodd;stroke:none"
        d="m 79.287384,-27.850728 c -3.067108,-0.679644 -6.406535,-0.110631 -9.056055,1.577299 -2.64952,1.68793 -4.576519,4.474002 -5.256773,7.540977 L 56.316972,20.319389 165.66212,44.560625 174.31971,5.5087854 c 0.67964,-3.067111 0.11063,-6.40653595 -1.5773,-9.056055 -1.68793,-2.649519 -4.474,-4.576522 -7.54098,-5.256772 L 79.287384,-27.850728 z"
        id="rect3962"
        inkscape:connector-curvature="0" />
@@ -277,12 +266,6 @@
        d="m 56.3125,84.3125 -8.65625,39.0625 c -0.335424,1.51372 -0.35101,3.09429 -0.09375,4.625 0.03452,-0.20902 0.04792,-0.41816 0.09375,-0.625 l 8.65625,-39.0625 108.5,24.0625 0.84375,-3.8125 -109.34375,-24.25 z"
        id="path3854"
        transform="translate(0,-64)"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:#212121;fill-opacity:0.2;fill-rule:evenodd;stroke:none"
-       d="m 174.40625,64.9375 c -0.032,0.18753 -0.0526,0.376754 -0.0937,0.5625 L 165.6563,104.5625 57.1563,80.5 56.31255,84.3125 165.6563,108.5625 174.3125,69.5 c 0.33103,-1.493886 0.34017,-3.050593 0.0937,-4.5625 z"
-       transform="translate(0,-64)"
-       id="path3864"
        inkscape:connector-curvature="0" />
     <path
        style="fill:#ffffff;fill-opacity:0.2;fill-rule:evenodd;stroke:none"
@@ -366,7 +349,8 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="light"
-     style="display:inline">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <path
        sodipodi:type="inkscape:offset"
        inkscape:radius="0"

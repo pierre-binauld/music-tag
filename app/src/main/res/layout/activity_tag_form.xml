@@ -123,26 +123,26 @@
                     android:orientation="vertical"
                     android:layout_height="match_parent">
 
-                    <com.iangclifton.android.floatlabel.FloatLabel
-                        android:id="@+id/txt_album_artist"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:hint="@string/album_artist"
-                        android:inputType="textCapWords" />
+                    <!--<com.iangclifton.android.floatlabel.FloatLabel-->
+                        <!--android:id="@+id/txt_album_artist"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:hint="@string/album_artist"-->
+                        <!--android:inputType="textCapWords" />-->
 
-                    <com.iangclifton.android.floatlabel.FloatLabel
-                        android:id="@+id/txt_composer"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:hint="@string/composer"
-                        android:inputType="textCapWords" />
+                    <!--<com.iangclifton.android.floatlabel.FloatLabel-->
+                        <!--android:id="@+id/txt_composer"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:hint="@string/composer"-->
+                        <!--android:inputType="textCapWords" />-->
 
-                    <com.iangclifton.android.floatlabel.FloatLabel
-                        android:id="@+id/txt_grouping"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:hint="@string/grouping"
-                        android:inputType="textCapWords" />
+                    <!--<com.iangclifton.android.floatlabel.FloatLabel-->
+                        <!--android:id="@+id/txt_grouping"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:hint="@string/grouping"-->
+                        <!--android:inputType="textCapWords" />-->
 
                     <com.iangclifton.android.floatlabel.FloatLabel
                         android:id="@+id/txt_genre"

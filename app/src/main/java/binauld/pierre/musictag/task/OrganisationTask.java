@@ -83,9 +83,9 @@ public class OrganisationTask extends AsyncTask<LibraryComponent, Void, Void> im
         supportedPlaceholderMapping.put(SupportedTag.YEAR, "\\[year\\]");
         supportedPlaceholderMapping.put(SupportedTag.DISC_NO, "\\[disc\\]");
         supportedPlaceholderMapping.put(SupportedTag.TRACK, "\\[track\\]");
-        supportedPlaceholderMapping.put(SupportedTag.ALBUM_ARTIST, "\\[album_artist\\]");
-        supportedPlaceholderMapping.put(SupportedTag.COMPOSER, "\\[composer\\]");
-        supportedPlaceholderMapping.put(SupportedTag.GROUPING, "\\[grouping\\]");
+//        supportedPlaceholderMapping.put(SupportedTag.ALBUM_ARTIST, "\\[album_artist\\]");
+//        supportedPlaceholderMapping.put(SupportedTag.COMPOSER, "\\[composer\\]");
+//        supportedPlaceholderMapping.put(SupportedTag.GROUPING, "\\[grouping\\]");
         supportedPlaceholderMapping.put(SupportedTag.GENRE, "\\[genre\\]");
     }
 

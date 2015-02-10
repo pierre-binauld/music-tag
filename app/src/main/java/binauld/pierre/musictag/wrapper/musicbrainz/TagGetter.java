@@ -48,7 +48,7 @@ public abstract class TagGetter {
 //        getters.put(SupportedTag.COMPOSER, new ComposerGetter());
 
         //TODO: Have to do a lookup to find more tags
-        getters.put(SupportedTag.GROUPING, new GroupingGetter());
+//        getters.put(SupportedTag.GROUPING, new GroupingGetter());
     }
 
     /**

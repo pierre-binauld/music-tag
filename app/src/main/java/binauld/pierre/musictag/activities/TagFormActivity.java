@@ -198,10 +198,10 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         EditText txtYear = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
         EditText txtDisc = ((FloatLabel) findViewById(R.id.txt_disc)).getEditText();
         EditText txtTrack = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
-        EditText txtAlbumArtist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
-        EditText txtComposer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
-        EditText txtGrouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
-        EditText txtDenre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
+//        EditText txtAlbumArtist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
+//        EditText txtComposer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
+//        EditText txtGrouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
+        EditText txtGenre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
 
         views.put(SupportedTag.TITLE, txtTitle);
         views.put(SupportedTag.ARTIST, txtArtist);
@@ -209,10 +209,10 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
         views.put(SupportedTag.YEAR, txtYear);
         views.put(SupportedTag.DISC_NO, txtDisc);
         views.put(SupportedTag.TRACK, txtTrack);
-        views.put(SupportedTag.ALBUM_ARTIST, txtAlbumArtist);
-        views.put(SupportedTag.COMPOSER, txtComposer);
-        views.put(SupportedTag.GROUPING, txtGrouping);
-        views.put(SupportedTag.GENRE, txtDenre);
+//        views.put(SupportedTag.ALBUM_ARTIST, txtAlbumArtist);
+//        views.put(SupportedTag.COMPOSER, txtComposer);
+//        views.put(SupportedTag.GROUPING, txtGrouping);
+        views.put(SupportedTag.GENRE, txtGenre);
 
         //TODO: Workaround
         CardView cardArtwork = (CardView) findViewById(R.id.card_artwork);

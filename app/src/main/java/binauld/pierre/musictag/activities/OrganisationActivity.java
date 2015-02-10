@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -73,12 +71,12 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             btn_disc.setOnClickListener(this);
             Button btn_track = (Button) findViewById(R.id.btn_track);
             btn_track.setOnClickListener(this);
-            Button btn_album_artist = (Button) findViewById(R.id.btn_album_artist);
-            btn_album_artist.setOnClickListener(this);
-            Button btn_composer = (Button) findViewById(R.id.btn_composer);
-            btn_composer.setOnClickListener(this);
-            Button btn_grouping = (Button) findViewById(R.id.btn_grouping);
-            btn_grouping.setOnClickListener(this);
+//            Button btn_album_artist = (Button) findViewById(R.id.btn_album_artist);
+//            btn_album_artist.setOnClickListener(this);
+//            Button btn_composer = (Button) findViewById(R.id.btn_composer);
+//            btn_composer.setOnClickListener(this);
+//            Button btn_grouping = (Button) findViewById(R.id.btn_grouping);
+//            btn_grouping.setOnClickListener(this);
             Button btn_genre = (Button) findViewById(R.id.btn_genre);
             btn_genre.setOnClickListener(this);
             Button btn_space = (Button) findViewById(R.id.btn_space);
@@ -116,15 +114,15 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
             case R.id.btn_track:
                 addContentToPlaceHolder("[track]");
                 break;
-            case R.id.btn_album_artist:
-                addContentToPlaceHolder("[album_artist]");
-                break;
-            case R.id.btn_composer:
-                addContentToPlaceHolder("[composer]");
-                break;
-            case R.id.btn_grouping:
-                addContentToPlaceHolder("[grouping]");
-                break;
+//            case R.id.btn_album_artist:
+//                addContentToPlaceHolder("[album_artist]");
+//                break;
+//            case R.id.btn_composer:
+//                addContentToPlaceHolder("[composer]");
+//                break;
+//            case R.id.btn_grouping:
+//                addContentToPlaceHolder("[grouping]");
+//                break;
             case R.id.btn_genre:
                 addContentToPlaceHolder("[genre]");
                 break;
@@ -163,7 +161,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
     private void processOrganisation() {
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString("pref_placeholder", placeholder.getText().toString());
-        editor.commit();
+        editor.apply();
 
         OrganisationTask organisationTask = new OrganisationTask(placeholder.getText().toString(), sourceFolder, getString(R.string.unknown), this);
         LibraryComponent[] libraryComponentArray = libraryComponents.toArray(new LibraryComponent[libraryComponents.size()]);

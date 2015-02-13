@@ -39,12 +39,18 @@
         <activity
             android:name=".activities.SuggestionActivity"
             android:label="@string/title_activity_suggestion"
-            android:theme="@style/NavigationDrawerTheme">
+            android:theme="@style/NavigationDrawerTheme" >
         </activity>
         <activity
             android:name=".activities.OrganisationActivity"
             android:label="@string/title_activity_organisation" >
         </activity>
+
+        <service
+            android:name=".service.LibraryService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

@@ -1,11 +1,15 @@
 package binauld.pierre.musictag.activities;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -31,6 +35,7 @@ import binauld.pierre.musictag.composite.LibraryLeaf;
 import binauld.pierre.musictag.factory.LibraryComponentFactory;
 import binauld.pierre.musictag.helper.LibraryComponentFactoryHelper;
 import binauld.pierre.musictag.listener.ItemMultiChoiceMode;
+import binauld.pierre.musictag.service.LibraryService;
 import binauld.pierre.musictag.task.LibraryComponentLoader;
 import binauld.pierre.musictag.task.LibraryComponentLoaderManager;
 import binauld.pierre.musictag.util.SharedObject;
@@ -55,6 +60,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     private static final int TAG_UPDATE_REQUEST = 1;
     private static final int ORGANISATION_REQUEST = 2;
+
+    private LibraryService service;
+    private ServiceConnection serviceConnection;
 
     private LibraryComponentLoaderManager manager;
     private LibraryComponentAdapter adapter;
@@ -139,16 +147,36 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     @Override
     protected void onStart() {
         super.onStart();
+
+        serviceConnection = new ServiceConnection() {
+
+            @Override
+            public void onServiceConnected(ComponentName className,
+                                           IBinder service) {
+                // We've bound to LocalService, cast the IBinder and get LocalService instance
+                LibraryService.LibraryServiceBinder binder = (LibraryService.LibraryServiceBinder) service;
+                MainActivity.this.service = binder.getService();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName arg0) {
+                MainActivity.this.service = null;
+            }
+        };
+
+
+        Intent intent = new Intent(this, LibraryService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-    }
+    protected void onStop() {
+        super.onStop();
+        if (null != service) {
+            unbindService(serviceConnection);
+        }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     @Override

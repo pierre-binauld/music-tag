@@ -36,6 +36,11 @@ public class LibraryComponentFactory {
         this.res = res;
     }
 
+    public LibraryComponent build(String path, LibraryComposite parent) throws IOException {
+        File file = new File(path);
+        return this.build(file, parent);
+    }
+
     /**
      * Build a library item from a source file.
      *

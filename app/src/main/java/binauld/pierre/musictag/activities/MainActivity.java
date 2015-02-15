@@ -23,7 +23,6 @@ import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,24 +30,22 @@ import java.util.logging.Logger;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.adapter.LibraryComponentAdapter;
+import binauld.pierre.musictag.composite.LibraryComponent;
+import binauld.pierre.musictag.composite.LibraryComposite;
 import binauld.pierre.musictag.composite.LibraryLeaf;
+import binauld.pierre.musictag.composite.LoadingState;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryComponentFactory;
 import binauld.pierre.musictag.helper.LibraryComponentFactoryHelper;
 import binauld.pierre.musictag.listener.ItemMultiChoiceMode;
+import binauld.pierre.musictag.service.ArtworkService;
+import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.service.LibraryService;
-import binauld.pierre.musictag.task.LibraryComponentLoader;
+import binauld.pierre.musictag.service.Locator;
 import binauld.pierre.musictag.task.LibraryComponentLoaderManager;
 import binauld.pierre.musictag.util.SharedObject;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
-import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
-import binauld.pierre.musictag.composite.LibraryComponent;
-import binauld.pierre.musictag.composite.LibraryComposite;
-import binauld.pierre.musictag.composite.LoadingState;
-import binauld.pierre.musictag.task.AsyncTaskExecutor;
-import binauld.pierre.musictag.service.ArtworkService;
-import binauld.pierre.musictag.service.CacheService;
-import binauld.pierre.musictag.service.Locator;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 
@@ -56,18 +53,19 @@ import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
  * Main activity of the app.
  * Display a list of directories and audio files the user can modify.
  */
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener, ObservableScrollViewCallbacks {
+public class MainActivity extends Activity implements AdapterView.OnItemClickListener, ObservableScrollViewCallbacks {
 
     private static final int TAG_UPDATE_REQUEST = 1;
     private static final int ORGANISATION_REQUEST = 2;
 
-    private LibraryService service;
+    private LibraryServiceInterface service;
     private ServiceConnection serviceConnection;
 
     private LibraryComponentLoaderManager manager;
     private LibraryComponentAdapter adapter;
 
     private ObservableListView listView;
+    private ProgressBar progressBar;
 
     private FileWrapper wrapper;
 
@@ -81,6 +79,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     private ItemMultiChoiceMode ItemMultiChoiceMode;
 //    private List<LibraryItem> updating;
 
+    private Runnable updateListViewCallback = new Runnable() {
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateListView();
+                    updateProgressBar();
+                }
+            });
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +103,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 
         // Init layout
         setContentView(R.layout.activity_main);
@@ -120,17 +130,16 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         componentFactory = LibraryComponentFactoryHelper.buildFactory(res, wrapper, defaultArtworkBitmapDecoder);
 
         // Init progress bar
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         // Init adapter
         adapter = new LibraryComponentAdapter(artworkService, artworkSize);
-        adapter.setProgressBar(progressBar);
 
         // Init manager(s)
-        manager = new LibraryComponentLoaderManager(componentFactory, res.getInteger(R.integer.artwork_loader_update_step));
+        manager = new LibraryComponentLoaderManager(componentFactory, res.getInteger(R.integer.library_loader_update_step));
 
-        // Load items
-        switchComposite(getSourceComposite());
+        // Init Title
+        initTitle();
 
         // Init view
         listView = (ObservableListView) findViewById(R.id.list_library_item);
@@ -142,11 +151,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         ItemMultiChoiceMode = new ItemMultiChoiceMode(adapter, listView, this);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(ItemMultiChoiceMode);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         serviceConnection = new ServiceConnection() {
 
@@ -155,7 +159,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                                            IBinder service) {
                 // We've bound to LocalService, cast the IBinder and get LocalService instance
                 LibraryService.LibraryServiceBinder binder = (LibraryService.LibraryServiceBinder) service;
-                MainActivity.this.service = binder.getService();
+                MainActivity.this.service = binder.getMainActivityServiceInterface();
+
+                MainActivity.this.service.loadCurrentComposite(false, updateListViewCallback);
+                MainActivity.this.initTitle();
+                MainActivity.this.initProgressBar();
             }
 
             @Override
@@ -167,16 +175,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         Intent intent = new Intent(this, LibraryService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (null != service) {
-            unbindService(serviceConnection);
-        }
-
     }
 
     @Override
@@ -197,7 +195,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 callSettingsActivity();
                 return true;
             case R.id.action_organisation:
-                callOrganisationActivity(adapter.getCurrentComposite());
+//                callOrganisationActivity(adapter.getComposite());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -205,9 +203,21 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if(null != service) {
+            service.loadCurrentComposite(false, updateListViewCallback);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         manager.cancelAll(true);
+
+        if (null != service) {
+            unbindService(serviceConnection);
+        }
     }
 
     @Override
@@ -231,18 +241,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 default:
                     break;
             }
-        }
-        else{
-            if (requestCode == ORGANISATION_REQUEST) {
-                // Make sure the request was successful
-                switch (resultCode) {
-                    case RESULT_OK:
-                        LibraryComposite composite = getSourceComposite();
-                        switchComposite(composite);
-                        break;
-                    default:
-                        break;
-                }
+        } else if (requestCode == ORGANISATION_REQUEST) {
+            // Make sure the request was successful
+            switch (resultCode) {
+                case RESULT_OK:
+//                        LibraryComposite composite = getSourceComposite();
+//                        switchComposite(composite);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -254,13 +261,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         }
 
         return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(res.getString(R.string.source_folder_preference_key))) {
-            switchComposite(getSourceComposite());
-        }
     }
 
     @Override
@@ -289,6 +289,40 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 //        }
     }
 
+    private void initTitle() {
+        setTitle(res.getString(R.string.app_name));
+    }
+
+    private void updateTitle() {
+        if (service.hasParent()) {
+            setTitle(service.getComponentName());
+        } else {
+            initTitle();
+        }
+
+    }
+
+    private void updateListView() {
+        List<LibraryComponent> componentList = service.getCurrentComponentList();
+        adapter.setComponentList(componentList);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void initProgressBar() {
+        int max = service.getComponentMaxChildrenCount();
+        progressBar.setMax(max);
+        progressBar.setVisibility(View.VISIBLE);
+        updateProgressBar();
+    }
+
+    private void updateProgressBar() {
+        if(LoadingState.LOADED == service.getCurrentState()) {
+            progressBar.setVisibility(View.GONE);
+        } else {
+            int currentProgress = service.getCurrentProgress();
+            progressBar.setProgress(currentProgress);
+        }
+    }
 
     private void callSettingsActivity() {
         Intent intent = new Intent(this, SettingsActivity.class);
@@ -314,20 +348,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         startActivityForResult(intent, ORGANISATION_REQUEST);
     }
 
-
-    /**
-     * Get the source folder item from shared preferences.
-     *
-     * @return The source folder item.
-     */
-    public LibraryComposite getSourceComposite() {
-        String sourceFolder = sharedPrefs.getString(
-                res.getString(R.string.source_folder_preference_key),
-                res.getString(R.string.source_folder_preference_default));
-
-        return componentFactory.buildComposite(new File(sourceFolder), null);
-    }
-
     /**
      * Switch the view to the specified node.
      * If the node has not been loaded yet, then it is loaded.
@@ -335,31 +355,27 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      * @param composite The composite to switch to.
      */
     private void switchComposite(LibraryComposite composite) {
-        adapter.setCurrentComposite(composite);
-        adapter.notifyDataSetChanged();
-        if (null == composite.getParent()) {
-            setTitle(res.getString(R.string.app_name));
-        } else {
-            setTitle(composite.getItem().getPrimaryInformation());
-        }
+        service.switchComposite(composite);
+        service.loadCurrentComposite(false, updateListViewCallback);
+        updateCompositeData();
 
-        if (composite.getState() == LoadingState.NOT_LOADED) {
-            LibraryComponentLoader loader = manager.get(true, new LibraryComponentLoader.Callback() {
-
-                @Override
-                public void onProgressUpdate(LibraryComposite libraryComposite) {
-                    if (adapter.getCurrentComposite().equals(libraryComposite)) {
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-
-                @Override
-                public void onPostExecute() {
-                }
-            });
-
-            AsyncTaskExecutor.execute(loader, composite);
-        }
+//        if (composite.getState() == LoadingState.NOT_LOADED) {
+//            LibraryComponentLoader loader = manager.get(true, new LibraryComponentLoader.Callback() {
+//
+//                @Override
+//                public void onProgressUpdate(LibraryComposite libraryComposite) {
+//                    if (adapter.getComposite().equals(libraryComposite)) {
+//                        adapter.notifyDataSetChanged();
+//                    }
+//                }
+//
+//                @Override
+//                public void onPostExecute() {
+//                }
+//            });
+//
+//            AsyncTaskExecutor.execute(loader, composite);
+//        }
     }
 
     /**
@@ -368,13 +384,26 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
      * @return True if the adapter has switch to the parent node.
      */
     public boolean backToParent() {
-        LibraryComposite parent = adapter.getCurrentComposite().getParent();
-        if (parent == null) {
-            return false;
-        } else {
-            switchComposite(parent);
-            return true;
+        boolean backToParent = service.backToParentComposite();
+
+        if (backToParent) {
+            service.loadCurrentComposite(false, updateListViewCallback);
+            updateCompositeData();
         }
+
+        return backToParent;
+//        LibraryComposite parent = adapter.getComposite().getParent();
+//        if (parent == null) {
+//            return false;
+//        } else {
+//            switchComposite(parent);
+//            return true;
+//        }
+    }
+
+    public void updateCompositeData() {
+        updateTitle();
+        initProgressBar();
     }
 
     class OnItemClickVisitor implements ComponentVisitor {
@@ -389,7 +418,26 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         @Override
         public void visit(LibraryComposite composite) {
             switchComposite(composite);
-            adapter.notifyDataSetChanged();
         }
+    }
+
+    public interface LibraryServiceInterface {
+        boolean hasParent();
+
+        String getComponentName();
+
+        List<LibraryComponent> getCurrentComponentList();
+
+        void loadCurrentComposite(boolean drillDown, Runnable callback);
+
+        void switchComposite(LibraryComposite composite);
+
+        boolean backToParentComposite();
+
+        int getComponentMaxChildrenCount();
+
+        int getCurrentProgress();
+
+        LoadingState getCurrentState();
     }
 }

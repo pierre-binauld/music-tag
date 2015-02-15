@@ -157,11 +157,12 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
         placeholder.setText(newText);
         placeholder.setSelection(cursorPosition + s.length());
     }
-
+//TODO: Shared pref bug
     private void processOrganisation() {
         SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putString("pref_placeholder", placeholder.getText().toString());
-        editor.apply();
+        editor.commit();
+
 
         OrganisationTask organisationTask = new OrganisationTask(placeholder.getText().toString(), sourceFolder, getString(R.string.unknown), this);
         LibraryComponent[] libraryComponentArray = libraryComponents.toArray(new LibraryComponent[libraryComponents.size()]);

@@ -15,6 +15,7 @@ public class LibraryComposite extends LibraryLeaf {
 
     private MultipleBufferedList<LibraryComponent> children;
     private LoadingState state;
+    private boolean isFullyLoaded = false;
     private int invalidComponentCount;
 
     public LibraryComposite(Item item) {
@@ -86,6 +87,14 @@ public class LibraryComposite extends LibraryLeaf {
      */
     public int getInvalidComponentCount() {
         return invalidComponentCount;
+    }
+
+    public boolean isFullyLoaded() {
+        return isFullyLoaded;
+    }
+
+    public void setFullyLoaded(boolean isFullyLoaded) {
+        this.isFullyLoaded = isFullyLoaded;
     }
 
     @Override

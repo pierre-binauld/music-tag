@@ -6,8 +6,7 @@ import android.util.Log;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-
-public class ServiceWorker extends AsyncTask<Void, Runnable, Void> {
+public class ServiceWorker extends AsyncTask<Void, Runnable, Void> implements Task.Publisher {
 
     BlockingQueue<Task> queue = new LinkedBlockingDeque<>();
     private boolean run = true;
@@ -19,7 +18,6 @@ public class ServiceWorker extends AsyncTask<Void, Runnable, Void> {
             while (run) {
                 Task task = queue.take();
                 task.run();
-                publishProgress(task.getCallback());
             }
         } catch (InterruptedException e) {
             Log.i(getClass().toString(), e.getMessage());
@@ -42,19 +40,12 @@ public class ServiceWorker extends AsyncTask<Void, Runnable, Void> {
     }
 
     public void addTask(Task task) {
+        task.setPublisher(this);
         queue.add(task);
     }
 
-    public abstract class Task implements Runnable {
-
-        private Runnable callback;
-
-        protected Task(Runnable callback) {
-            this.callback = callback;
-        }
-
-        public Runnable getCallback() {
-            return callback;
-        }
+    public void publish(Runnable runnable) {
+        publishProgress(runnable);
     }
+
 }

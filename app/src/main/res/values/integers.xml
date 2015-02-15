@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="artwork_loader_update_step">10</integer>
+    <integer name="library_loader_update_step">10</integer>
 
     <integer name="cardview_elevation">5</integer>
     <integer name="cardview_elevation_selected">10</integer>

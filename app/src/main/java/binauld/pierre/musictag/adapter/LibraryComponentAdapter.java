@@ -9,22 +9,20 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.composite.LibraryComposite;
-import binauld.pierre.musictag.item.AudioFile;
-import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.item.Item;
 import binauld.pierre.musictag.service.ArtworkService;
-import binauld.pierre.musictag.visitor.ItemVisitor;
 
 /**
  * Adapt a list of library item for a list view.
  */
 public class LibraryComponentAdapter extends BaseAdapter {
-    private Drawable background;
 
     static class ViewHolder {
         TextView firstLine;
@@ -32,30 +30,35 @@ public class LibraryComponentAdapter extends BaseAdapter {
         ImageView thumbnail;
     }
 
-    private LibraryComposite currentComposite;
+    private Drawable background;
+
+    //    private LibraryComposite composite;
+    private List<LibraryComponent> componentList = new ArrayList<>();
     private final ArtworkService artworkService;
     private int artworkSize;
-    private ProgressBar progressBar;
+//    private ProgressBar progressBar;
 
     public LibraryComponentAdapter(ArtworkService artworkService, int artworkSize) {
         this.artworkService = artworkService;
         this.artworkSize = artworkSize;
+
+//        composite = new LibraryComposite(null,null);
     }
 
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
-        updateProgressBar();
+//        updateProgressBar();
     }
 
     @Override
     public int getCount() {
-        return currentComposite.size();
+        return componentList.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return currentComposite.getChild(i);
+        return componentList.get(i);
     }
 
     @Override
@@ -93,7 +96,7 @@ public class LibraryComponentAdapter extends BaseAdapter {
         }
 
         // object item based on the position
-        Item item = currentComposite.getChild(position).getItem();
+        Item item = componentList.get(position).getItem();
 
         // assign values if the object is not null
         if (item != null) {
@@ -112,76 +115,79 @@ public class LibraryComponentAdapter extends BaseAdapter {
         return convertView;
     }
 
-    /**
-     * Set the progress bar.
-     * @param progressBar The progress bar.
-     */
-    public void setProgressBar(ProgressBar progressBar) {
-        this.progressBar = progressBar;
+//    /**
+//     * Set the progress bar.
+//     * @param progressBar The progress bar.
+//     */
+//    public void setProgressBar(ProgressBar progressBar) {
+//        this.progressBar = progressBar;
+//    }
+
+//    /**
+//     * Initialize the progress bar (progress, max, visibility).
+//     */
+//    private void setUpProgressBar() {
+//        if (null != progressBar) {
+//            if (null == composite) {
+//                progressBar.setVisibility(View.GONE);
+//            } else {
+//                progressBar.setVisibility(View.VISIBLE);
+//                composite.getItem().accept(new ItemVisitor() {
+//                    @Override
+//                    public void visit(AudioFile audioFile) {
+//
+//                    }
+//
+//                    @Override
+//                    public void visit(Folder folder) {
+//                        progressBar.setMax(folder.getMaxChildrenCount());
+//                    }
+//                });
+//                updateProgressBar();
+//            }
+//        }
+//    }
+
+//    /**
+//     * Update the progression of the progress bar.
+//     */
+//    private void updateProgressBar() {
+//        if (null != progressBar) {
+//            switch (composite.getState()) {
+//                case LOADING:
+//                    progressBar.setProgress(composite.size() + composite.getInvalidComponentCount());
+//                    break;
+//                case LOADED:
+//                    progressBar.setVisibility(View.GONE);
+//                    break;
+//                case NOT_LOADED:
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//    }
+
+//    /**
+//     * Set the current node of the library tree list.
+//     *
+//     * @param currentComposite The current node to set.
+//     */
+//    public void setComposite(LibraryComposite currentComposite) {
+//        this.composite = currentComposite;
+//        setUpProgressBar();
+//    }
+//
+//    /**
+//     * Get the current node display by the list.
+//     *
+//     * @return The current node to get.
+//     */
+//    public LibraryComposite getComposite() {
+//        return composite;
+//    }
+
+    public void setComponentList(List<LibraryComponent> componentList) {
+        this.componentList = componentList;
     }
-
-    /**
-     * Initialize the progress bar (progress, max, visibility).
-     */
-    private void setUpProgressBar() {
-        if (null != progressBar) {
-            if (null == currentComposite) {
-                progressBar.setVisibility(View.GONE);
-            } else {
-                progressBar.setVisibility(View.VISIBLE);
-                currentComposite.getItem().accept(new ItemVisitor() {
-                    @Override
-                    public void visit(AudioFile audioFile) {
-
-                    }
-
-                    @Override
-                    public void visit(Folder folder) {
-                        progressBar.setMax(folder.getMaxChildrenCount());
-                    }
-                });
-                updateProgressBar();
-            }
-        }
-    }
-
-    /**
-     * Update the progression of the progress bar.
-     */
-    private void updateProgressBar() {
-        if (null != progressBar) {
-            switch (currentComposite.getState()) {
-                case LOADING:
-                    progressBar.setProgress(currentComposite.size() + currentComposite.getInvalidComponentCount());
-                    break;
-                case LOADED:
-                    progressBar.setVisibility(View.GONE);
-                    break;
-                case NOT_LOADED:
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Set the current node of the library tree list.
-     *
-     * @param currentComposite The current node to set.
-     */
-    public void setCurrentComposite(LibraryComposite currentComposite) {
-        this.currentComposite = currentComposite;
-        setUpProgressBar();
-    }
-
-    /**
-     * Get the current node display by the list.
-     *
-     * @return The current node to get.
-     */
-    public LibraryComposite getCurrentComposite() {
-        return currentComposite;
-    }
-
 }

@@ -1,35 +1,45 @@
 package binauld.pierre.musictag.task;
 
-abstract class Task implements Runnable {
+import android.os.AsyncTask;
 
-    private Runnable callback;
-    private Publisher publisher;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Task() {
-        this.callback = emptyCallback;
-    }
+abstract class Task extends AsyncTask<Void, Void, Void> {
 
-    protected void publish() {
-        publisher.publish(callback);
-    }
+    private List<Runnable> onProgressUpdateCallbacks = new ArrayList<>();
+    private List<Runnable> onPostExecuteCallbacks = new ArrayList<>();
+    private Integer token;
 
-    public void setPublisher(Publisher publisher) {
-        this.publisher = publisher;
-    }
-
-    public void setCallback(Runnable callback) {
-        this.callback = callback;
-    }
-
-    public static Runnable emptyCallback = new Runnable() {
-
-        @Override
-        public void run() {
-
+    @Override
+    protected void onProgressUpdate(Void... values) {
+        for (Runnable callback : onProgressUpdateCallbacks) {
+            callback.run();
         }
-    };
+    }
 
-    protected interface Publisher {
-        void publish(Runnable runnable);
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        for (Runnable callback : onPostExecuteCallbacks) {
+            callback.run();
+        }
+    }
+
+    public void addOnProgressUpdateCallbacks(Runnable runnable) {
+        onProgressUpdateCallbacks.add(runnable);
+    }
+
+    public void addOnPostExecuteCallbacks(Runnable runnable) {
+        onPostExecuteCallbacks.add(runnable);
+    }
+
+
+    public Integer getToken() {
+        return token;
+    }
+
+    public void setToken(Integer token) {
+        this.token = token;
     }
 }

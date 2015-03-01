@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.task;
+package binauld.pierre.musictag.service;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+
+import binauld.pierre.musictag.service.task.Task;
+import binauld.pierre.musictag.task.AsyncTaskExecutor;
 
 public class ServiceWorker extends AsyncTask<Void, Task, Void> {
 
@@ -23,10 +26,10 @@ public class ServiceWorker extends AsyncTask<Void, Task, Void> {
         try {
             while (run) {
                 Integer token = tokens.take();
-                TaskEndingHandler taskEndingHandler = new TaskEndingHandler(taskId, token);
+                TokenGrabber tokenGrabber = new TokenGrabber(taskId, token);
 
                 Task task = queue.take();
-                task.addOnPostExecuteCallbacks(taskEndingHandler);
+                task.addOnPostExecuteCallbacks(tokenGrabber);
 
                 currentTasks.put(taskId, task);
 
@@ -57,16 +60,20 @@ public class ServiceWorker extends AsyncTask<Void, Task, Void> {
         run = false;
     }
 
-    public void addTask(Task task) {
+    public void pushTask(Task task) {
         queue.add(task);
     }
 
-    class TaskEndingHandler implements Runnable {
+    public void launchAsyncTask(Task task) {
+        AsyncTaskExecutor.execute(task);
+    }
+
+    class TokenGrabber implements Runnable {
 
         private int taskId;
         private Integer token;
 
-        TaskEndingHandler(int taskId, Integer token) {
+        TokenGrabber(int taskId, Integer token) {
             this.taskId = taskId;
             this.token = token;
         }

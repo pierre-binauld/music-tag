@@ -43,6 +43,7 @@ import binauld.pierre.musictag.service.ArtworkService;
 import binauld.pierre.musictag.service.CacheService;
 import binauld.pierre.musictag.service.LibraryService;
 import binauld.pierre.musictag.service.Locator;
+import binauld.pierre.musictag.service.state.LibraryServiceState;
 import binauld.pierre.musictag.task.LibraryComponentLoaderManager;
 import binauld.pierre.musictag.util.SharedObject;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
@@ -58,7 +59,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     private static final int TAG_UPDATE_REQUEST = 1;
     private static final int ORGANISATION_REQUEST = 2;
 
-    private LibraryServiceInterface service;
+    private LibraryServiceState service;
     private ServiceConnection serviceConnection;
 
     private LibraryComponentLoaderManager manager;
@@ -159,7 +160,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                                            IBinder service) {
                 // We've bound to LocalService, cast the IBinder and get LocalService instance
                 LibraryService.LibraryServiceBinder binder = (LibraryService.LibraryServiceBinder) service;
-                MainActivity.this.service = binder.getMainActivityServiceInterface();
+                MainActivity.this.service = binder.getServiceWrapper();
 
                 MainActivity.this.service.loadCurrentComposite(false, updateListViewCallback);
                 MainActivity.this.initTitle();
@@ -316,7 +317,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     }
 
     private void updateProgressBar() {
-        if(LoadingState.LOADED == service.getCurrentState()) {
+        if(LoadingState.LOADED == service.getCurrentLoadingState()) {
             progressBar.setVisibility(View.GONE);
         } else {
             int currentProgress = service.getCurrentProgress();
@@ -419,25 +420,5 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         public void visit(LibraryComposite composite) {
             switchComposite(composite);
         }
-    }
-
-    public interface LibraryServiceInterface {
-        boolean hasParent();
-
-        String getComponentName();
-
-        List<LibraryComponent> getCurrentComponentList();
-
-        void loadCurrentComposite(boolean drillDown, Runnable callback);
-
-        void switchComposite(LibraryComposite composite);
-
-        boolean backToParentComposite();
-
-        int getComponentMaxChildrenCount();
-
-        int getCurrentProgress();
-
-        LoadingState getCurrentState();
     }
 }

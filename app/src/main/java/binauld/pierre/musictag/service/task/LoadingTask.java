@@ -1,4 +1,4 @@
-package binauld.pierre.musictag.task;
+package binauld.pierre.musictag.service.task;
 
 import android.util.Log;
 
@@ -44,14 +44,15 @@ public class LoadingTask extends Task implements ComponentVisitor, ItemVisitor {
         this.filterVisitor = new CompositeFilterVisitor(this.queue);
         this.queue.add(rootComposite);
     }
-
     @Override
-    public void run() {
+    protected Void doInBackground(Void... params) {
+
         while (!queue.isEmpty()) {
             queue.poll().accept(this);
         }
-    }
 
+        return null;
+    }
 
     @Override
     public void visit(LibraryLeaf leaf) {
@@ -114,24 +115,24 @@ public class LoadingTask extends Task implements ComponentVisitor, ItemVisitor {
                 }
 
                 j = ++j % updateStep;
-                if (j == 0 /*|| i == currentFiles.length - 1*/) {
+                if (j == 0 /*|| i == currentFiles.length - 1*/) {// Todo: warn
                     publish();
                 }
             }
         }
     }
 
-    @Override
     protected void publish() {
         MultipleBufferedList<LibraryComponent> children = currentComposite.getChildren();
         Collections.sort(children.getWorkingList(), comparator);
         children.push();
-        super.publish();
+        publishProgress();
     }
 
     public void setDrillDown(boolean drillDown) {
         this.drillDown = drillDown;
     }
+
 
     class CompositeFilterVisitor implements ComponentVisitor {
 

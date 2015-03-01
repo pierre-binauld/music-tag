@@ -1,15 +1,14 @@
-package binauld.pierre.musictag.task;
+package binauld.pierre.musictag.service.task;
 
 import android.os.AsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class Task extends AsyncTask<Void, Void, Void> {
+public abstract class Task extends AsyncTask<Void, Void, Void> {
 
     private List<Runnable> onProgressUpdateCallbacks = new ArrayList<>();
     private List<Runnable> onPostExecuteCallbacks = new ArrayList<>();
-    private Integer token;
 
     @Override
     protected void onProgressUpdate(Void... values) {
@@ -34,12 +33,4 @@ abstract class Task extends AsyncTask<Void, Void, Void> {
         onPostExecuteCallbacks.add(runnable);
     }
 
-
-    public Integer getToken() {
-        return token;
-    }
-
-    public void setToken(Integer token) {
-        this.token = token;
-    }
 }

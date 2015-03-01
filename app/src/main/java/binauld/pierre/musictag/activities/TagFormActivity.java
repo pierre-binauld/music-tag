@@ -24,27 +24,26 @@ import java.util.List;
 import java.util.Map;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.composite.LibraryComponent;
+import binauld.pierre.musictag.composite.LibraryComposite;
+import binauld.pierre.musictag.decoder.BitmapDecoder;
+import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryComponentFactory;
+import binauld.pierre.musictag.item.AudioFile;
 import binauld.pierre.musictag.item.Folder;
+import binauld.pierre.musictag.service.ArtworkManager;
+import binauld.pierre.musictag.tag.Id3Tag;
+import binauld.pierre.musictag.tag.MultipleId3Tag;
+import binauld.pierre.musictag.tag.SupportedTag;
+import binauld.pierre.musictag.task.AsyncTaskExecutor;
 import binauld.pierre.musictag.task.AudioFileFilter;
 import binauld.pierre.musictag.task.LibraryComponentLoader;
-import binauld.pierre.musictag.task.LibraryComponentLoaderManager;
+import binauld.pierre.musictag.task.TagFormLoader;
+import binauld.pierre.musictag.task.TagSaver;
 import binauld.pierre.musictag.util.SharedObject;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
 import binauld.pierre.musictag.visitor.ItemVisitor;
 import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
-import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
-import binauld.pierre.musictag.composite.LibraryComponent;
-import binauld.pierre.musictag.composite.LibraryComposite;
-import binauld.pierre.musictag.item.AudioFile;
-import binauld.pierre.musictag.task.AsyncTaskExecutor;
-import binauld.pierre.musictag.task.TagFormLoader;
-import binauld.pierre.musictag.task.TagSaver;
-import binauld.pierre.musictag.service.ArtworkService;
-import binauld.pierre.musictag.tag.Id3Tag;
-import binauld.pierre.musictag.tag.MultipleId3Tag;
-import binauld.pierre.musictag.tag.SupportedTag;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 
@@ -57,10 +56,10 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
     private Resources res;
 
-    private ArtworkService artworkService;
+    private ArtworkManager artworkManager;
     private LibraryComponentFactory componentFactory;
 
-    private LibraryComponentLoaderManager loaderManager;
+//    private LibraryComponentLoaderManager loaderManager;
     private List<LibraryComponent> components;
     private MultipleId3Tag multipleId3Tag;
     private Map<AudioFile, Id3Tag> id3Tags;
@@ -82,7 +81,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
         // Init content
         if(initContent()) {
-            loaderManager = new LibraryComponentLoaderManager(componentFactory, 200);
+//            loaderManager = new LibraryComponentLoaderManager(componentFactory, 200);
 
             //Init layout
             this.setContentView(R.layout.activity_tag_form);
@@ -104,7 +103,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
 
             // Init service(s)
             BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
-            artworkService = new ArtworkService(defaultArtworkBitmapDecoder);
+//            artworkManager = new ArtworkManager(defaultArtworkBitmapDecoder, cacheService);
 
             // Init views
             initViews();
@@ -301,7 +300,7 @@ public class TagFormActivity extends Activity implements View.OnClickListener {
             }
         };
 
-        AsyncTaskExecutor.execute(loaderManager.get(true, filterLauncher), componentArray);
+//        AsyncTaskExecutor.execute(loaderManager.get(true, filterLauncher), componentArray);
     }
 
     private void loadContent(Map<AudioFile, Id3Tag> audioFileId3TagMap) {

@@ -17,7 +17,7 @@ import java.util.List;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.item.Item;
-import binauld.pierre.musictag.service.ArtworkService;
+import binauld.pierre.musictag.service.ArtworkManager;
 
 /**
  * Adapt a list of library item for a list view.
@@ -34,12 +34,12 @@ public class LibraryComponentAdapter extends BaseAdapter {
 
     //    private LibraryComposite composite;
     private List<LibraryComponent> componentList = new ArrayList<>();
-    private final ArtworkService artworkService;
+    private final ArtworkManager artworkManager;
     private int artworkSize;
 //    private ProgressBar progressBar;
 
-    public LibraryComponentAdapter(ArtworkService artworkService, int artworkSize) {
-        this.artworkService = artworkService;
+    public LibraryComponentAdapter(ArtworkManager artworkManager, int artworkSize) {
+        this.artworkManager = artworkManager;
         this.artworkSize = artworkSize;
 
 //        composite = new LibraryComposite(null,null);
@@ -102,7 +102,7 @@ public class LibraryComponentAdapter extends BaseAdapter {
         if (item != null) {
             viewHolder.firstLine.setText(item.getPrimaryInformation());
             viewHolder.secondLine.setText(item.getSecondaryInformation());
-            artworkService.setArtwork(item, viewHolder.thumbnail, artworkSize);
+            artworkManager.setArtwork(item, viewHolder.thumbnail, artworkSize);
             convertView.setTag(viewHolder);
             if(listView.isItemChecked(position)) {
                 //TODO: Magic Color!

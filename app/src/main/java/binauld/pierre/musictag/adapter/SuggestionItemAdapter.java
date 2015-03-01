@@ -78,7 +78,7 @@ public class SuggestionItemAdapter extends BaseAdapter {
 
         // object item based on the position
         SuggestionItem item = suggestionItems.get(position);
-
+//TODO: strategy pattern
         // assign values if the object is not null
         if (item != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

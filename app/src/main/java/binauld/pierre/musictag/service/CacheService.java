@@ -18,9 +18,9 @@ public class CacheService<Resource> {
      * @param resource The resource to put in the cache.
      */
     public void put(String key, Resource resource) {
-        if (cache.get(key) == null) {
+//        if (cache.get(key) == null) {
             cache.put(key, resource);
-        }
+//        }
     }
 
     /**

@@ -47,7 +47,7 @@
         </activity>
 
         <service
-            android:name=".service.LibraryService"
+            android:name=".service.LibraryServiceImpl"
             android:enabled="true"
             android:exported="false" >
         </service>

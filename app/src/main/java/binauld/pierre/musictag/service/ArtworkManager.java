@@ -13,15 +13,15 @@ import binauld.pierre.musictag.task.DefaultArtworkLoader;
 /**
  * Help to build artwork from audio file.
  */
-public class ArtworkService {
+public class ArtworkManager {
 
     private BitmapDecoder defaultArtworkDecoder;
 
     private CacheService<Bitmap> cacheService;
 
-    public ArtworkService(BitmapDecoder defaultArtworkDecoder) {
-        this.cacheService = Locator.getCacheService();
+    public ArtworkManager(CacheService<Bitmap> cacheService, BitmapDecoder defaultArtworkDecoder) {
         this.defaultArtworkDecoder = defaultArtworkDecoder;
+        this.cacheService = cacheService;
     }
 
     public void initDefaultArtwork(int artworkSize) {

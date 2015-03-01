@@ -3,13 +3,13 @@ package binauld.pierre.musictag.task;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.LruCache;
 import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.item.Item;
-import binauld.pierre.musictag.service.CacheService;
 
 /**
  * Load an artwork in background.
@@ -19,13 +19,13 @@ public class ArtworkLoader extends AsyncTask<Item, Void, Bitmap> {
     private final WeakReference<ImageView> imageViewReference;
     private final BitmapDecoder defaultArtworkDecoder;
     private Item item;
-    private CacheService<Bitmap> cacheService;
+    private LruCache<String, Bitmap> cache;
     private int artworkSize;
 
-    public ArtworkLoader(ImageView imageView, CacheService<Bitmap> cacheService, BitmapDecoder defaultArtworkDecoder, int artworkSize) {
+    public ArtworkLoader(ImageView imageView, LruCache<String, Bitmap> cache, BitmapDecoder defaultArtworkDecoder, int artworkSize) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
         this.imageViewReference = new WeakReference<>(imageView);
-        this.cacheService = cacheService;
+        this.cache = cache;
         this.defaultArtworkDecoder = defaultArtworkDecoder;
         this.artworkSize = artworkSize;
     }
@@ -38,7 +38,7 @@ public class ArtworkLoader extends AsyncTask<Item, Void, Bitmap> {
         String key = decoder.getKey(artworkSize, artworkSize);
         Bitmap bitmap = decoder.decode(artworkSize, artworkSize);
         if (null != bitmap) {
-            cacheService.put(key, bitmap);
+            cache.put(key, bitmap);
         } else if (decoder != defaultArtworkDecoder) {
             item.setBitmapDecoder(defaultArtworkDecoder);
             bitmap = this.doInBackground(item);

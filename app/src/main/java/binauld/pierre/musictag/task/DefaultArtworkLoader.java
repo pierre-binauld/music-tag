@@ -3,27 +3,27 @@ package binauld.pierre.musictag.task;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.LruCache;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
-import binauld.pierre.musictag.service.CacheService;
 
 /**
  * Allow to load artwork and put it in the cache. Perfect to load default artwork.
  */
 public class DefaultArtworkLoader extends AsyncTask<BitmapDecoder, Void, Integer> {
 
-    private CacheService<Bitmap> cacheService;
+    private LruCache<String, Bitmap> cache;
     private int artworkSize;
 
-    public DefaultArtworkLoader(CacheService<Bitmap> cacheService, int artworkSize) {
-        this.cacheService = cacheService;
+    public DefaultArtworkLoader(LruCache<String, Bitmap> cache, int artworkSize) {
+        this.cache = cache;
         this.artworkSize = artworkSize;
     }
 
     @Override
     protected Integer doInBackground(BitmapDecoder... decoders) {
         for(BitmapDecoder decoder : decoders) {
-            cacheService.put(decoder.getKey(artworkSize, artworkSize), decoder.decode());
+            cache.put(decoder.getKey(artworkSize, artworkSize), decoder.decode());
         }
         return decoders.length;
     }

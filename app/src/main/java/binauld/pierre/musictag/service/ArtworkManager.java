@@ -2,6 +2,7 @@ package binauld.pierre.musictag.service;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.util.LruCache;
 import android.widget.ImageView;
 
 import binauld.pierre.musictag.decoder.BitmapDecoder;
@@ -17,15 +18,16 @@ public class ArtworkManager {
 
     private BitmapDecoder defaultArtworkDecoder;
 
-    private CacheService<Bitmap> cacheService;
+    private LruCache<String, Bitmap> cache;
 
-    public ArtworkManager(CacheService<Bitmap> cacheService, BitmapDecoder defaultArtworkDecoder) {
+    public ArtworkManager(BitmapDecoder defaultArtworkDecoder) {
         this.defaultArtworkDecoder = defaultArtworkDecoder;
-        this.cacheService = cacheService;
+        // Use 1/8th of the available memory for this memory cache.
+        this.cache = new LruCache<>((int) (Runtime.getRuntime().maxMemory() / 1024 / 8));
     }
 
     public void initDefaultArtwork(int artworkSize) {
-        DefaultArtworkLoader loader = new DefaultArtworkLoader(this.cacheService, artworkSize);
+        DefaultArtworkLoader loader = new DefaultArtworkLoader(this.cache, artworkSize);
         loader.execute(this.defaultArtworkDecoder);
     }
 
@@ -40,14 +42,14 @@ public class ArtworkManager {
 
         final String key = item.getBitmapDecoder().getKey(artworkSize, artworkSize);
 
-        final Bitmap bitmap = cacheService.get(key);
+        final Bitmap bitmap = cache.get(key);
 
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
         } else if (cancelPotentialWork(item, imageView)) {
             Resources res = imageView.getResources();
-            final ArtworkLoader task = new ArtworkLoader(imageView, cacheService, defaultArtworkDecoder, artworkSize);
-            Bitmap placeholder = cacheService.get(defaultArtworkDecoder.getKey(artworkSize, artworkSize));
+            final ArtworkLoader task = new ArtworkLoader(imageView, cache, defaultArtworkDecoder, artworkSize);
+            Bitmap placeholder = cache.get(defaultArtworkDecoder.getKey(artworkSize, artworkSize));
             final AsyncDrawable asyncDrawable = new AsyncDrawable(res, placeholder, task);
             imageView.setImageDrawable(asyncDrawable);
             task.execute(item);

@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -20,8 +19,8 @@ import binauld.pierre.musictag.factory.LibraryComponentFactory;
 import binauld.pierre.musictag.helper.LibraryComponentFactoryHelper;
 import binauld.pierre.musictag.service.state.LibraryServiceState;
 import binauld.pierre.musictag.service.state.impl.LibraryServiceStateImpl;
-import binauld.pierre.musictag.task.AsyncTaskExecutor;
 import binauld.pierre.musictag.service.task.TaskBuilder;
+import binauld.pierre.musictag.task.AsyncTaskExecutor;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
 
@@ -68,11 +67,8 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
         // Init TaskBuilder
         TaskBuilder taskBuilder = new TaskBuilder(res, componentFactory);
 
-        // Init cache
-        CacheService<Bitmap> cacheService = new CacheService<>();
-
         // Init artwork manager
-        artworkManager = new ArtworkManager(cacheService, defaultArtworkBitmapDecoder);
+        artworkManager = new ArtworkManager(defaultArtworkBitmapDecoder);
 
         // Init state
         serviceState = new LibraryServiceStateImpl(getComposite(), worker, taskBuilder);

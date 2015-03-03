@@ -10,15 +10,19 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.List;
 
 import binauld.pierre.musictag.R;
+import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.composite.LibraryComposite;
 import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryComponentFactory;
 import binauld.pierre.musictag.helper.LibraryComponentFactoryHelper;
 import binauld.pierre.musictag.service.state.LibraryServiceState;
+import binauld.pierre.musictag.service.state.MultiTagContextualState;
 import binauld.pierre.musictag.service.state.impl.LibraryServiceStateImpl;
+import binauld.pierre.musictag.service.state.impl.MultiTagContextualStateImpl;
 import binauld.pierre.musictag.service.task.TaskBuilder;
 import binauld.pierre.musictag.task.AsyncTaskExecutor;
 import binauld.pierre.musictag.wrapper.FileWrapper;
@@ -36,6 +40,7 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
     private LibraryComponentFactory componentFactory;
 
     private LibraryServiceState serviceState;
+    private MultiTagContextualState multiTagContextualState;
 
     private ArtworkManager artworkManager;
 
@@ -111,6 +116,16 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
     @Override
     public LibraryServiceState getServiceState() {
         return serviceState;
+    }
+
+    @Override
+    public void initMultiTagContextualState(List<LibraryComponent> components) {
+        multiTagContextualState = new MultiTagContextualStateImpl();
+    }
+
+    @Override
+    public MultiTagContextualState getMultiTagContextualState() {
+        return multiTagContextualState;
     }
 
     public class LibraryServiceBinder extends Binder {

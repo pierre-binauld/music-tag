@@ -38,7 +38,6 @@ import binauld.pierre.musictag.service.ArtworkManager;
 import binauld.pierre.musictag.service.LibraryService;
 import binauld.pierre.musictag.service.LibraryServiceImpl;
 import binauld.pierre.musictag.service.state.LibraryServiceState;
-import binauld.pierre.musictag.util.SharedObject;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
 
 /**
@@ -260,7 +259,8 @@ public class MainActivity extends Activity implements ServiceConnection, Adapter
 
     @Override
     public void onServiceDisconnected(ComponentName arg0) {
-        MainActivity.this.service = null;
+        this.service = null;
+        this.serviceState = null;
     }
 
     private void initTitle() {
@@ -304,8 +304,9 @@ public class MainActivity extends Activity implements ServiceConnection, Adapter
     }
 
     public void callTagFormActivity(List<LibraryComponent> components) {
+        service.initMultiTagContextualState(components);
         Intent intent = new Intent(this, TagFormActivity.class);
-        SharedObject.provideComponents(components);
+//        SharedObject.provideComponents(components);
 //        SharedObject.provideComponentFactory(componentFactory);
         startActivityForResult(intent, TAG_UPDATE_REQUEST);
     }
@@ -318,7 +319,7 @@ public class MainActivity extends Activity implements ServiceConnection, Adapter
 
     public void callOrganisationActivity(List<LibraryComponent> components) {
         Intent intent = new Intent(this, OrganisationActivity.class);
-        SharedObject.provideComponents(components);
+//        SharedObject.provideComponents(components);
         startActivityForResult(intent, ORGANISATION_REQUEST);
     }
 

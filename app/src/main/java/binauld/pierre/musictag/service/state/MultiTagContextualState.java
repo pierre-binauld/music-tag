@@ -1,6 +1,8 @@
 package binauld.pierre.musictag.service.state;
 
 
+import java.util.List;
+
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 
 public interface MultiTagContextualState {
@@ -9,9 +11,11 @@ public interface MultiTagContextualState {
 
     String getFilenames();
 
+    Integer getItemCount();
+
     void launchComponentsLoading();
 
-    void launchMultiTagCreation(Runnable callback);
+    void launchMultiTagCreation(List<Runnable> callbacks);
 
-    void launchSaving(Runnable callback);
+    void launchSaving(List<Runnable> callbacks);
 }

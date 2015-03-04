@@ -44,6 +44,7 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
 
     private LoadingTaskBuilder loadingTaskBuilder;
     private ArtworkManager artworkManager;
+    private FileWrapper fileWrapper;
 
 
     @Override
@@ -65,10 +66,10 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
         BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
 
         // Init Wrapper
-        FileWrapper wrapper = new JAudioTaggerWrapper();
+        fileWrapper = new JAudioTaggerWrapper();
 
         // Init factory
-        componentFactory = LibraryComponentFactoryHelper.buildFactory(res, wrapper, defaultArtworkBitmapDecoder);
+        componentFactory = LibraryComponentFactoryHelper.buildFactory(res, fileWrapper, defaultArtworkBitmapDecoder);
 
         // Init TaskBuilder
         loadingTaskBuilder = new LoadingTaskBuilder(res, componentFactory);
@@ -121,7 +122,7 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
 
     @Override
     public void initMultiTagContextualState(List<LibraryComponent> components) {
-        multiTagContextualState = new MultiTagContextualStateImpl(serviceWorker, loadingTaskBuilder, components);
+        multiTagContextualState = new MultiTagContextualStateImpl(serviceWorker, loadingTaskBuilder, components, fileWrapper);
     }
 
     @Override

@@ -9,7 +9,7 @@ public class MultipleId3Tag {
     private Set<SupportedTag> isMultiple = new HashSet<>();
     private Id3Tag id3Tag = new Id3Tag();
 
-    public void update(Id3Tag out) {
+    public void updateId3Tag(Id3Tag out) {
         for(Map.Entry<SupportedTag, String> entry : id3Tag.entrySet()) {
             if (!isAMultipleTag(entry.getKey())) {
                 out.put(entry.getKey(), entry.getValue());

@@ -25,13 +25,13 @@ public abstract class Task extends AsyncTask<Void, Void, Void> {
         }
     }
 
-    public void addOnProgressUpdateCallbacks(Runnable runnable) {
+    public void addOnProgressUpdateCallback(Runnable runnable) {
         if (null != runnable) {
             onProgressUpdateCallbacks.add(runnable);
         }
     }
 
-    public void addOnPostExecuteCallbacks(Runnable runnable) {
+    public void addOnPostExecuteCallback(Runnable runnable) {
         if (null != runnable) {
             onPostExecuteCallbacks.add(runnable);
         }

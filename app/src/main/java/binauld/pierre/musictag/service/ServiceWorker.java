@@ -33,7 +33,7 @@ public class ServiceWorker extends AsyncTask<Void, Task, Void> {
                 TokenGrabber tokenGrabber = new TokenGrabber(taskId, token);
 
                 Task task = queue.take();
-                task.addOnPostExecuteCallbacks(tokenGrabber);
+                task.addOnPostExecuteCallback(tokenGrabber);
 
                 currentTasks.put(taskId, task);
 

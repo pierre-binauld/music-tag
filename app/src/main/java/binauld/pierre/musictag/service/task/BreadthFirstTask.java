@@ -1,9 +1,7 @@
 package binauld.pierre.musictag.service.task;
 
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import binauld.pierre.musictag.composite.LibraryComponent;
@@ -12,9 +10,8 @@ import binauld.pierre.musictag.composite.LibraryLeaf;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
 import binauld.pierre.musictag.visitor.ItemVisitor;
 
-public class BreadthFirstTask extends Task implements ComponentVisitor {
+public class BreadthFirstTask extends ActionTask<ItemVisitor> implements ComponentVisitor {
 
-    private List<ItemVisitor> actions = new ArrayList<>();
     private Queue<LibraryComponent> queue = new LinkedList<>();
 
     public BreadthFirstTask(LibraryComponent composite) {
@@ -47,9 +44,5 @@ public class BreadthFirstTask extends Task implements ComponentVisitor {
         }
 
         queue.addAll(composite.getChildren());
-    }
-
-    public void addAction(ItemVisitor action) {
-        actions.add(action);
     }
 }

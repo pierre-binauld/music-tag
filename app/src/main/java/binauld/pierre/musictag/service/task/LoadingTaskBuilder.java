@@ -9,7 +9,6 @@ import binauld.pierre.musictag.collection.LibraryItemComparator;
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.composite.LibraryComposite;
 import binauld.pierre.musictag.factory.LibraryComponentFactory;
-import binauld.pierre.musictag.tag.MultipleId3Tag;
 
 public class LoadingTaskBuilder {
 
@@ -25,7 +24,7 @@ public class LoadingTaskBuilder {
     public Task build(LibraryComposite composite, boolean drillDown, Runnable callback) {
         LoadingTask task = new LoadingTask(composite, componentFactory, comparator, libraryLoaderUpdateStep);
         task.setDrillDown(drillDown);
-        task.addOnProgressUpdateCallbacks(callback);
+        task.addOnProgressUpdateCallback(callback);
 
         return task;
     }

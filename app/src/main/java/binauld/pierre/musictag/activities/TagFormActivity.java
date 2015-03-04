@@ -23,23 +23,18 @@ import com.iangclifton.android.floatlabel.FloatLabel;
 import com.melnykov.fab.FloatingActionButton;
 import com.melnykov.fab.ObservableScrollView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import binauld.pierre.musictag.R;
-import binauld.pierre.musictag.composite.LibraryComponent;
-import binauld.pierre.musictag.item.AudioFile;
-import binauld.pierre.musictag.item.Folder;
 import binauld.pierre.musictag.service.LibraryService;
 import binauld.pierre.musictag.service.LibraryServiceImpl;
 import binauld.pierre.musictag.service.state.MultiTagContextualState;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
-import binauld.pierre.musictag.visitor.ComponentVisitor;
-import binauld.pierre.musictag.visitor.ItemVisitor;
-import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
 
 /**
  * Activity for editing audio tag of one or several track.
@@ -54,7 +49,7 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 //    private LibraryComponentFactory componentFactory;
 
     //    private LibraryComponentLoaderManager loaderManager;
-    private List<LibraryComponent> components;
+//    private List<LibraryComponent> components;
 //    private MultipleId3Tag multipleId3Tag;
 //    private Map<AudioFile, Id3Tag> id3Tags;
 
@@ -66,11 +61,12 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 //    private FileWrapper wrapper = new JAudioTaggerWrapper();
 
     private LibraryService service;
-//    private LibraryServiceState serviceState;
+    //    private LibraryServiceState serviceState;
     private MultiTagContextualState multiTagContextualState;
 
     private FinishCallback finishCallback = new FinishCallback();
-    private LoadingCallback loadingCallback = new LoadingCallback();
+    private LoadingFinishedCallback loadingFinishedCallback = new LoadingFinishedCallback();
+    private ProgressDialogCallback progressDialogCallback;
 
 
     @Override
@@ -105,6 +101,7 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 
         // Init views
         initViews();
+        progressDialogCallback = new ProgressDialogCallback();
 
 
         // Init service
@@ -182,6 +179,40 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
                     break;
             }
         }
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        LibraryServiceImpl.LibraryServiceBinder binder = (LibraryServiceImpl.LibraryServiceBinder) service;
+
+        this.service = binder.getService();
+//        this.serviceState = this.service.getServiceState();
+        this.multiTagContextualState = this.service.getMultiTagContextualState();
+
+        if (null == this.multiTagContextualState) {
+            Log.e(this.getClass().toString(), "No contextual state has been provided.");
+            finish();
+        } else {
+            // Load content
+
+            List<Runnable> callbacks = new ArrayList<>();
+            callbacks.add(loadingFinishedCallback);
+
+            if(multiTagContextualState.getItemCount() != 1) {
+                progressDialogCallback.initDialog(this, res.getString(R.string.loading),
+                        res.getString(R.string.please_wait));
+                callbacks.add(progressDialogCallback);
+            }
+
+            multiTagContextualState.launchComponentsLoading();
+            multiTagContextualState.launchMultiTagCreation(callbacks);
+        }
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        this.service = null;
+//        this.serviceState = null;
     }
 
     /**
@@ -322,17 +353,28 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 //    }
 
     public void saveContentAndFinish() {
-        finishCallback.initDialog();
-        multiTagContextualState.launchSaving(finishCallback);
+        MultipleId3Tag multipleId3Tag = multiTagContextualState.getMultiTag();
+
+        for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
+            String value = entry.getValue().getText().toString();
+            //TODO: Find another way
+            if (!value.equals(multipleTagMessage)) {
+                multipleId3Tag.set(entry.getKey(), value);
+            }
+        }
+
+        List<Runnable> callbacks = new ArrayList<>();
+        callbacks.add(finishCallback);
+        if(multiTagContextualState.getItemCount() != 1) {
+            progressDialogCallback.initDialog(this, res.getString(R.string.saving),
+                    res.getString(R.string.please_wait));
+            callbacks.add(progressDialogCallback);
+        }
+
+        multiTagContextualState.launchSaving(callbacks);
 //        savingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.saving),
 //                res.getString(R.string.please_wait), true);
-//        for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
-//            String value = entry.getValue().getText().toString();
-//            //TODO: Find another way
-//            if (!value.equals(multipleTagMessage)) {
-//                multipleId3Tag.set(entry.getKey(), value);
-//            }
-//        }
+
 //
 //        TagSaver saver = new TagSaver(multipleId3Tag, wrapper, new TagSaver.Callback() {
 //            @Override
@@ -347,60 +389,42 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 //        AsyncTaskExecutor.execute(saver, id3Tags);
     }
 
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        LibraryServiceImpl.LibraryServiceBinder binder = (LibraryServiceImpl.LibraryServiceBinder) service;
 
-        this.service = binder.getService();
-//        this.serviceState = this.service.getServiceState();
-        this.multiTagContextualState = this.service.getMultiTagContextualState();
-
-        if (null == this.multiTagContextualState) {
-            Log.e(this.getClass().toString(), "No contextual state has been provided.");
-            finish();
-        } else {
-            // Load content
-            loadingCallback.initDialog();
-            multiTagContextualState.launchComponentsLoading();
-            multiTagContextualState.launchMultiTagCreation(loadingCallback);
-        }
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        this.service = null;
-//        this.serviceState = null;
-    }
 
 
     class FinishCallback implements Runnable {
 
-        private ProgressDialog savingDialog;
-
-        public void initDialog() {
-            savingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.saving),
-                    res.getString(R.string.please_wait), true);
-        }
-
         @Override
         public void run() {
-            savingDialog.dismiss();
+            Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
+            finish();
         }
     }
 
-    class LoadingCallback implements Runnable {
+    class LoadingFinishedCallback implements Runnable {
 
-        private ProgressDialog loadingDialog;
+        @Override
+        public void run() {
+            fillViews();
+        }
+    }
 
-        public void initDialog() {
-            loadingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.loading),
-                    res.getString(R.string.please_wait), true);
+    class ProgressDialogCallback implements Runnable {
+
+        private ProgressDialog dialog;
+
+        public void initDialog(Context context, String title, String message) {
+            if (null != dialog) {
+                run();
+            }
+            dialog = ProgressDialog.show(context, title, message, true);
         }
 
         @Override
         public void run() {
-            loadingDialog.dismiss();
-            fillViews();
+            dialog.dismiss();
+            dialog = null;
         }
     }
 }

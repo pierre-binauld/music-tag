@@ -23,7 +23,7 @@ import binauld.pierre.musictag.service.state.LibraryServiceState;
 import binauld.pierre.musictag.service.state.MultiTagContextualState;
 import binauld.pierre.musictag.service.state.impl.LibraryServiceStateImpl;
 import binauld.pierre.musictag.service.state.impl.MultiTagContextualStateImpl;
-import binauld.pierre.musictag.service.task.TaskBuilder;
+import binauld.pierre.musictag.service.task.LoadingTaskBuilder;
 import binauld.pierre.musictag.task.AsyncTaskExecutor;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
@@ -42,7 +42,7 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
     private LibraryServiceState serviceState;
     private MultiTagContextualState multiTagContextualState;
 
-    private TaskBuilder taskBuilder;
+    private LoadingTaskBuilder loadingTaskBuilder;
     private ArtworkManager artworkManager;
 
 
@@ -71,13 +71,13 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
         componentFactory = LibraryComponentFactoryHelper.buildFactory(res, wrapper, defaultArtworkBitmapDecoder);
 
         // Init TaskBuilder
-        taskBuilder = new TaskBuilder(res, componentFactory);
+        loadingTaskBuilder = new LoadingTaskBuilder(res, componentFactory);
 
         // Init artwork manager
         artworkManager = new ArtworkManager(defaultArtworkBitmapDecoder);
 
         // Init state
-        serviceState = new LibraryServiceStateImpl(getComposite(), serviceWorker, taskBuilder);
+        serviceState = new LibraryServiceStateImpl(getComposite(), serviceWorker, loadingTaskBuilder);
 
     }
 
@@ -121,7 +121,7 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
 
     @Override
     public void initMultiTagContextualState(List<LibraryComponent> components) {
-        multiTagContextualState = new MultiTagContextualStateImpl(serviceWorker, taskBuilder, components);
+        multiTagContextualState = new MultiTagContextualStateImpl(serviceWorker, loadingTaskBuilder, components);
     }
 
     @Override

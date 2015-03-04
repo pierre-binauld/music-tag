@@ -9,19 +9,19 @@ import binauld.pierre.musictag.item.Item;
 import binauld.pierre.musictag.service.state.LibraryServiceState;
 import binauld.pierre.musictag.service.ServiceWorker;
 import binauld.pierre.musictag.service.task.Task;
-import binauld.pierre.musictag.service.task.TaskBuilder;
+import binauld.pierre.musictag.service.task.LoadingTaskBuilder;
 import binauld.pierre.musictag.visitor.impl.MaxChildrenCountExtractor;
 
 public class LibraryServiceStateImpl implements LibraryServiceState {
 
     private LibraryComposite composite;
     private ServiceWorker worker;
-    private TaskBuilder taskBuilder;
+    private LoadingTaskBuilder loadingTaskBuilder;
 
-    public LibraryServiceStateImpl(LibraryComposite composite, ServiceWorker worker, TaskBuilder taskBuilder) {
+    public LibraryServiceStateImpl(LibraryComposite composite, ServiceWorker worker, LoadingTaskBuilder loadingTaskBuilder) {
         this.composite = composite;
         this.worker = worker;
-        this.taskBuilder = taskBuilder;
+        this.loadingTaskBuilder = loadingTaskBuilder;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class LibraryServiceStateImpl implements LibraryServiceState {
 
     public void load(LibraryComposite composite, boolean drillDown, Runnable callback) {
         if (this.composite.getState() == LoadingState.NOT_LOADED || drillDown) {
-            Task task = taskBuilder.buildLoadingTask(composite, drillDown, callback);
+            Task task = loadingTaskBuilder.build(composite, drillDown, callback);
 
             worker.pushTask(task);
         } else {
@@ -94,7 +94,7 @@ public class LibraryServiceStateImpl implements LibraryServiceState {
 
     public void asyncLoad(LibraryComposite composite, boolean drillDown, Runnable callback) {
         if (this.composite.getState() == LoadingState.NOT_LOADED || drillDown) {
-            Task task = taskBuilder.buildLoadingTask(composite, drillDown, callback);
+            Task task = loadingTaskBuilder.build(composite, drillDown, callback);
 
             worker.launchAsyncTask(task);
         } else {

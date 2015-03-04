@@ -55,7 +55,7 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 
     //    private LibraryComponentLoaderManager loaderManager;
     private List<LibraryComponent> components;
-    private MultipleId3Tag multipleId3Tag;
+//    private MultipleId3Tag multipleId3Tag;
 //    private Map<AudioFile, Id3Tag> id3Tags;
 
     private HashMap<SupportedTag, EditText> views = new HashMap<>();
@@ -230,18 +230,10 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
     }
 
     public void fillViews() {
-        //TODO: make a task
-        FilenameBuilderVisitor builderVisitor = new FilenameBuilderVisitor();
-        ComponentVisitor componentVisitor = ComponentVisitors.buildDrillDownComponentVisitor(builderVisitor);
 
-//        for (LibraryComponent component : components) {
-//            component.accept(componentVisitor);
-//        }
+        txt_filename.setText(multiTagContextualState.getFilenames());
 
-//        StringBuilder builder = builderVisitor.getBuilder();
-//        builder.deleteCharAt(builder.length() - 1);
-//        txt_filename.setText(builder.toString());
-
+        MultipleId3Tag multipleId3Tag = multiTagContextualState.getMultiTag();
         Id3Tag id3Tag = multipleId3Tag.getId3Tag();
         for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
             if (multipleId3Tag.isAMultipleTag(entry.getKey())) {
@@ -380,29 +372,6 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 //        this.serviceState = null;
     }
 
-    class FilenameBuilderVisitor implements ItemVisitor {
-
-        private StringBuilder builder;
-
-        FilenameBuilderVisitor() {
-            this.builder = new StringBuilder();
-        }
-
-        @Override
-        public void visit(AudioFile audioFile) {
-            builder.append(audioFile.getFile().getAbsolutePath());
-            builder.append("\n");
-        }
-
-        @Override
-        public void visit(Folder folder) {
-
-        }
-
-        public StringBuilder getBuilder() {
-            return builder;
-        }
-    }
 
     class FinishCallback implements Runnable {
 
@@ -431,7 +400,6 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
         @Override
         public void run() {
             loadingDialog.dismiss();
-            multipleId3Tag = multiTagContextualState.getMultiTag();
             fillViews();
         }
     }

@@ -7,6 +7,8 @@ public interface MultiTagContextualState {
 
     MultipleId3Tag getMultiTag();
 
+    String getFilenames();
+
     void launchComponentsLoading();
 
     void launchMultiTagCreation(Runnable callback);

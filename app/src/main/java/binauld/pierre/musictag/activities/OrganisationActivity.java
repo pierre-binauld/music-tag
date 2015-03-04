@@ -19,7 +19,6 @@ import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.task.AsyncTaskExecutor;
 import binauld.pierre.musictag.task.OrganisationTask;
-import binauld.pierre.musictag.util.SharedObject;
 
 public class OrganisationActivity extends Activity implements View.OnClickListener, OrganisationTask.CallBack {
     private EditText placeholder;
@@ -144,7 +143,7 @@ public class OrganisationActivity extends Activity implements View.OnClickListen
     }
 
     private boolean initContent() {
-        libraryComponents = SharedObject.getComponents();
+//        libraryComponents = SharedObject.getComponents();
         return null != libraryComponents;
     }
 

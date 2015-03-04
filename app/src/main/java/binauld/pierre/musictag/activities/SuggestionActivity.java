@@ -19,7 +19,6 @@ import binauld.pierre.musictag.item.SuggestionItem;
 import binauld.pierre.musictag.task.AsyncTaskExecutor;
 import binauld.pierre.musictag.task.SuggestionLoader;
 import binauld.pierre.musictag.tag.Id3Tag;
-import binauld.pierre.musictag.util.SharedObject;
 import it.neokree.materialnavigationdrawer.MaterialNavigationDrawer;
 import it.neokree.materialnavigationdrawer.elements.MaterialSection;
 
@@ -35,16 +34,16 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
 
     @Override
     public void init(Bundle savedInstanceState) {
-        id3Tags = SharedObject.getId3Tags();
-        if(null == id3Tags) {
-            finish();
-        } else {
-            SuggestionFragment fragment = null;
-            for (Map.Entry<AudioFile, Id3Tag> entry : id3Tags.entrySet()) {
-                fragment = initFragment(entry);
-            }
-            fragment.setLastFragment(true);
-        }
+//        id3Tags = SharedObject.getId3Tags();
+//        if(null == id3Tags) {
+//            finish();
+//        } else {
+//            SuggestionFragment fragment = null;
+//            for (Map.Entry<AudioFile, Id3Tag> entry : id3Tags.entrySet()) {
+//                fragment = initFragment(entry);
+//            }
+//            fragment.setLastFragment(true);
+//        }
     }
 
     @Override
@@ -141,7 +140,7 @@ public class SuggestionActivity extends MaterialNavigationDrawer implements Sugg
         }
         //TODO: warn
         Intent intent = new Intent();
-        SharedObject.provideId3Tags(id3Tags);
+//        SharedObject.provideId3Tags(id3Tags);
         setResult(RESULT_OK, intent);
         finish();
     }

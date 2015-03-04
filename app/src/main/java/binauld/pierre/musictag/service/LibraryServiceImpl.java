@@ -35,13 +35,14 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
     private Resources res;
     private SharedPreferences sharedPrefs;
 
-    private ServiceWorker worker = new ServiceWorker();
+    private ServiceWorker serviceWorker = new ServiceWorker();
 
     private LibraryComponentFactory componentFactory;
 
     private LibraryServiceState serviceState;
     private MultiTagContextualState multiTagContextualState;
 
+    private TaskBuilder taskBuilder;
     private ArtworkManager artworkManager;
 
 
@@ -50,8 +51,8 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
         super.onCreate();
         Toast.makeText(this, "Library Service created.", Toast.LENGTH_SHORT).show();
 
-        // Init worker
-        AsyncTaskExecutor.execute(worker);
+        // Init serviceWorker
+        AsyncTaskExecutor.execute(serviceWorker);
 
         // Init preference(s)
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
@@ -70,13 +71,13 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
         componentFactory = LibraryComponentFactoryHelper.buildFactory(res, wrapper, defaultArtworkBitmapDecoder);
 
         // Init TaskBuilder
-        TaskBuilder taskBuilder = new TaskBuilder(res, componentFactory);
+        taskBuilder = new TaskBuilder(res, componentFactory);
 
         // Init artwork manager
         artworkManager = new ArtworkManager(defaultArtworkBitmapDecoder);
 
         // Init state
-        serviceState = new LibraryServiceStateImpl(getComposite(), worker, taskBuilder);
+        serviceState = new LibraryServiceStateImpl(getComposite(), serviceWorker, taskBuilder);
 
     }
 
@@ -89,7 +90,7 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
     public void onDestroy() {
         super.onDestroy();
         Toast.makeText(this, "Library Service destroyed.", Toast.LENGTH_SHORT).show();
-        worker.cancel(true);
+        serviceWorker.cancel(true);
     }
 
 
@@ -120,12 +121,14 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
 
     @Override
     public void initMultiTagContextualState(List<LibraryComponent> components) {
-        multiTagContextualState = new MultiTagContextualStateImpl();
+        multiTagContextualState = new MultiTagContextualStateImpl(serviceWorker, taskBuilder, components);
     }
 
     @Override
     public MultiTagContextualState getMultiTagContextualState() {
-        return multiTagContextualState;
+        MultiTagContextualState mtcs = multiTagContextualState;
+        multiTagContextualState = null;
+        return mtcs;
     }
 
     public class LibraryServiceBinder extends Binder {

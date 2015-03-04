@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import binauld.pierre.musictag.collection.MultipleBufferedList;
 import binauld.pierre.musictag.composite.LibraryComponent;
@@ -30,8 +31,9 @@ public class LoadingTask extends Task implements ComponentVisitor, ItemVisitor {
     private int updateStep;
     private boolean drillDown = false;
 
+    private MultipleBufferedListPullingCallback multipleBufferedListPullingCallback = new MultipleBufferedListPullingCallback();
+
     private Queue<LibraryComponent> queue = new LinkedList<>();
-    private CompositeFilterVisitor filterVisitor;
     private Comparator<LibraryComponent> comparator;
 
 
@@ -41,12 +43,13 @@ public class LoadingTask extends Task implements ComponentVisitor, ItemVisitor {
         this.comparator = comparator;
         this.updateStep = updateStep;
 
-        this.filterVisitor = new CompositeFilterVisitor(this.queue);
         this.queue.add(rootComposite);
+
+        this.addOnProgressUpdateCallbacks(multipleBufferedListPullingCallback);
     }
+
     @Override
     protected Void doInBackground(Void... params) {
-
         while (!queue.isEmpty()) {
             queue.poll().accept(this);
         }
@@ -104,7 +107,7 @@ public class LoadingTask extends Task implements ComponentVisitor, ItemVisitor {
                     LibraryComponent component = factory.build(currentFiles[i], currentComposite);
 
                     if (drillDown) {
-                        component.accept(filterVisitor);
+                        queue.add(component);
                     }
                     children.add(component);
 
@@ -126,6 +129,7 @@ public class LoadingTask extends Task implements ComponentVisitor, ItemVisitor {
         MultipleBufferedList<LibraryComponent> children = currentComposite.getChildren();
         Collections.sort(children.getWorkingList(), comparator);
         children.push();
+        multipleBufferedListPullingCallback.add(children);
         publishProgress();
     }
 
@@ -133,23 +137,19 @@ public class LoadingTask extends Task implements ComponentVisitor, ItemVisitor {
         this.drillDown = drillDown;
     }
 
+    class MultipleBufferedListPullingCallback implements Runnable {
 
-    class CompositeFilterVisitor implements ComponentVisitor {
-
-        private Collection<LibraryComponent> collection;
-
-        CompositeFilterVisitor(Collection<LibraryComponent> collection) {
-            this.collection = collection;
-        }
+        private Queue<MultipleBufferedList> queue = new ConcurrentLinkedQueue<>();
 
         @Override
-        public void visit(LibraryLeaf leaf) {
-
+        public void run() {
+            while (!queue.isEmpty()) {
+                queue.poll().pull();
+            }
         }
 
-        @Override
-        public void visit(LibraryComposite composite) {
-            collection.add(composite);
+        public void add(MultipleBufferedList list) {
+            queue.add(list);
         }
     }
 }

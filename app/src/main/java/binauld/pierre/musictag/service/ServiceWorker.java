@@ -19,6 +19,10 @@ public class ServiceWorker extends AsyncTask<Void, Task, Void> {
     private Map<Integer, Task> currentTasks = new HashMap<>();
     private boolean run = true;
 
+    public ServiceWorker() {
+        this.tokens.add(42);
+    }
+
     @Override
     protected Void doInBackground(Void... params) {
         int taskId = 0;

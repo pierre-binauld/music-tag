@@ -29,19 +29,14 @@ import java.util.Map;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.composite.LibraryComponent;
-import binauld.pierre.musictag.factory.LibraryComponentFactory;
 import binauld.pierre.musictag.item.AudioFile;
 import binauld.pierre.musictag.item.Folder;
-import binauld.pierre.musictag.service.ArtworkManager;
 import binauld.pierre.musictag.service.LibraryService;
 import binauld.pierre.musictag.service.LibraryServiceImpl;
-import binauld.pierre.musictag.service.state.LibraryServiceState;
 import binauld.pierre.musictag.service.state.MultiTagContextualState;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
-import binauld.pierre.musictag.task.AsyncTaskExecutor;
-import binauld.pierre.musictag.task.TagFormLoader;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
 import binauld.pierre.musictag.visitor.ItemVisitor;
 import binauld.pierre.musictag.visitor.impl.ComponentVisitors;
@@ -55,13 +50,13 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 
     private Resources res;
 
-    private ArtworkManager artworkManager;
-    private LibraryComponentFactory componentFactory;
+//    private ArtworkManager artworkManager;
+//    private LibraryComponentFactory componentFactory;
 
     //    private LibraryComponentLoaderManager loaderManager;
     private List<LibraryComponent> components;
     private MultipleId3Tag multipleId3Tag;
-    private Map<AudioFile, Id3Tag> id3Tags;
+//    private Map<AudioFile, Id3Tag> id3Tags;
 
     private HashMap<SupportedTag, EditText> views = new HashMap<>();
 
@@ -71,7 +66,7 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 //    private FileWrapper wrapper = new JAudioTaggerWrapper();
 
     private LibraryService service;
-    private LibraryServiceState serviceState;
+//    private LibraryServiceState serviceState;
     private MultiTagContextualState multiTagContextualState;
 
     private FinishCallback finishCallback = new FinishCallback();
@@ -128,6 +123,16 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 //        if (null != savingDialog) {
 //            savingDialog.dismiss();
 //        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+
+        if (null != service) {
+            unbindService(this);
+        }
     }
 
     @Override
@@ -225,16 +230,17 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
     }
 
     public void fillViews() {
+        //TODO: make a task
         FilenameBuilderVisitor builderVisitor = new FilenameBuilderVisitor();
         ComponentVisitor componentVisitor = ComponentVisitors.buildDrillDownComponentVisitor(builderVisitor);
 
-        for (LibraryComponent component : components) {
-            component.accept(componentVisitor);
-        }
+//        for (LibraryComponent component : components) {
+//            component.accept(componentVisitor);
+//        }
 
-        StringBuilder builder = builderVisitor.getBuilder();
-        builder.deleteCharAt(builder.length() - 1);
-        txt_filename.setText(builder.toString());
+//        StringBuilder builder = builderVisitor.getBuilder();
+//        builder.deleteCharAt(builder.length() - 1);
+//        txt_filename.setText(builder.toString());
 
         Id3Tag id3Tag = multipleId3Tag.getId3Tag();
         for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
@@ -324,6 +330,7 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 //    }
 
     public void saveContentAndFinish() {
+        finishCallback.initDialog();
         multiTagContextualState.launchSaving(finishCallback);
 //        savingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.saving),
 //                res.getString(R.string.please_wait), true);
@@ -353,7 +360,7 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
         LibraryServiceImpl.LibraryServiceBinder binder = (LibraryServiceImpl.LibraryServiceBinder) service;
 
         this.service = binder.getService();
-        this.serviceState = this.service.getServiceState();
+//        this.serviceState = this.service.getServiceState();
         this.multiTagContextualState = this.service.getMultiTagContextualState();
 
         if (null == this.multiTagContextualState) {
@@ -362,7 +369,7 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
         } else {
             // Load content
             loadingCallback.initDialog();
-            multiTagContextualState.launchComponentsLoadind();
+            multiTagContextualState.launchComponentsLoading();
             multiTagContextualState.launchMultiTagCreation(loadingCallback);
         }
     }
@@ -370,7 +377,7 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
     @Override
     public void onServiceDisconnected(ComponentName name) {
         this.service = null;
-        this.serviceState = null;
+//        this.serviceState = null;
     }
 
     class FilenameBuilderVisitor implements ItemVisitor {

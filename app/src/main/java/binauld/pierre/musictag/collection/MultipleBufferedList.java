@@ -25,7 +25,7 @@ public class MultipleBufferedList<E> implements List<E> {
         public abstract List<E> buildEmptyList();
     }
 
-    private ListFactory factory;
+    private ListFactory<E> factory;
 
     private Queue<List<E>> queue;
 

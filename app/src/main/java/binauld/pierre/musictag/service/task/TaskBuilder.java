@@ -9,6 +9,7 @@ import binauld.pierre.musictag.collection.LibraryItemComparator;
 import binauld.pierre.musictag.composite.LibraryComponent;
 import binauld.pierre.musictag.composite.LibraryComposite;
 import binauld.pierre.musictag.factory.LibraryComponentFactory;
+import binauld.pierre.musictag.tag.MultipleId3Tag;
 
 public class TaskBuilder {
 
@@ -27,5 +28,17 @@ public class TaskBuilder {
         task.addOnProgressUpdateCallbacks(callback);
 
         return task;
+    }
+
+    public Task buildMultiTagTask(MultipleId3Tag multiId3Tag, LibraryComponent component, Runnable callback) {
+        MultiTagTask multiTagTask = new MultiTagTask(multiId3Tag, component);
+        multiTagTask.addOnPostExecuteCallbacks(callback);
+        return multiTagTask;
+    }
+
+    public Task buildSavingTask(MultipleId3Tag multipleId3Tag, LibraryComponent component, Runnable callback) {
+        SavingTask savingTask = new SavingTask(multipleId3Tag, component);
+        savingTask.addOnPostExecuteCallbacks(callback);
+        return savingTask;
     }
 }

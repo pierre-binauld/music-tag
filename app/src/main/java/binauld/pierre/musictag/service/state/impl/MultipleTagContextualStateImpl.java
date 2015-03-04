@@ -10,10 +10,11 @@ import binauld.pierre.musictag.composite.LibraryLeaf;
 import binauld.pierre.musictag.item.AudioFile;
 import binauld.pierre.musictag.service.ServiceWorker;
 import binauld.pierre.musictag.service.action.FilenamesBuilderAction;
+import binauld.pierre.musictag.service.action.Id3TagUpdaterAction;
 import binauld.pierre.musictag.service.action.ModifiedId3TagCreatorAction;
-import binauld.pierre.musictag.service.action.MultipleTagAction;
+import binauld.pierre.musictag.service.action.MultipleTagUpdaterAction;
 import binauld.pierre.musictag.service.action.SavingAction;
-import binauld.pierre.musictag.service.state.MultiTagContextualState;
+import binauld.pierre.musictag.service.state.MultipleTagContextualState;
 import binauld.pierre.musictag.service.task.BreadthFirstTask;
 import binauld.pierre.musictag.service.task.CallbackTask;
 import binauld.pierre.musictag.service.task.LoadingTaskBuilder;
@@ -24,7 +25,7 @@ import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.visitor.ComponentVisitor;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 
-public class MultiTagContextualStateImpl implements MultiTagContextualState {
+public class MultipleTagContextualStateImpl implements MultipleTagContextualState {
 
     private StringBuilder filenamesBuilder;
     private MultipleId3Tag multipleId3Tag;
@@ -35,7 +36,7 @@ public class MultiTagContextualStateImpl implements MultiTagContextualState {
     private ServiceWorker serviceWorker;
     private FileWrapper fileWrapper;
 
-    public MultiTagContextualStateImpl(ServiceWorker serviceWorker, LoadingTaskBuilder loadingTaskBuilder, List<LibraryComponent> components, FileWrapper fileWrapper) {
+    public MultipleTagContextualStateImpl(ServiceWorker serviceWorker, LoadingTaskBuilder loadingTaskBuilder, List<LibraryComponent> components, FileWrapper fileWrapper) {
         this.components = components;
         this.serviceWorker = serviceWorker;
         this.loadingTaskBuilder = loadingTaskBuilder;
@@ -64,6 +65,11 @@ public class MultiTagContextualStateImpl implements MultiTagContextualState {
     }
 
     @Override
+    public Map<AudioFile, Id3Tag> getModifiedId3Tags() {
+        return modifiedId3Tags;
+    }
+
+    @Override
     public void launchComponentsLoading() {
         LibraryComponentLoaderVisitor loaderVisitor = new LibraryComponentLoaderVisitor(null);
 
@@ -89,8 +95,8 @@ public class MultiTagContextualStateImpl implements MultiTagContextualState {
             task.addAction(filenamesBuilderAction);
             task.addOnPostExecuteCallback(filenamesBuilderAction);
 
-            MultipleTagAction multipleTagAction = new MultipleTagAction(multipleId3Tag);
-            task.addAction(multipleTagAction);
+            MultipleTagUpdaterAction multipleTagUpdaterAction = new MultipleTagUpdaterAction(multipleId3Tag);
+            task.addAction(multipleTagUpdaterAction);
 
 
             serviceWorker.pushTask(task);
@@ -104,21 +110,33 @@ public class MultiTagContextualStateImpl implements MultiTagContextualState {
     }
 
     @Override
-    public void launchSaving(List<Runnable> callbacks) {
-        for (LibraryComponent component : components) {
-            SavingAction savingAction = new SavingAction(multipleId3Tag, fileWrapper);
+    public void launchSaving(MultipleId3Tag multipleId3Tag, List<Runnable> callbacks) {
+        this.multipleId3Tag = multipleId3Tag;
+        Id3TagUpdaterAction id3TagUpdaterAction = new Id3TagUpdaterAction(multipleId3Tag);
+        SavingAction savingAction = new SavingAction(fileWrapper);
 
-            ModifiedId3TagsTask task = new ModifiedId3TagsTask(modifiedId3Tags);
-            task.addAction(savingAction);
+        ModifiedId3TagsTask task = new ModifiedId3TagsTask(modifiedId3Tags);
+        task.addAction(id3TagUpdaterAction);
+        task.addAction(savingAction);
 
-            serviceWorker.pushTask(task);
-        }
-
-        CallbackTask callbackTask = new CallbackTask();
         for (Runnable callback : callbacks) {
-            callbackTask.addOnPostExecuteCallback(callback);
+            task.addOnPostExecuteCallback(callback);
         }
-        serviceWorker.pushTask(callbackTask);
+        serviceWorker.pushTask(task);
+    }
+
+    @Override
+    public void launchUpdateModifiedId3Tag(MultipleId3Tag multipleId3Tag, List<Runnable> callbacks) {
+        this.multipleId3Tag = multipleId3Tag;
+        Id3TagUpdaterAction id3TagUpdaterAction = new Id3TagUpdaterAction(multipleId3Tag);
+
+        ModifiedId3TagsTask task = new ModifiedId3TagsTask(modifiedId3Tags);
+        task.addAction(id3TagUpdaterAction);
+
+        for (Runnable callback : callbacks) {
+            task.addOnPostExecuteCallback(callback);
+        }
+        serviceWorker.pushTask(task);
     }
 
     class LibraryComponentLoaderVisitor implements ComponentVisitor {

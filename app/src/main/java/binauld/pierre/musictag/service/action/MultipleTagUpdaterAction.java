@@ -8,11 +8,11 @@ import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.visitor.ItemVisitor;
 
-public class MultipleTagAction implements ItemVisitor, ModifiedId3TagsTask.ModifiedId3TagsAction {
+public class MultipleTagUpdaterAction implements ItemVisitor, ModifiedId3TagsTask.ModifiedId3TagsAction {
 
     private MultipleId3Tag multipleId3Tag;
 
-    public MultipleTagAction(MultipleId3Tag multipleId3Tag) {
+    public MultipleTagUpdaterAction(MultipleId3Tag multipleId3Tag) {
         this.multipleId3Tag = multipleId3Tag;
     }
 

@@ -188,6 +188,7 @@ public class MainActivity extends Activity implements ServiceConnection, Adapter
                     listView.setItemChecked(-1, false);
                     ItemMultiChoiceMode.clearSelection();
                     adapter.notifyDataSetChanged();
+                    service.clearMultipleTagContextualState();
                     break;
                 default:
                     break;
@@ -304,10 +305,8 @@ public class MainActivity extends Activity implements ServiceConnection, Adapter
     }
 
     public void callTagFormActivity(List<LibraryComponent> components) {
-        service.initMultiTagContextualState(components);
+        service.initMultipleTagContextualState(components);
         Intent intent = new Intent(this, TagFormActivity.class);
-//        SharedObject.provideComponents(components);
-//        SharedObject.provideComponentFactory(componentFactory);
         startActivityForResult(intent, TAG_UPDATE_REQUEST);
     }
 

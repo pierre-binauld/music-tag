@@ -13,12 +13,9 @@ import binauld.pierre.musictag.wrapper.FileWrapper;
 
 public class SavingAction implements ModifiedId3TagsTask.ModifiedId3TagsAction {
 
-
-    private MultipleId3Tag multipleId3Tag;
     private FileWrapper fileWrapper;
 
-    public SavingAction(MultipleId3Tag multipleId3Tag, FileWrapper fileWrapper) {
-        this.multipleId3Tag = multipleId3Tag;
+    public SavingAction(FileWrapper fileWrapper) {
         this.fileWrapper = fileWrapper;
     }
 
@@ -27,7 +24,6 @@ public class SavingAction implements ModifiedId3TagsTask.ModifiedId3TagsAction {
     public void doAction(AudioFile audioFile, Id3Tag modifiedId3Tag) {
 
         try {
-            multipleId3Tag.updateId3Tag(modifiedId3Tag);
             audioFile.setId3Tag(modifiedId3Tag);
             fileWrapper.save(audioFile);
         } catch (IOException e) {

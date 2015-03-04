@@ -31,7 +31,7 @@ import java.util.Map;
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.service.LibraryService;
 import binauld.pierre.musictag.service.LibraryServiceImpl;
-import binauld.pierre.musictag.service.state.MultiTagContextualState;
+import binauld.pierre.musictag.service.state.MultipleTagContextualState;
 import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.tag.MultipleId3Tag;
 import binauld.pierre.musictag.tag.SupportedTag;
@@ -45,24 +45,14 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 
     private Resources res;
 
-//    private ArtworkManager artworkManager;
-//    private LibraryComponentFactory componentFactory;
-
-    //    private LibraryComponentLoaderManager loaderManager;
-//    private List<LibraryComponent> components;
-//    private MultipleId3Tag multipleId3Tag;
-//    private Map<AudioFile, Id3Tag> id3Tags;
-
     private HashMap<SupportedTag, EditText> views = new HashMap<>();
 
     private TextView txt_filename;
 
     private String multipleTagMessage;
-//    private FileWrapper wrapper = new JAudioTaggerWrapper();
 
     private LibraryService service;
-    //    private LibraryServiceState serviceState;
-    private MultiTagContextualState multiTagContextualState;
+    private MultipleTagContextualState multipleTagContextualState;
 
     private FinishCallback finishCallback = new FinishCallback();
     private LoadingFinishedCallback loadingFinishedCallback = new LoadingFinishedCallback();
@@ -72,10 +62,6 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Init content
-//        if(initContent()) {
-//            loaderManager = new LibraryComponentLoaderManager(componentFactory, 200);
 
         //Init layout
         this.setContentView(R.layout.activity_tag_form);
@@ -95,10 +81,6 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
         res = getResources();
         multipleTagMessage = res.getString(R.string.multiple_tag_message);
 
-        // Init service(s)
-//            BitmapDecoder defaultArtworkBitmapDecoder = new ResourceBitmapDecoder(res, R.drawable.list_item_placeholder);
-//            artworkManager = new ArtworkManager(defaultArtworkBitmapDecoder, cacheService);
-
         // Init views
         initViews();
         progressDialogCallback = new ProgressDialogCallback();
@@ -114,12 +96,6 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
     @Override
     protected void onPause() {
         super.onPause();
-//        if (null != loadingDialog) {
-//            loadingDialog.dismiss();
-//        }
-//        if (null != savingDialog) {
-//            savingDialog.dismiss();
-//        }
     }
 
     @Override
@@ -187,9 +163,9 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 
         this.service = binder.getService();
 //        this.serviceState = this.service.getServiceState();
-        this.multiTagContextualState = this.service.getMultiTagContextualState();
+        this.multipleTagContextualState = this.service.getMultipleTagContextualState();
 
-        if (null == this.multiTagContextualState) {
+        if (null == this.multipleTagContextualState) {
             Log.e(this.getClass().toString(), "No contextual state has been provided.");
             finish();
         } else {
@@ -198,32 +174,35 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
             List<Runnable> callbacks = new ArrayList<>();
             callbacks.add(loadingFinishedCallback);
 
-            if(multiTagContextualState.getItemCount() != 1) {
-                progressDialogCallback.initDialog(this, res.getString(R.string.loading),
-                        res.getString(R.string.please_wait));
-                callbacks.add(progressDialogCallback);
-            }
+            progressDialogCallback.initDialog(this, res.getString(R.string.loading),
+                    res.getString(R.string.please_wait));
+            callbacks.add(progressDialogCallback);
 
-            multiTagContextualState.launchComponentsLoading();
-            multiTagContextualState.launchMultiTagCreation(callbacks);
+            multipleTagContextualState.launchComponentsLoading();
+            multipleTagContextualState.launchMultiTagCreation(callbacks);
         }
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
         this.service = null;
-//        this.serviceState = null;
     }
 
     /**
      * Start the suggestion activity.
      */
     private void callSuggestionActivity() {
-//        updateId3TagFromViews();
-        Intent intent = new Intent(this, SuggestionActivity.class);
-//        intent.putExtra(TagSuggestionActivity.TAG_KEY, new Id3TagParcelable(id3Tags));
-//        SharedObject.provideId3Tags(id3Tags);
-        startActivityForResult(intent, SUGGESTION_REQUEST_CODE);
+        progressDialogCallback.initDialog(this, res.getString(R.string.loading),
+                res.getString(R.string.please_wait));
+
+        MultipleId3Tag multipleId3Tag = updateMultipleId3TagFromViews();
+
+        List<Runnable> callbacks = new ArrayList<>();
+        callbacks.add(progressDialogCallback);
+        callbacks.add(new CallSuggestionActivityCallback());
+
+        multipleTagContextualState.launchUpdateModifiedId3Tag(multipleId3Tag, callbacks);
+
     }
 
 
@@ -239,9 +218,6 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
         EditText txtYear = ((FloatLabel) findViewById(R.id.txt_year)).getEditText();
         EditText txtDisc = ((FloatLabel) findViewById(R.id.txt_disc)).getEditText();
         EditText txtTrack = ((FloatLabel) findViewById(R.id.txt_track)).getEditText();
-//        EditText txtAlbumArtist = ((FloatLabel) findViewById(R.id.txt_album_artist)).getEditText();
-//        EditText txtComposer = ((FloatLabel) findViewById(R.id.txt_composer)).getEditText();
-//        EditText txtGrouping = ((FloatLabel) findViewById(R.id.txt_grouping)).getEditText();
         EditText txtGenre = ((FloatLabel) findViewById(R.id.txt_genre)).getEditText();
 
         views.put(SupportedTag.TITLE, txtTitle);
@@ -250,9 +226,6 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
         views.put(SupportedTag.YEAR, txtYear);
         views.put(SupportedTag.DISC_NO, txtDisc);
         views.put(SupportedTag.TRACK, txtTrack);
-//        views.put(SupportedTag.ALBUM_ARTIST, txtAlbumArtist);
-//        views.put(SupportedTag.COMPOSER, txtComposer);
-//        views.put(SupportedTag.GROUPING, txtGrouping);
         views.put(SupportedTag.GENRE, txtGenre);
 
         //TODO: Workaround
@@ -262,9 +235,9 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
 
     public void fillViews() {
 
-        txt_filename.setText(multiTagContextualState.getFilenames());
+        txt_filename.setText(multipleTagContextualState.getFilenames());
 
-        MultipleId3Tag multipleId3Tag = multiTagContextualState.getMultiTag();
+        MultipleId3Tag multipleId3Tag = multipleTagContextualState.getMultiTag();
         Id3Tag id3Tag = multipleId3Tag.getId3Tag();
         for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
             if (multipleId3Tag.isAMultipleTag(entry.getKey())) {
@@ -275,85 +248,8 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
         }
     }
 
-    /**
-     * Initialize the audio item and finish if it is not possible.
-     */
-//    public boolean initContent() {
-//        if (null == SharedObject.getComponents()) {
-//            Log.e(this.getClass().toString(), "No item has been provided.");
-//            finish();
-//            return false;
-//        } else if (null == SharedObject.getComponentFactory()) {
-//            Log.e(this.getClass().toString(), "No component factory has been provided.");
-//            finish();
-//            return false;
-//        } else {
-//            components = SharedObject.getComponents();
-//            componentFactory = SharedObject.getComponentFactory();
-//            return true;
-//        }
-//    }
-    private void loadContent() {
-
-//        loadingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.loading),
-//                res.getString(R.string.please_wait), true);
-//
-//
-////        final TagFormLoader.Callback finishLoading = new TagFormLoader.Callback() {
-////            @Override
-////            public void onPostExecute(MultipleId3Tag multipleId3Tag) {
-////                TagFormActivity.this.multipleId3Tag = multipleId3Tag;
-////                fillViews();
-////                loadingDialog.dismiss();
-////            }
-////        };
-//
-//        final AudioFileFilter.Callback tagFormLoaderLauncher = new AudioFileFilter.Callback() {
-//            @Override
-//            public void onPostExecute(Map<AudioFile, Id3Tag> audioFileId3TagMap) {
-////                TagFormActivity.this.id3Tags = audioFileId3TagMap;
-////                Id3Tag[] id3TagArray = TagFormActivity.this.id3Tags.values().toArray(new Id3Tag[id3Tags.size()]);
-////                AsyncTaskExecutor.execute(new TagFormLoader(finishLoading), id3TagArray);
-//                loadContent(audioFileId3TagMap);
-//            }
-//        };
-//
-//        final LibraryComponent[] componentArray = components.toArray(new LibraryComponent[components.size()]);
-//
-//        LibraryComponentLoader.Callback filterLauncher = new LibraryComponentLoader.Callback() {
-//
-//            @Override
-//            public void onProgressUpdate(LibraryComposite composite) {
-//
-//            }
-//
-//            @Override
-//            public void onPostExecute(/*List<LibraryComposite> results*/) {
-//                AsyncTaskExecutor.execute(new AudioFileFilter(tagFormLoaderLauncher), componentArray);
-//            }
-//        };
-
-//        AsyncTaskExecutor.execute(loaderManager.get(true, filterLauncher), componentArray);
-    }
-
-//    private void loadContent(Map<AudioFile, Id3Tag> audioFileId3TagMap) {
-//        loadingDialog.show();
-//        final TagFormLoader.Callback finishLoading = new TagFormLoader.Callback() {
-//            @Override
-//            public void onPostExecute(MultipleId3Tag multipleId3Tag) {
-//                TagFormActivity.this.multipleId3Tag = multipleId3Tag;
-//                fillViews();
-//                loadingDialog.dismiss();
-//            }
-//        };
-//
-//        TagFormActivity.this.id3Tags = audioFileId3TagMap;
-//        Id3Tag[] id3TagArray = TagFormActivity.this.id3Tags.values().toArray(new Id3Tag[id3Tags.size()]);
-//        AsyncTaskExecutor.execute(new TagFormLoader(finishLoading), id3TagArray);
-//    }
-
-    public void saveContentAndFinish() {
-        MultipleId3Tag multipleId3Tag = multiTagContextualState.getMultiTag();
+    public MultipleId3Tag updateMultipleId3TagFromViews() {
+        MultipleId3Tag multipleId3Tag = multipleTagContextualState.getMultiTag();
 
         for (Map.Entry<SupportedTag, EditText> entry : views.entrySet()) {
             String value = entry.getValue().getText().toString();
@@ -363,33 +259,23 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
             }
         }
 
+        return multipleId3Tag;
+    }
+
+    public void saveContentAndFinish() {
+        MultipleId3Tag multipleId3Tag = updateMultipleId3TagFromViews();
+
         List<Runnable> callbacks = new ArrayList<>();
         callbacks.add(finishCallback);
-        if(multiTagContextualState.getItemCount() != 1) {
+        
+        if (multipleTagContextualState.getItemCount() != 1) {
             progressDialogCallback.initDialog(this, res.getString(R.string.saving),
                     res.getString(R.string.please_wait));
             callbacks.add(progressDialogCallback);
         }
 
-        multiTagContextualState.launchSaving(callbacks);
-//        savingDialog = ProgressDialog.show(TagFormActivity.this, res.getString(R.string.saving),
-//                res.getString(R.string.please_wait), true);
-
-//
-//        TagSaver saver = new TagSaver(multipleId3Tag, wrapper, new TagSaver.Callback() {
-//            @Override
-//            public void onPostExecution() {
-//                savingDialog.dismiss();
-//                Intent intent = new Intent();
-//                setResult(RESULT_OK, intent);
-//                finish();
-//            }
-//        });
-//
-//        AsyncTaskExecutor.execute(saver, id3Tags);
+        multipleTagContextualState.launchSaving(multipleId3Tag, callbacks);
     }
-
-
 
 
     class FinishCallback implements Runnable {
@@ -407,6 +293,16 @@ public class TagFormActivity extends Activity implements ServiceConnection, View
         @Override
         public void run() {
             fillViews();
+        }
+    }
+
+    class CallSuggestionActivityCallback implements Runnable {
+
+        @Override
+        public void run() {
+            service.initSuggestionContextualState(multipleTagContextualState.getModifiedId3Tags());
+            Intent intent = new Intent(TagFormActivity.this, SuggestionActivity.class);
+            startActivityForResult(intent, SUGGESTION_REQUEST_CODE);
         }
     }
 

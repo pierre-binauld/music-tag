@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import binauld.pierre.musictag.R;
 import binauld.pierre.musictag.composite.LibraryComponent;
@@ -19,11 +20,15 @@ import binauld.pierre.musictag.decoder.BitmapDecoder;
 import binauld.pierre.musictag.decoder.ResourceBitmapDecoder;
 import binauld.pierre.musictag.factory.LibraryComponentFactory;
 import binauld.pierre.musictag.helper.LibraryComponentFactoryHelper;
+import binauld.pierre.musictag.item.AudioFile;
 import binauld.pierre.musictag.service.state.LibraryServiceState;
-import binauld.pierre.musictag.service.state.MultiTagContextualState;
+import binauld.pierre.musictag.service.state.MultipleTagContextualState;
+import binauld.pierre.musictag.service.state.SuggestionContextualState;
 import binauld.pierre.musictag.service.state.impl.LibraryServiceStateImpl;
-import binauld.pierre.musictag.service.state.impl.MultiTagContextualStateImpl;
+import binauld.pierre.musictag.service.state.impl.MultipleTagContextualStateImpl;
+import binauld.pierre.musictag.service.state.impl.SuggestionContextualStateImpl;
 import binauld.pierre.musictag.service.task.LoadingTaskBuilder;
+import binauld.pierre.musictag.tag.Id3Tag;
 import binauld.pierre.musictag.task.AsyncTaskExecutor;
 import binauld.pierre.musictag.wrapper.FileWrapper;
 import binauld.pierre.musictag.wrapper.jaudiotagger.JAudioTaggerWrapper;
@@ -40,7 +45,8 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
     private LibraryComponentFactory componentFactory;
 
     private LibraryServiceState serviceState;
-    private MultiTagContextualState multiTagContextualState;
+    private MultipleTagContextualState multipleTagContextualState;
+    private SuggestionContextualState suggestionContextualState;
 
     private LoadingTaskBuilder loadingTaskBuilder;
     private ArtworkManager artworkManager;
@@ -121,15 +127,33 @@ public class LibraryServiceImpl extends Service implements LibraryService, Share
     }
 
     @Override
-    public void initMultiTagContextualState(List<LibraryComponent> components) {
-        multiTagContextualState = new MultiTagContextualStateImpl(serviceWorker, loadingTaskBuilder, components, fileWrapper);
+    public void initMultipleTagContextualState(List<LibraryComponent> components) {
+        multipleTagContextualState = new MultipleTagContextualStateImpl(serviceWorker, loadingTaskBuilder, components, fileWrapper);
     }
 
     @Override
-    public MultiTagContextualState getMultiTagContextualState() {
-        MultiTagContextualState mtcs = multiTagContextualState;
-        multiTagContextualState = null;
-        return mtcs;
+    public MultipleTagContextualState getMultipleTagContextualState() {
+        return multipleTagContextualState;
+    }
+
+    @Override
+    public void clearMultipleTagContextualState() {
+        multipleTagContextualState = null;
+    }
+
+    @Override
+    public void initSuggestionContextualState(Map<AudioFile, Id3Tag> modifiedId3Tags) {
+        suggestionContextualState = new SuggestionContextualStateImpl(modifiedId3Tags);
+    }
+
+    @Override
+    public SuggestionContextualState getSuggestionContextualState() {
+        return suggestionContextualState;
+    }
+
+    @Override
+    public void clearSuggestionContextualState() {
+        suggestionContextualState = null;
     }
 
     public class LibraryServiceBinder extends Binder {
